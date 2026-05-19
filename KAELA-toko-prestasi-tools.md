@@ -133,8 +133,8 @@ window.electronAPI = {
 ```cmd
 cd "D:\KAELA PROJECT\#APLIKASIKU\TOKO PRESTASI TOOLS"
 node generate-manifest.js
-# Masukkan versi baru (misal: 2.3)
-git add . && git commit -m "v2.3: deskripsi perubahan" && git push
+# Masukkan versi baru (misal: 2.4)
+git add . && git commit -m "v2.4: deskripsi perubahan" && git push
 ```
 Client akan dapat notif UPDATE dalam 5 menit.
 
@@ -227,6 +227,16 @@ Windows Electron tidak support print preview via `window.print()`. Solusi: gener
 
 ### Kenapa cetak.html perlu setWindowOpenHandler?
 `cetak.html` dibuka via `window.open()` — child window tidak otomatis dapat preload.js. `setWindowOpenHandler` di `main.js` memastikan semua child window inject preload yang sama.
+
+---
+
+## RIWAYAT VERSI
+
+| Versi | Tanggal | Perubahan |
+|-------|---------|-----------|
+| v2.1 | — | Versi EXE awal — basis distribusi ke komputer toko |
+| v2.2 | 19 Mei 2026 | Fix foto Nexus Forge, fix klik kanan popup, fix print PDF (cetak foto + barcode), fix footer tercetak |
+| v2.3 | 20 Mei 2026 | Hapus ikon gunting ✂ dari garis potong cetak foto & barcode, garis potong lebih kontrast (#555) |
 
 ---
 

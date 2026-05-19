@@ -7,6 +7,43 @@
 let currentMode    = 'foto';   // 'foto' | 'dokumen' | 'barcode'
 let generatedPrompt = '';
 
+/* ── CHANGELOG ── */
+const GITHUB_RAW = 'https://raw.githubusercontent.com/kaelatkp/toko-prestasi-tools/main';
+
+async function loadChangelog() {
+  try {
+    const r    = await fetch(GITHUB_RAW + '/changelog.json?t=' + Date.now());
+    const data = await r.json();
+    if (!data.updates?.length) return;
+
+    const wrap = document.getElementById('brnd-changelog');
+    const body = document.getElementById('changelog-body');
+    if (!wrap || !body) return;
+
+    const items = data.updates.slice(0, 20);
+    body.innerHTML = items.map(u => `
+      <div class="cl-item">
+        <div class="cl-item-header">
+          <span class="cl-ver">v${u.version}</span>
+          <span class="cl-date">${u.date}</span>
+        </div>
+        <ul class="cl-notes">${u.notes.map(n => `<li>${n}</li>`).join('')}</ul>
+      </div>
+    `).join('');
+
+    wrap.style.display = '';
+  } catch (_) { /* offline — panel tersembunyi */ }
+}
+
+function toggleChangelog() {
+  const body   = document.getElementById('changelog-body');
+  const toggle = document.getElementById('changelog-toggle');
+  if (!body) return;
+  const open = body.style.display !== 'none' && body.style.display !== '';
+  body.style.display   = open ? 'none' : 'block';
+  toggle.style.transform = open ? '' : 'rotate(180deg)';
+}
+
 /* ── PLATFORM URLS ── */
 const PLATFORM_URLS = {
   claude:  'https://claude.ai/new',
@@ -114,7 +151,7 @@ function startSplashLoading() {
   const codeBg = document.getElementById('spl-code-bg');
   if (codeBg) {
     const CODE_LINES = [
-      '// Toko Prestasi Tools v2.1 — Nexus Forge Team',
+      '// Toko Prestasi Tools v2.3 — Nexus Forge Team',
       'import { FotoModule } from "./modules/foto";',
       'import { DokumenModule } from "./modules/dokumen";',
       'const WAJAH_RULE = { strict: true, protect: "identity", version: "2.1" };',
@@ -193,7 +230,7 @@ function startSplashLoading() {
   /* ══ FASE 2: BIOS Pre-boot sequence ══ */
   const BIOS = [
     { t: 'sep',    s: '══════════════════════════════════════════════════════════════' },
-    { t: 'bright', s: '  TOKO PRESTASI TOOLS  ::  BIOS v2.1  (C) 2024 NEXUS FORGE TEAM' },
+    { t: 'bright', s: '  TOKO PRESTASI TOOLS  ::  BIOS v2.3  (C) 2024 NEXUS FORGE TEAM' },
     { t: 'sep',    s: '══════════════════════════════════════════════════════════════' },
     { t: '',       s: '' },
     { t: 'dim',    s: '  CPU   : NEXUS-CORE x8 @ 3.60GHz ................. [OK]' },
@@ -206,7 +243,7 @@ function startSplashLoading() {
     { t: 'bright', s: '  FOTO MODULE   [25] : ████████████████████ LOADED' },
     { t: 'bright', s: '  DOKUMEN MODULE[28] : ████████████████████ LOADED' },
     { t: 'bright', s: '  BARCODE ENGINE     : ████████████████████ LOADED' },
-    { t: 'bright', s: '  PROMPT ENGINE v2.1 : ████████████████████ LOADED' },
+    { t: 'bright', s: '  PROMPT ENGINE v2.3 : ████████████████████ LOADED' },
     { t: 'bright', s: '  WAJAH_RULE         : ████████████████████ ACTIVE' },
     { t: '',       s: '' },
     { t: 'bright', s: '  Memulai Toko Prestasi Tools...' },
@@ -260,7 +297,7 @@ function startSplashLoading() {
       '[ NET ] Kompatibel: Claude AI · Gemini · ChatGPT — tidak perlu API key apapun',
       '[ SEC ] Zero API mode — tidak ada biaya tersembunyi, tidak ada batas kuota',
       '[ OPS ] Auto-fill tanggal & kota — hemat waktu di setiap pembuatan dokumen',
-      '[ ENG ] Prompt engine v2.1 — output terstruktur dan konsisten setiap generate',
+      '[ ENG ] Prompt engine v2.3 — output terstruktur dan konsisten setiap generate',
       '[ RULE] CROP_RULE aktif — canvas margin +15% untuk crop watermark yang optimal',
       '[ LOC ] Jl. Poros Sp 4, Marga Mulia, Kongbeng, Kutai-Timur · Buka 07:00–21:00',
       '[ DEV ] Dibangun oleh Nexus Forge Team — hubungi: 0812-99-303-888',
@@ -278,12 +315,12 @@ function startSplashLoading() {
 
     // Terminal messages
     const MSGS = [
-      ['BOOT', 'Menginisialisasi Toko Prestasi Tools v2.1...'],
+      ['BOOT', 'Menginisialisasi Toko Prestasi Tools v2.3...'],
       ['LOAD', 'Memuat komponen antarmuka utama...'],
       ['MOD ', 'Mendaftarkan 25 modul foto ke sistem...'],
       ['MOD ', 'Mendaftarkan 28 jenis dokumen ATK...'],
       ['RULE', 'Mengaktifkan WAJAH_RULE — proteksi identitas ON'],
-      ['ENG ', 'Menginisialisasi prompt engine v2.1...'],
+      ['ENG ', 'Menginisialisasi prompt engine v2.3...'],
       ['SYNC', 'Menyinkronkan preset chips & template dokumen...'],
       ['CODE', 'Memuat barcode engine CODE128A v3.11...'],
       ['NET ', 'Menghubungkan: Claude AI · Gemini · ChatGPT...'],
@@ -661,7 +698,7 @@ function laporkanBug() {
       ? document.querySelector('.dok-btn.active')
       : null;
   const namaModul = aktifEl ? (aktifEl.title || aktifEl.textContent.trim()) : modeLabel;
-  const msg = `🐛 Bug Report — Toko Prestasi Tools\n\nModul: ${namaModul}\nVersi: v2.1\n\nDeskripsi bug:\n`;
+  const msg = `🐛 Bug Report — Toko Prestasi Tools\n\nModul: ${namaModul}\nVersi: v2.3\n\nDeskripsi bug:\n`;
   window.open('https://wa.me/6281299303888?text=' + encodeURIComponent(msg), '_blank');
 }
 

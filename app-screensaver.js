@@ -48,7 +48,7 @@ function initScreensaver() {
     '> wajah_lock: ENABLED — identitas aman',
     '> modul_dokumen[28]: all loaded [OK]',
     '> barcode_engine: CODE128A v3.11 [READY]',
-    '> prompt_engine: v2.1 [ACTIVE]',
+    '> prompt_engine: v2.3 [ACTIVE]',
     '> crop_rule: +15% canvas expansion ON',
     '> zero_api_mode: billing=false quota=false',
     '> nexus_forge.build: PASSING',
@@ -97,7 +97,7 @@ function initScreensaver() {
     'applyPreset()','generatePrompt()','initGroups()',
     'claude.ai','gemini.google','chatgpt.com',
     '✓ ZERO API','✓ NO QUOTA','✓ OFFLINE READY',
-    'Nexus Forge','v2.1','CODE128A',
+    'Nexus Forge','v2.3','CODE128A',
     '25 Modul Foto','28 Dokumen',
   ];
   const STATUS_ITEMS = [
@@ -151,7 +151,7 @@ function initScreensaver() {
 
   /* ══ Layer 1: Code-typing scrolling background ══ */
   const SS_CODE = [
-    '// Toko Prestasi Tools v2.1 — Nexus Forge',
+    '// Toko Prestasi Tools v2.3 — Nexus Forge',
     'import { FotoModule } from "./modules/foto";',
     'const WAJAH_RULE = { strict: true, version: "2.1" };',
     'function generatePrompt(config) {',
@@ -321,7 +321,7 @@ function initScreensaver() {
     wrap.style.cssText = 'position:absolute;bottom:80px;right:22px;width:320px;background:rgba(1,8,4,0.9);border:1px solid rgba(0,200,83,0.18);border-radius:12px;padding:10px 14px;z-index:30;pointer-events:none;';
     const head = document.createElement('div');
     head.style.cssText = 'font-family:"DM Mono",monospace;font-size:8px;color:rgba(0,200,83,0.4);letter-spacing:2px;margin-bottom:8px;';
-    head.textContent = 'MEM DUMP :: PROMPT ENGINE v2.1';
+    head.textContent = 'MEM DUMP :: PROMPT ENGINE v2.3';
     wrap.appendChild(head);
     hexEl = document.createElement('div');
     hexEl.style.cssText = 'font-family:"DM Mono",monospace;font-size:9px;color:rgba(0,200,83,0.5);line-height:1.8;letter-spacing:.6px;';

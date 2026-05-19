@@ -1,0 +1,35 @@
+{
+  "updates": [
+    {
+      "version": "2.3",
+      "date": "20 Mei 2026",
+      "notes": [
+        "Hapus ikon gunting dari garis potong cetak foto",
+        "Hapus ikon gunting dari garis potong cetak barcode",
+        "Garis potong lebih kontrast (#555)"
+      ]
+    },
+    {
+      "version": "2.2",
+      "date": "19 Mei 2026",
+      "notes": [
+        "Fix foto tim Nexus Forge tidak tampil di EXE",
+        "Fix klik kanan tidak bisa di popup referensi foto",
+        "Fix print preview tidak muncul di cetak foto",
+        "Fix print barcode tidak support PDF preview",
+        "Fix cetak foto mencetak halaman utama (bukan halaman cetak)",
+        "Fix footer ikut tercetak (jadi 2 halaman)",
+        "Fix popup cetak.html tidak dapat electronAPI"
+      ]
+    },
+    {
+      "version": "2.1",
+      "date": "Mei 2026",
+      "notes": [
+        "Rilis pertama distribusi ke komputer toko",
+        "EXE installer & portable tersedia di GitHub Releases",
+        "Update otomatis via GitHub tanpa reinstall"
+      ]
+    }
+  ]
+}

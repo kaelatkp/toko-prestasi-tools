@@ -1531,6 +1531,49 @@ body {
   font-size: 12px; font-weight: 700; color: #00C853;
   padding-top: 10px;
 }
+/* ── Changelog panel ── */
+.brnd-changelog {
+  margin: 0 28px 20px; border-radius: 12px;
+  border: 1.5px solid #ddeee4; background: #f9fdfb; overflow: hidden;
+}
+.brnd-changelog-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px; cursor: pointer; user-select: none;
+  transition: background 0.15s;
+}
+.brnd-changelog-header:hover { background: #f0faf4; }
+.brnd-changelog-title {
+  font-size: 12px; font-weight: 700; color: #3a7a52;
+  font-family: 'Sora', sans-serif; letter-spacing: 0.2px;
+}
+.brnd-changelog-toggle {
+  font-size: 10px; color: #7fb894; transition: transform 0.2s;
+}
+.brnd-changelog-body {
+  border-top: 1px solid #e2f0e8; padding: 10px 16px 12px;
+  display: none; max-height: 320px; overflow-y: auto;
+}
+.cl-item { margin-bottom: 14px; }
+.cl-item:last-child { margin-bottom: 0; }
+.cl-item-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+}
+.cl-ver {
+  font-size: 11px; font-weight: 700; color: #fff;
+  background: #00C853; border-radius: 5px; padding: 1px 7px;
+  font-family: 'DM Mono', monospace;
+}
+.cl-date {
+  font-size: 10px; color: #8db0a0; font-family: 'DM Mono', monospace;
+}
+.cl-notes {
+  margin: 0; padding-left: 16px; list-style: disc;
+}
+.cl-notes li {
+  font-size: 11px; color: #3d5c49; line-height: 1.6;
+  font-family: 'Sora', sans-serif;
+}
+
 .brnd-footer {
   padding: 10px 40px; margin-top: auto; flex-shrink: 0;
   text-align: center; font-size: 9.5px;
