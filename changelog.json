@@ -4,7 +4,11 @@
       "version": "2.5",
       "date": "20 Mei 2026",
       "notes": [
-        "✨ Ada yang baru hari ini — temukan sendiri!"
+        "Beranda ganti tema warna otomatis setiap hari",
+        "Edit Foto: garis tengah draggable (cyan) untuk luruskan posisi wajah",
+        "Edit Foto: slider Saturasi warna",
+        "Fix marquee teks tidak berjalan horizontal",
+        "Popup Riwayat Update muncul otomatis setelah masuk app"
       ]
     },
     {
