@@ -4,11 +4,7 @@
       "version": "2.5",
       "date": "20 Mei 2026",
       "notes": [
-        "Daily Theme System — beranda ganti warna & pesan otomatis setiap hari",
-        "Pesan dari anggota Nexus Forge di marquee harian (7 hari berbeda)",
-        "Dev panel Ctrl+Shift+T untuk preview semua 10 event theme",
-        "Fix marquee harian tidak scroll horizontal (text wrap bug)",
-        "Fix Ctrl+Shift+T tidak respons (case-insensitive + z-index fix)"
+        "✨ Ada yang baru hari ini — temukan sendiri!"
       ]
     },
     {
