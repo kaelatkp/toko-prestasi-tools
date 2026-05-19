@@ -170,15 +170,14 @@
 
 <!-- SPLASH SCREEN — LOADING V3 -->
 <div id="app-splash">
-  <!-- Layer 0: Code-typing scrolling background -->
-  <div id="spl-code-bg"></div>
+  <!-- Particle canvas background -->
+  <canvas id="spl-particles"></canvas>
 
-  <!-- Layer 1: BIOS pre-boot overlay -->
-  <div id="spl-preboot"></div>
-
-  <!-- Layer 2: Main content (glass panels) -->
+  <!-- Main content -->
   <div id="spl-main">
-    <div class="spl-top">
+
+    <!-- Center glass card -->
+    <div class="spl-card">
       <div class="spl-brand-row">
         <div class="spl-brand-icon"><img src="icon.png" alt="icon"></div>
         <div>
@@ -186,28 +185,14 @@
           <div class="spl-brand-tagline">Sistem Produktivitas · Foto · Dokumen · Barcode</div>
         </div>
       </div>
-    </div>
-
-    <div class="spl-loading-area">
       <div class="spl-pbar-row">
         <div class="spl-pbar-track"><div class="spl-pbar-fill" id="spl-fill"></div></div>
         <div class="spl-pct" id="spl-pct">0%</div>
       </div>
-      <div class="spl-terminal">
-        <div class="spl-term-head">
-          <div class="spl-term-dots">
-            <span class="spl-term-dot" style="background:#e74c3c;"></span>
-            <span class="spl-term-dot" style="background:#f39c12;"></span>
-            <span class="spl-term-dot" style="background:#00C853;"></span>
-          </div>
-          TOKO PRESTASI TOOLS :: INIT LOG
-        </div>
-        <div class="spl-term-body" id="spl-term-body"></div>
-      </div>
+      <div class="spl-tip" id="spl-tip">Memuat sistem...</div>
     </div>
 
-    <div class="spl-tip" id="spl-tip"></div>
-
+    <!-- Bottom store info -->
     <div class="spl-bottom">
       <div class="spl-info-grid">
         <div class="spl-info-col">
@@ -231,6 +216,7 @@
       </div>
       <button class="spl-btn-masuk" id="spl-btn" onclick="appMasuk()" style="display:none"></button>
     </div>
+
   </div>
 </div>
 
@@ -259,6 +245,11 @@
     </div>
     <div class="brnd-ver">v2.3</div>
   </div>
+
+  <div id="event-marquee"></div>
+  <div id="daily-marquee"></div>
+
+  <div id="event-banner"></div>
 
   <div class="brnd-hero">
     <div class="brnd-hero-title">Semua yang kamu butuhkan, <span>dalam satu tempat</span></div>
@@ -340,15 +331,10 @@
     </div>
   </div>
 
-  <div class="brnd-changelog" id="brnd-changelog" style="display:none">
-    <div class="brnd-changelog-header" onclick="toggleChangelog()">
-      <span class="brnd-changelog-title">📋 Riwayat Update</span>
-      <span class="brnd-changelog-toggle" id="changelog-toggle">▼</span>
-    </div>
-    <div class="brnd-changelog-body" id="changelog-body"></div>
+  <div class="brnd-footer">
+    <span>Prestasi Tools v2.3 &nbsp;·&nbsp; Nexus Forge &nbsp;·&nbsp; Jl. Poros Sp 4, Kongbeng, Kutai-Timur</span>
+    <button class="brnd-cl-btn" id="brnd-cl-btn" onclick="openChangelog()" title="Riwayat Update">📋 Update</button>
   </div>
-
-  <div class="brnd-footer">Prestasi Tools v2.3 &nbsp;·&nbsp; Nexus Forge &nbsp;·&nbsp; Jl. Poros Sp 4, Kongbeng, Kutai-Timur</div>
 </div>
 
 <!-- APP -->
@@ -1012,51 +998,57 @@
       <div class="bc-identity bc-identity-row">
         <div class="bc-field-wrap" style="flex:1.5">
           <label>Nama Toko</label>
-          <input type="text" id="bc-nama-toko" value="Toko Prestasi" placeholder="Nama toko" oninput="bcRenderPreview()" title="Nama toko yang dicetak di header halaman barcode">
+          <input type="text" id="bc-nama-toko" value="Toko Prestasi" readonly
+            style="background:var(--bg-2);color:var(--text-3);cursor:default;"
+            title="Nama toko terkunci sesuai aplikasi">
         </div>
         <div class="bc-field-wrap" style="flex:1">
           <label>Dibuat Oleh <span style="font-weight:400;font-size:8px;opacity:.7">(opsional)</span></label>
-          <input type="text" id="bc-created-by" placeholder="Nama kasir" oninput="bcRenderPreview()" title="Nama kasir atau operator (opsional) — ditampilkan kecil di footer halaman">
+          <input type="text" id="bc-created-by" placeholder="Nama kasir" maxlength="10"
+            oninput="this.value=this.value.toUpperCase();bcRenderPreview()"
+            title="Nama kasir/operator — opsional, maks 10 karakter">
         </div>
       </div>
 
       <div class="bc-section-header">📐 Layout Cetak</div>
       <div class="bc-layout">
         <div class="bc-layout-top-row">
-          <div class="bc-field-wrap" style="flex:1.2">
+          <div class="bc-field-wrap" style="flex:1.4">
             <label>Ukuran</label>
-            <select id="bc-paper-size" onchange="bcRenderPreview()" title="Pilih ukuran kertas printer. A4 untuk printer standar, F4/Folio untuk kertas panjang">
+            <select id="bc-paper-size" onchange="bcRenderPreview()" title="Pilih ukuran kertas printer">
               <option value="A4">A4 (210×297 mm)</option>
               <option value="F4">F4 / Folio (215×330 mm)</option>
             </select>
           </div>
-          <div class="bc-field-wrap" style="flex:1">
+          <div class="bc-field-wrap">
             <label>Orientasi</label>
             <div class="bc-orient-btns">
-              <button class="bc-orient-btn" id="bc-btn-portrait" onclick="bcSetOrient('portrait')" title="Orientasi Portrait: kertas berdiri, lebih banyak baris">▯ Portrait</button>
-              <button class="bc-orient-btn active" id="bc-btn-landscape" onclick="bcSetOrient('landscape')" title="Orientasi Landscape: kertas tidur, lebih banyak kolom — cocok untuk barcode kecil">▭ Landscape</button>
+              <button class="bc-orient-btn" id="bc-btn-portrait" onclick="bcSetOrient('portrait')" title="Portrait — kertas berdiri">▯</button>
+              <button class="bc-orient-btn active" id="bc-btn-landscape" onclick="bcSetOrient('landscape')" title="Landscape — kertas tidur">▭</button>
             </div>
           </div>
+          <div class="bc-field-wrap" style="align-self:flex-end">
+            <button class="bc-btn-reset" onclick="bcResetLayoutDefault()" title="Reset ke default (Landscape, 10×10, Gap 2mm, Margin 2mm)">↺ Reset</button>
+          </div>
         </div>
-        <div class="bc-grid-fields">
+        <div class="bc-grid-fields-4">
           <div class="bc-field-wrap">
             <label>Kolom</label>
-            <input type="number" id="bc-cols" value="10" min="1" max="20" oninput="bcRenderPreview()" style="text-align:center;" title="Jumlah kolom barcode per baris (1–20)">
+            <input type="number" id="bc-cols" value="10" min="1" max="20" oninput="bcRenderPreview()" style="text-align:center;">
           </div>
           <div class="bc-field-wrap">
             <label>Baris</label>
-            <input type="number" id="bc-rows" value="10" min="1" max="30" oninput="bcRenderPreview()" style="text-align:center;" title="Jumlah baris barcode per halaman (1–30)">
+            <input type="number" id="bc-rows" value="10" min="1" max="30" oninput="bcRenderPreview()" style="text-align:center;">
           </div>
           <div class="bc-field-wrap">
             <label>Gap (mm)</label>
-            <input type="number" id="bc-gap" value="2" min="0" max="10" step="0.5" oninput="bcRenderPreview()" style="text-align:center;" title="Jarak antar barcode dalam mm. Lebih besar = lebih mudah dipotong, ukuran barcode lebih kecil">
+            <input type="number" id="bc-gap" value="2" min="0" max="10" step="0.5" oninput="bcRenderPreview()" style="text-align:center;">
           </div>
           <div class="bc-field-wrap">
             <label>Margin (mm)</label>
-            <input type="number" id="bc-margin" value="2" min="0" max="20" oninput="bcRenderPreview()" style="text-align:center;" title="Margin tepi halaman dalam mm — jarak dari tepi kertas ke barcode pertama">
+            <input type="number" id="bc-margin" value="2" min="0" max="20" oninput="bcRenderPreview()" style="text-align:center;">
           </div>
         </div>
-        <button class="bc-btn-reset" onclick="bcResetLayoutDefault()" title="Kembalikan semua pengaturan layout ke nilai default (Landscape, 10×10, Gap 2mm, Margin 2mm)">↺ Reset Default</button>
       </div>
 
       <div class="bc-section-header">📦 Data Produk</div>
@@ -1072,6 +1064,8 @@
 
   <!-- MAIN -->
   <main class="main">
+
+    <div id="tool-marquee"></div>
 
     <!-- WELCOME FOTO -->
     <div class="welcome" id="welcome">
@@ -1656,6 +1650,8 @@ initScreensaver();
 initPingWidget();
 startSplashLoading();
 loadChangelog();
+applyDailyTheme();
+loadEventTheme();
 
 /* ── EVENT AUTO-HOT: COMING SOON INFO ── */
 function showEventSoonInfo() {

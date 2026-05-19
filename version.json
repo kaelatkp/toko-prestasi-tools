@@ -1,15 +1,15 @@
 {
-  "version": "2.4",
+  "version": "2.5",
   "files": {
-    "index.html": "4d89cbc117fd5b050acaacab9cf4fad16bfb676615bf935984ccf4cf83ddd70f",
-    "tokens.css": "4e0250b70480c7f254bb7c441adf2cbfb33915799f2be4bb5209d99e46aac859",
+    "index.html": "25bd44dbefa86b2fb0b21f3c4bdea8e7d4e39fbd0fac421f5c850beebe9d21e1",
+    "tokens.css": "3ad812b42d15766e2986f25ae475c1182571b67340b9d0e528492d49fbea67e2",
     "config.js": "8709f3637aea0ebf52434acea01f1c3b9005b8e6b2588b342c327e7b9ab8ba6e",
-    "app-core.js": "ec6c7bea05269015e2e6311b866ed7d0edfb153fe002454e5337fd9900c462d8",
+    "app-core.js": "4a0d99f8d4db9e35ec5f8a2adc38f93fffa5c3f521bd994002b8f524e3119f81",
     "app-foto.js": "e389bd0d560de9099ad2f7aa099460be6d26e137843ec6ed7653539ab7711925",
     "app-dokumen.js": "6bd143aa9a5f3dd6429669160408bae9314eb95f8b47c42b0ba1117e9bb84eb2",
-    "app-barcode.js": "856ecef3d44740deea173158d692dc9fecbf87a92ad4572d8246904eac810f2a",
+    "app-barcode.js": "b53222a35cd1ed981d15512129aae6eb8a1ff56850bbf7b72c5ec58c57c8412e",
     "app-screensaver.js": "466fa97248344257940eb9d26eb4bbe0b148fba89fb65d9b1393daebdd9be79b",
-    "app-cetak.js": "a3f7f52a30e93e2579462030096eb9e92dc49bbfb8e3c636c24e1e0a80c3e979",
-    "cetak.html": "014133d9cb80eca5833b5daa8f54f1786d67038d6339ef3626aa703234912794"
+    "app-cetak.js": "73ae8b603433dac2aa0be814ac5aa23f78d33b1905855f4172e381c9485f0e49",
+    "cetak.html": "2946f45e9d9312ddfdb128733fe14f7ec73e70d57cbdd3c5b3be318565979d0e"
   }
 }
