@@ -11,7 +11,7 @@ let generatedPrompt = '';
 const GITHUB_RAW = 'https://raw.githubusercontent.com/kaelatkp/toko-prestasi-tools/main';
 
 /* ── CHANGELOG ── */
-const CL_SEEN_KEY = 'tp_cl_seen_v2.3';
+const CL_SEEN_KEY = 'tp_cl_seen_v2.5';
 let _clData = null;
 
 async function loadChangelog() {
