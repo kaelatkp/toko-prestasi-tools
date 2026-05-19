@@ -1815,15 +1815,16 @@ body.cyberpunk-mode .ws-steps { background: rgba(0,229,255,.04); border-color: r
 #daily-marquee {
   display: none;
   overflow: hidden;
+  height: 30px; line-height: 30px;
   font-size: 11px; font-family: 'DM Mono', monospace;
-  padding: 7px 0; letter-spacing: 0.1px;
+  letter-spacing: 0.1px; flex-shrink: 0;
   background: rgba(0,0,0,0.035);
   color: var(--green-dim);
   border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 #daily-marquee.active { display: block; }
-.daily-track { animation-duration: 70s; }
-.daily-track strong { color: var(--green-dark); font-weight: 700; font-style: normal; }
+.daily-track { animation-duration: 70s; white-space: nowrap; }
+.daily-track strong { color: var(--green-dark); font-weight: 700; }
 .daily-track em { font-style: normal; opacity: 0.85; }
 
 /* ── SPOTLIGHT CARD ── */
