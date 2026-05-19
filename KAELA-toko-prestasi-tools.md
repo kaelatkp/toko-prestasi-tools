@@ -1,5 +1,5 @@
 # TOKO PRESTASI TOOLS — HANDOFF DOCUMENT
-> Terakhir diperbarui: 20 Mei 2026 · v2.3 · Ditulis oleh Kaela (AI Architect)
+> Terakhir diperbarui: 20 Mei 2026 · v2.5 · Ditulis oleh Kaela (AI Architect)
 
 ---
 
@@ -7,7 +7,7 @@
 
 Aplikasi desktop Windows untuk Toko Prestasi — generator prompt foto AI, dokumen resmi, barcode label, cetak foto, dan screensaver toko. Dibangun dengan Electron (wrapper HTML/CSS/JS), didistribusikan via GitHub Releases, update otomatis via GitHub raw.
 
-**Status:** ✅ Resmi Launch & Approved — v2.3
+**Status:** ✅ Aktif & Live — v2.5
 
 ---
 
@@ -54,15 +54,17 @@ TOKO PRESTASI TOOLS/
 ├── index.html              ← Main app (semua modul di-render di sini)
 ├── tokens.css              ← Design tokens & CSS global
 ├── config.js               ← Konfigurasi toko (nama, alamat, kontak)
-├── app-core.js             ← Core logic, navigasi, splash screen
+├── app-core.js             ← Core logic, navigasi, splash screen, daily theme
 ├── app-foto.js             ← Generator prompt foto (25 modul)
 ├── app-dokumen.js          ← Generator dokumen resmi
 ├── app-barcode.js          ← Generator & cetak barcode label
 ├── app-screensaver.js      ← Screensaver display toko
 ├── app-cetak.js            ← Modul cetak foto (queue, layout, PDF)
 ├── cetak.html              ← Halaman cetak foto (window.open terpisah)
+├── themes.json             ← Data event themes (Idul Adha, HUT RI, dll)
+├── changelog.json          ← Riwayat update — edit manual, entry terbaru di atas
 ├── icon.png                ← Icon aplikasi
-├── version.json            ← Manifest versi + hash semua file
+├── version.json            ← Manifest versi + hash semua file (auto-generated)
 ├── crew/                   ← Foto Nexus Forge team (14 PNG ~2MB each)
 │   ├── NEXUS_FORGE_OLAN.png
 │   ├── NEXUS_FORGE_KAELA.png
@@ -133,8 +135,8 @@ window.electronAPI = {
 ```cmd
 cd "D:\KAELA PROJECT\#APLIKASIKU\TOKO PRESTASI TOOLS"
 node generate-manifest.js
-# Masukkan versi baru (misal: 2.4)
-git add . && git commit -m "v2.4: deskripsi perubahan" && git push
+# Masukkan versi baru (misal: 2.5)
+git add . && git commit -m "v2.5: deskripsi perubahan" && git push
 ```
 Client akan dapat notif UPDATE dalam 5 menit.
 
@@ -153,7 +155,7 @@ Lalu buka GitHub Release → edit → replace file EXE lama dengan yang baru dar
 ### Kapan TIDAK perlu rebuild:
 - Edit HTML, CSS, JS app files
 - Tambah modul baru di app-foto.js / app-dokumen.js
-- Fix bug di app-cetak.js, app-barcode.js, dll
+- Fix bug, tambah fitur beranda, daily theme, event theme, dll
 
 ---
 
@@ -183,16 +185,18 @@ Output di `dist/`:
 
 | File | Update via | Keterangan |
 |------|-----------|-----------|
-| `index.html` | git push | Main app shell + update banner |
-| `tokens.css` | git push | Design system |
+| `index.html` | git push | Main app shell + update banner + daily-marquee div |
+| `tokens.css` | git push | Design system + daily theme CSS + spotlight card CSS |
 | `config.js` | git push | Data toko (nama, alamat, kontak, jam) |
-| `app-core.js` | git push | Core, navigasi, splash, Nexus Forge modal |
+| `app-core.js` | git push | Core, navigasi, splash, event theme, **daily theme system** |
 | `app-foto.js` | git push | 25 modul foto, cari referensi |
 | `app-dokumen.js` | git push | Generator dokumen resmi |
 | `app-barcode.js` | git push | Generator barcode + cetak |
 | `app-screensaver.js` | git push | Screensaver toko |
 | `app-cetak.js` | git push | Cetak foto — queue, layout, PDF print |
 | `cetak.html` | git push | Halaman cetak (window terpisah) |
+| `themes.json` | git push | Data event themes — edit untuk tambah event baru |
+| `changelog.json` | git push | Riwayat update — edit manual, tambah entry di atas array |
 | `version.json` | generate-manifest.js | Auto-generated, jangan edit manual |
 | `crew/*.png` | rebuild EXE | Foto Nexus Forge — di-sync dari EXE ke AppData |
 
@@ -208,6 +212,72 @@ Output di `dist/`:
 | Cetak Foto | `app-cetak.js` + `cetak.html` | Queue cetak, layout A4/F4/10R, PDF preview |
 | Screensaver | `app-screensaver.js` | Display promosi toko |
 | Nexus Forge | `app-core.js` | Modal info tim AI + foto crew |
+| **Daily Theme** | `app-core.js` + `tokens.css` | **Beranda ganti otomatis setiap hari** |
+| Event Theme | `app-core.js` + `themes.json` | Tema khusus hari besar (Idul Adha, HUT RI, dll) |
+
+---
+
+## SISTEM DAILY THEME (v2.5) — BARU
+
+### Cara kerja:
+- `applyDailyTheme()` dipanggil saat app init, sebelum `loadEventTheme()`
+- Membaca `new Date().getDay()` → load data dari `DAILY_THEMES` di `app-core.js`
+- **Priority:** Event theme > Daily theme. Saat event aktif → daily marquee sembunyi otomatis
+
+### Yang berubah per hari:
+| Elemen | Keterangan |
+|--------|-----------|
+| Warna aksen | Override CSS vars `--green`, `--green-dark`, dll via `<style id="daily-theme-style">` |
+| Background beranda | `#beranda` style.background |
+| Hero title + subtitle | `.brnd-hero-title` / `.brnd-hero-sub` |
+| Spotlight card | `.brnd-tool-card--spotlight` — badge "★ Hari Ini" di card featured |
+| Daily marquee | `#daily-marquee` — pesan berjalan dari anggota Nexus Forge |
+
+### Data 7 hari:
+| Hari | Warna | Speaker | Featured Card |
+|------|-------|---------|--------------|
+| Minggu (0) | Ungu Lavender | OLZ | Dokumen |
+| Senin (1) | Biru Navy | KAELA + SEIRA | Dokumen |
+| Selasa (2) | Teal/Cyan | CIPHER + NOVA | Foto |
+| Rabu (3) | Oranye | LYRA + REED | Cetak Foto |
+| Kamis (4) | Hijau (default) | RAVEN + PRISM | Foto |
+| Jumat (5) | Emas/Amber | ZANE + MARCUS | Barcode |
+| Sabtu (6) | Merah Coral | DRAKE + VECTOR | Foto |
+
+### Format pesan marquee:
+```
+💬 NAMA · "Pesan motivasi tentang pelayanan, kesabaran, kejujuran..."
+```
+
+### Catatan penting:
+- Data pesan ada di `DAILY_THEMES` const di `app-core.js` — edit di sana untuk ganti pesan
+- OLZ (Minggu) hanya pakai inisial — bukan nama Olan
+- Kamis = warna hijau default agar tidak terasa "ganti" dari tampilan normal
+
+---
+
+## SISTEM EVENT THEME
+
+### Data event ada di dua tempat:
+1. **`themes.json`** (GitHub) — sumber utama, bisa diupdate tanpa rebuild
+2. **`_THEMES_FALLBACK`** di `app-core.js` — fallback kalau themes.json tidak bisa di-fetch
+
+### Event yang sudah ada (di fallback):
+| Event | Tanggal | Emoji |
+|-------|---------|-------|
+| Idul Adha 1447H | 27 Mei 2026 | 🐑 |
+| Hari Lahir Pancasila | 1 Jun 2026 | 🦅 |
+| Tahun Baru Islam 1448H | 16 Jun 2026 | 🌙 |
+| Hari Anak Nasional | 23 Jul 2026 | 👶 |
+| HUT RI ke-81 | 17 Agt 2026 | 🇮🇩 |
+| Natal 2026 | 25 Des 2026 | 🎄 |
+| Hari Ibu | 22 Des 2026 | 💐 |
+| Tahun Baru 2027 | 1 Jan 2027 | 🎊 |
+| Hari Kartini 2027 | 21 Apr 2027 | 🌸 |
+| Idul Fitri 1448H | 10 Mar 2027 | 🕌 |
+
+### Dev tool: Ctrl+Shift+T
+Tampilkan panel preview theme di beranda — bisa preview semua event tanpa nunggu tanggalnya.
 
 ---
 
@@ -237,6 +307,8 @@ Windows Electron tidak support print preview via `window.print()`. Solusi: gener
 | v2.1 | — | Versi EXE awal — basis distribusi ke komputer toko |
 | v2.2 | 19 Mei 2026 | Fix foto Nexus Forge, fix klik kanan popup, fix print PDF (cetak foto + barcode), fix footer tercetak |
 | v2.3 | 20 Mei 2026 | Hapus ikon gunting ✂ dari garis potong cetak foto & barcode, garis potong lebih kontrast (#555) |
+| v2.4 | 20 Mei 2026 | Fix semua label versi tertinggal (v2.1→v2.3), tambah panel Riwayat Update di beranda, tambah changelog.json |
+| **v2.5** | **20 Mei 2026** | **Daily theme 7 hari — warna + hero text + spotlight card + pesan motivasi Nexus Forge** |
 
 ---
 
@@ -254,15 +326,25 @@ Windows Electron tidak support print preview via `window.print()`. Solusi: gener
 | 8 | Ikon gunting ✂ menumpuki foto di cetak foto | Hapus `<text>✂</text>` dari SVG + `fillText('✂')` dari canvas preview di `app-cetak.js` | v2.3 |
 | 9 | Ikon gunting ✂ menumpuki label di cetak barcode | Hapus `<text>✂</text>` dari SVG di `app-barcode.js` | v2.3 |
 | 10 | Garis potong terlalu pudar (#bbb/#aaa) | Ganti ke `stroke:#555` di SVG & canvas — cetak foto dan barcode | v2.3 |
+| 11 | Label versi tertinggal v2.1 di banyak tempat | Replace all v2.1 → v2.3 di index.html, app-core.js, app-screensaver.js, cetak.html | v2.4 |
 
 ---
 
 ## KNOWN LIMITATIONS
 
 - **Foto crew tidak bisa update via GitHub push** — disimpan di `resources/` dalam EXE. Untuk update foto crew, wajib rebuild EXE.
-- **Versi EXE (2.1.0) berbeda dari versi app (2.3)** — normal. EXE version di `package.json`, app version di `version.json`.
+- **Versi EXE (2.1.0) berbeda dari versi app (2.5)** — normal. EXE version di `package.json`, app version di `version.json`.
 - **Icon warning saat build** (`default Electron icon is used`) — tidak mempengaruhi hasil build.
 - **PDF viewer tergantung sistem** — jika client tidak punya PDF viewer, file PDF tidak akan terbuka otomatis.
+
+---
+
+## IDE / TOOLS YANG DIPAKAI
+
+- **Claude Code** — AI coding assistant (editor utama semua file)
+- **VS Code** — terlihat di taskbar, untuk review manual
+- **Git Bash / Terminal** — git push, generate-manifest
+- **Node.js** — untuk `generate-manifest.js`
 
 ---
 
@@ -309,4 +391,4 @@ Windows Electron tidak support print preview via `window.print()`. Solusi: gener
 
 ---
 
-*Nexus Forge Team · Toko Prestasi Tools v2.3 · 20 Mei 2026*
+*Nexus Forge Team · Toko Prestasi Tools v2.5 · 20 Mei 2026*
