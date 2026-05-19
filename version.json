@@ -2,9 +2,9 @@
   "version": "2.5",
   "files": {
     "index.html": "25bd44dbefa86b2fb0b21f3c4bdea8e7d4e39fbd0fac421f5c850beebe9d21e1",
-    "tokens.css": "c081ccf555d62529ce55d218c4803da1768a927b1018131b145650aa8f55b124",
+    "tokens.css": "9c71d7ef8eb3dff5bd05a2cad5b18425cd73acf03c7cf4a1bd80827d76e64008",
     "config.js": "8709f3637aea0ebf52434acea01f1c3b9005b8e6b2588b342c327e7b9ab8ba6e",
-    "app-core.js": "4a0d99f8d4db9e35ec5f8a2adc38f93fffa5c3f521bd994002b8f524e3119f81",
+    "app-core.js": "d8a32c349e8cd46ce705e988bcb66108cc01eacd26ea2d1058f2545345e6ca52",
     "app-foto.js": "e389bd0d560de9099ad2f7aa099460be6d26e137843ec6ed7653539ab7711925",
     "app-dokumen.js": "6bd143aa9a5f3dd6429669160408bae9314eb95f8b47c42b0ba1117e9bb84eb2",
     "app-barcode.js": "b53222a35cd1ed981d15512129aae6eb8a1ff56850bbf7b72c5ec58c57c8412e",

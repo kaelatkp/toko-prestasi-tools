@@ -1295,7 +1295,7 @@ function downloadPrompt() {
 ════════════════════════════════════ */
 document.addEventListener('keydown', function(e) {
   // Secret: Ctrl+Shift+T — dev theme preview panel
-  if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+  if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === 'T') {
     e.preventDefault();
     const toggle = () => {
       _buildDevThemePanel();
