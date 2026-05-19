@@ -214,6 +214,7 @@ Output di `dist/`:
 | Nexus Forge | `app-core.js` | Modal info tim AI + foto crew |
 | **Daily Theme** | `app-core.js` + `tokens.css` | **Beranda ganti otomatis setiap hari** |
 | Event Theme | `app-core.js` + `themes.json` | Tema khusus hari besar (Idul Adha, HUT RI, dll) |
+| **Edit Foto** | `app-cetak.js` + `cetak.html` | Modal edit di Cetak Foto — putar, cermin, kemiringan, kecerahan, kontras, saturasi, garis tengah draggable |
 
 ---
 
@@ -300,6 +301,44 @@ Windows Electron tidak support print preview via `window.print()`. Solusi: gener
 
 ---
 
+## EDIT FOTO SISTEM (v2.5)
+
+Modal edit di dalam `cetak.html` — dibuka dari Cetak Foto workspace.
+
+### State (`state` object di `app-cetak.js`):
+| Property | Default | Range | Keterangan |
+|----------|---------|-------|-----------|
+| `rotate` | 0 | 0/90/180/270 | Putar 90° |
+| `angle` | 0 | -15..+15 | Kemiringan halus |
+| `flipH` | false | bool | Cermin horizontal |
+| `brightness` | 0 | -100..100 | Kecerahan |
+| `contrast` | 0 | -100..100 | Kontras |
+| `saturation` | 0 | -100..100 | Saturasi warna |
+| `centerGuideX` | 0.5 | 0..1 | Posisi garis tengah (0=kiri, 1=kanan) |
+
+### Garis Tengah Draggable:
+- Garis cyan putus-putus di atas foto — tarik kiri/kanan untuk cocokkan hidung
+- Digambar di canvas `drawEditPreview()` — **bukan** bagian dari hasil crop/export
+- Handle circle di `H/2` dengan ikon `⟺`
+- Hit zone: ±18px dari posisi garis → cursor berubah `ew-resize`
+- Tombol "⊕ Reset ke Tengah" → `state.centerGuideX = 0.5`
+
+### Filter CSS:
+```javascript
+// Diterapkan ke editPreviewCanvas (preview) dan offCanvas (export)
+`brightness(${b}) contrast(${c}) saturate(${s})`
+// b = (100 + brightness) / 100
+// c = contrast >= 0 ? (100 + contrast*2)/100 : (100 + contrast)/100
+// s = (100 + saturation) / 100
+```
+
+### Grid:
+- Rule-of-thirds 3×3 — digambar setelah gambar, sebelum garis tengah
+- Titik persimpangan: white dot radius 3.5px di atas shadow 5.5px
+- Outer border: rgba(255,255,255,0.5)
+
+---
+
 ## RIWAYAT VERSI
 
 | Versi | Tanggal | Perubahan |
@@ -308,7 +347,7 @@ Windows Electron tidak support print preview via `window.print()`. Solusi: gener
 | v2.2 | 19 Mei 2026 | Fix foto Nexus Forge, fix klik kanan popup, fix print PDF (cetak foto + barcode), fix footer tercetak |
 | v2.3 | 20 Mei 2026 | Hapus ikon gunting ✂ dari garis potong cetak foto & barcode, garis potong lebih kontrast (#555) |
 | v2.4 | 20 Mei 2026 | Fix semua label versi tertinggal (v2.1→v2.3), tambah panel Riwayat Update di beranda, tambah changelog.json |
-| **v2.5** | **20 Mei 2026** | **Daily theme 7 hari — warna + hero text + spotlight card + pesan motivasi Nexus Forge** |
+| **v2.5** | **20 Mei 2026** | **Daily theme 7 hari, fix marquee wrapping, fix Ctrl+Shift+T dev panel, edit foto: garis tengah draggable + slider Saturasi, changelog popup muncul setelah splash** |
 
 ---
 
@@ -327,6 +366,31 @@ Windows Electron tidak support print preview via `window.print()`. Solusi: gener
 | 9 | Ikon gunting ✂ menumpuki label di cetak barcode | Hapus `<text>✂</text>` dari SVG di `app-barcode.js` | v2.3 |
 | 10 | Garis potong terlalu pudar (#bbb/#aaa) | Ganti ke `stroke:#555` di SVG & canvas — cetak foto dan barcode | v2.3 |
 | 11 | Label versi tertinggal v2.1 di banyak tempat | Replace all v2.1 → v2.3 di index.html, app-core.js, app-screensaver.js, cetak.html | v2.4 |
+| 12 | Daily marquee text wrapping vertikal bukan scroll horizontal | `.marquee-track` dan `.daily-track` tidak punya `white-space: nowrap`; `#daily-marquee` tidak ada `height` fixed | v2.5 |
+| 13 | `Ctrl+Shift+T` dev panel tidak muncul | `e.key === 'T'` tidak match karena Chromium kirim lowercase `'t'`; fix ke `.toUpperCase()`; z-index 9998 dinaikkan ke 999999 | v2.5 |
+| 14 | Changelog popup tidak muncul setelah splash | `loadChangelog()` dipanggil saat page init → modal muncul di balik splash → key localStorage langsung ter-set. Fix: pindah ke dalam `appMasuk()` (400ms setelah splash hilang); key baru di-set saat user klik Tutup, bukan saat modal dibuka | v2.5 |
+| 15 | Changelog popup tidak muncul karena key sudah ter-set di run sebelumnya | Key `tp_cl_seen_vX` di-set terlalu dini (saat `openChangelog()` bukan saat `closeChangelog()`). Root cause: modal muncul di balik splash → user tidak lihat tapi key sudah set. Fix: key di-set di `closeChangelog()` + skip popup kalau data gagal dimuat | v2.5 |
+
+---
+
+## CARA BUKA APP VIA COMPUTER-USE (AI Session)
+
+```
+# request_access dulu:
+request_access: ["toko prestasi tools.exe"]
+# lalu open:
+open_application("Toko prestasi tools")
+```
+
+**JANGAN** buka "Barcode Generator Toko Prestasi" — itu app lama, sudah dimerger ke Prestasi Tools.
+
+EXE yang benar: `D:\KAELA PROJECT\ELECTRON-BUILD\dist\win-unpacked\Toko Prestasi Tools.exe`
+App files yang running: `C:\Users\Hype G12\AppData\Roaming\TokoPrestasiTools\`
+
+Setelah edit source file, perlu:
+1. `git push`
+2. Copy file ke AppData (agar langsung efektif tanpa nunggu UPDATE)
+3. Restart app
 
 ---
 
