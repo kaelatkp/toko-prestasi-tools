@@ -55,6 +55,8 @@ const state = {
   angle: 0,         // fine -15..+15
   brightness: 0,    // -100..100
   contrast: 0,      // -100..100
+  saturation: 0,    // -100..100
+  centerGuideX: 0.5,// 0..1 posisi garis tengah
   flipH: false,
   displayScale: 1,
   selectedSize: null,   // { label, wMM, hMM }
@@ -236,7 +238,7 @@ function closeEditModal() {
 function drawEditPreview() {
   const img = state.originalImage;
   if (!img) return;
-  const { rotate, angle, flipH, brightness, contrast } = state;
+  const { rotate, angle, flipH, brightness, contrast, saturation } = state;
   const isRot90 = rotate % 180 !== 0;
   const natW = isRot90 ? img.height : img.width;
   const natH = isRot90 ? img.width  : img.height;
@@ -253,13 +255,12 @@ function drawEditPreview() {
   editPreviewCtx.clearRect(0, 0, W, H);
 
   // ── Draw image ──
-  if (brightness !== 0 || contrast !== 0) {
-    const b = (100 + brightness) / 100;
-    const c = contrast >= 0 ? (100 + contrast * 2) / 100 : (100 + contrast) / 100;
-    editPreviewCtx.filter = `brightness(${b}) contrast(${c})`;
-  } else {
-    editPreviewCtx.filter = 'none';
-  }
+  const b = (100 + brightness) / 100;
+  const c = contrast >= 0 ? (100 + contrast * 2) / 100 : (100 + contrast) / 100;
+  const s = (100 + saturation) / 100;
+  editPreviewCtx.filter = (brightness !== 0 || contrast !== 0 || saturation !== 0)
+    ? `brightness(${b}) contrast(${c}) saturate(${s})`
+    : 'none';
   editPreviewCtx.save();
   editPreviewCtx.translate(W / 2, H / 2);
   editPreviewCtx.rotate((rotate + angle) * Math.PI / 180);
@@ -317,6 +318,35 @@ function drawEditPreview() {
   });
 
   editPreviewCtx.restore();
+
+  // ── Garis tengah draggable (cyan) ──
+  const gx = Math.round(W * state.centerGuideX);
+  editPreviewCtx.save();
+  editPreviewCtx.setLineDash([6, 4]);
+  // Shadow
+  editPreviewCtx.strokeStyle = 'rgba(0,0,0,0.5)';
+  editPreviewCtx.lineWidth = 3;
+  editPreviewCtx.beginPath();
+  editPreviewCtx.moveTo(gx, 0); editPreviewCtx.lineTo(gx, H);
+  editPreviewCtx.stroke();
+  // Garis cyan
+  editPreviewCtx.strokeStyle = 'rgba(0, 220, 195, 0.95)';
+  editPreviewCtx.lineWidth = 1.5;
+  editPreviewCtx.beginPath();
+  editPreviewCtx.moveTo(gx + 0.5, 0); editPreviewCtx.lineTo(gx + 0.5, H);
+  editPreviewCtx.stroke();
+  editPreviewCtx.setLineDash([]);
+  // Handle di tengah (circle grab)
+  editPreviewCtx.fillStyle = 'rgba(0,0,0,0.45)';
+  editPreviewCtx.beginPath(); editPreviewCtx.arc(gx, H / 2, 11, 0, Math.PI * 2); editPreviewCtx.fill();
+  editPreviewCtx.fillStyle = 'rgba(0, 220, 195, 1)';
+  editPreviewCtx.beginPath(); editPreviewCtx.arc(gx, H / 2, 9, 0, Math.PI * 2); editPreviewCtx.fill();
+  editPreviewCtx.fillStyle = '#fff';
+  editPreviewCtx.font = 'bold 11px sans-serif';
+  editPreviewCtx.textAlign = 'center';
+  editPreviewCtx.textBaseline = 'middle';
+  editPreviewCtx.fillText('⟺', gx, H / 2);
+  editPreviewCtx.restore();
 }
 
 /* ─────────────────────────────── EDIT CONTROLS ── */
@@ -325,18 +355,45 @@ function bindEditControls() {
   $('btnRotateR').addEventListener('click', () => { state.rotate = (state.rotate + 90) % 360; redraw(); drawEditPreview(); });
   $('btnFlipH').addEventListener('click',   () => { state.flipH = !state.flipH; redraw(); drawEditPreview(); });
   $('btnReset').addEventListener('click', resetEdit);
+  $('btnResetGuide').addEventListener('click', () => { state.centerGuideX = 0.5; drawEditPreview(); });
 
   $('slAngle').addEventListener('input',    function() { state.angle      = +this.value; $('valAngle').textContent    = this.value + '°'; redraw(); drawEditPreview(); });
   $('slBright').addEventListener('input',   function() { state.brightness = +this.value; $('valBright').textContent   = this.value;       redraw(); drawEditPreview(); });
   $('slContrast').addEventListener('input', function() { state.contrast   = +this.value; $('valContrast').textContent = this.value;       redraw(); drawEditPreview(); });
+  $('slSat').addEventListener('input',      function() { state.saturation = +this.value; $('valSat').textContent      = this.value;       redraw(); drawEditPreview(); });
+
+  // ── Drag garis tengah ──
+  let draggingGuide = false;
+  const cvs = editPreviewCanvas;
+  cvs.addEventListener('mousedown', e => {
+    const rect = cvs.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (cvs.width / rect.width);
+    const gx = cvs.width * state.centerGuideX;
+    if (Math.abs(x - gx) <= 18) { draggingGuide = true; cvs.style.cursor = 'ew-resize'; }
+  });
+  cvs.addEventListener('mousemove', e => {
+    const rect = cvs.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (cvs.width / rect.width);
+    if (draggingGuide) {
+      state.centerGuideX = Math.max(0.01, Math.min(0.99, x / cvs.width));
+      drawEditPreview();
+    } else {
+      const gx = cvs.width * state.centerGuideX;
+      cvs.style.cursor = Math.abs(x - gx) <= 18 ? 'ew-resize' : 'default';
+    }
+  });
+  cvs.addEventListener('mouseup',    () => { draggingGuide = false; cvs.style.cursor = 'default'; });
+  cvs.addEventListener('mouseleave', () => { draggingGuide = false; });
 }
 
 function resetEdit() {
   state.rotate = 0; state.angle = 0;
-  state.brightness = 0; state.contrast = 0; state.flipH = false;
+  state.brightness = 0; state.contrast = 0; state.saturation = 0; state.flipH = false;
+  state.centerGuideX = 0.5;
   $('slAngle').value    = 0; $('valAngle').textContent    = '0°';
   $('slBright').value   = 0; $('valBright').textContent   = '0';
   $('slContrast').value = 0; $('valContrast').textContent = '0';
+  $('slSat').value      = 0; $('valSat').textContent      = '0';
   if (state.originalImage) { redraw(); drawEditPreview(); }
 }
 
@@ -416,10 +473,10 @@ function initCropBox(size, center) {
 
   let bw, bh;
   if (cw / ch > ratio) {
-    bh = ch * 0.88;
+    bh = ch;
     bw = bh * ratio;
   } else {
-    bw = cw * 0.88;
+    bw = cw;
     bh = bw / ratio;
   }
 
@@ -493,6 +550,10 @@ function onPointerDown(e) {
   if (px >= x+w-hit && px <= x+w+hit     && py >= y - hit     && py <= y + hit)     corner = 'ne';
   if (px >= x - hit && px <= x + hit     && py >= y+h-hit     && py <= y+h+hit)     corner = 'sw';
   if (px >= x+w-hit && px <= x+w+hit     && py >= y+h-hit     && py <= y+h+hit)     corner = 'se';
+  // Top-center and bottom-center handles
+  const mx = x + w / 2;
+  if (!corner && px >= mx-hit && px <= mx+hit && py >= y-hit   && py <= y+hit)   corner = 'tc';
+  if (!corner && px >= mx-hit && px <= mx+hit && py >= y+h-hit && py <= y+h+hit) corner = 'bc';
 
   // Check interior (move)
   const inside = px > x && px < x+w && py > y && py < y+h;
@@ -567,6 +628,22 @@ function onPointerMove(e) {
       nw = Math.min(nw, sb.x + sb.w, (sb.y + sb.h) * ratio);
       b.w = nw; b.h = nw / ratio;
       b.x = sb.x + sb.w - nw; b.y = sb.y + sb.h - b.h;
+
+    } else if (mode === 'tc' || mode === 'bc') {
+      // Top/bottom center: resize by height, ratio locked, box stays centered horizontally
+      const fixedRatio = sb.w / sb.h;
+      const centerX = sb.x + sb.w / 2;
+      const newH = Math.max(MIN, mode === 'tc' ? sb.h - dy : sb.h + dy);
+      const newW = newH * fixedRatio;
+      // Cap so box stays within canvas from center outward
+      const maxWfromCenter = Math.min(centerX, CW - centerX) * 2;
+      const cappedW = Math.min(newW, maxWfromCenter, CW);
+      const cappedH = cappedW / fixedRatio;
+      b.w = cappedW;
+      b.h = cappedH;
+      b.x = centerX - cappedW / 2;
+      b.y = mode === 'tc' ? sb.y + sb.h - cappedH : sb.y;
+      clampCropBox();
     }
   }
 
@@ -580,7 +657,7 @@ function onPointerUp() {
 /* ─────────────────────────────── CROP EXTRACT ── */
 function extractCrop() {
   const img = state.originalImage;
-  const { rotate, angle, flipH, brightness, contrast, cropBox: cb, displayScale } = state;
+  const { rotate, angle, flipH, brightness, contrast, saturation, cropBox: cb, displayScale } = state;
 
   // Build high-res offscreen canvas (original image dimensions after rotation)
   const isRot90 = rotate % 180 !== 0;
@@ -592,10 +669,11 @@ function extractCrop() {
   offCanvas.height = outH;
   const offCtx = offCanvas.getContext('2d');
 
-  if (brightness !== 0 || contrast !== 0) {
+  if (brightness !== 0 || contrast !== 0 || saturation !== 0) {
     const b = (100 + brightness) / 100;
     const c = contrast >= 0 ? (100 + contrast * 2) / 100 : (100 + contrast) / 100;
-    offCtx.filter = `brightness(${b}) contrast(${c})`;
+    const s = (100 + saturation) / 100;
+    offCtx.filter = `brightness(${b}) contrast(${c}) saturate(${s})`;
   }
 
   // Same transform as display canvas but at full resolution

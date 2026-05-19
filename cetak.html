@@ -244,6 +244,20 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
 .crop-handle.ne { top:-6px; right:-6px; cursor:nesw-resize; }
 .crop-handle.sw { bottom:-6px; left:-6px; cursor:nesw-resize; }
 .crop-handle.se { bottom:-6px; right:-6px; cursor:nwse-resize; }
+.crop-handle.tc { top:-6px; left:50%; transform:translateX(-50%); cursor:ns-resize; }
+.crop-handle.bc { bottom:-6px; left:50%; transform:translateX(-50%); cursor:ns-resize; }
+.crop-center-h {
+  position:absolute; left:0; right:0; top:50%;
+  height:1px; transform:translateY(-50%);
+  background:rgba(0,220,100,0.85); pointer-events:none;
+  box-shadow: 0 0 3px rgba(0,0,0,0.4);
+}
+.crop-center-v {
+  position:absolute; top:0; bottom:0; left:50%;
+  width:1px; transform:translateX(-50%);
+  background:rgba(0,220,100,0.85); pointer-events:none;
+  box-shadow: 0 0 3px rgba(0,0,0,0.4);
+}
 
 .canvas-empty {
   display: flex; flex-direction: column; align-items: center;
@@ -572,6 +586,11 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
   cursor: pointer; transition: all .15s;
 }
 .btn-modal-reset:hover { color: var(--red); border-color: var(--red); background: #fff5f5; }
+.edit-guide-section { margin-top: 4px; padding: 8px 10px; background: rgba(0,220,195,0.07); border: 1px solid rgba(0,220,195,0.25); border-radius: 8px; display: flex; flex-direction: column; gap: 4px; }
+.edit-guide-label { font-size: 10px; font-weight: 700; color: #00ab99; }
+.edit-guide-hint { font-size: 9.5px; color: var(--text-3); line-height: 1.4; }
+.btn-guide-reset { margin-top: 2px; padding: 5px 8px; font-size: 10px; font-weight: 700; font-family: 'Sora',sans-serif; background: rgba(0,220,195,0.12); border: 1px solid rgba(0,220,195,0.4); color: #00ab99; border-radius: 6px; cursor: pointer; transition: all .15s; }
+.btn-guide-reset:hover { background: rgba(0,220,195,0.22); }
 .btn-modal-done {
   width: 100%; padding: 10px; font-size: 12px; font-weight: 800;
   font-family: 'Sora', sans-serif; color: var(--white);
@@ -786,6 +805,10 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
             <div class="crop-handle ne" data-corner="ne"></div>
             <div class="crop-handle sw" data-corner="sw"></div>
             <div class="crop-handle se" data-corner="se"></div>
+            <div class="crop-handle tc" data-corner="tc"></div>
+            <div class="crop-handle bc" data-corner="bc"></div>
+            <div class="crop-center-h"></div>
+            <div class="crop-center-v"></div>
           </div>
         </div>
       </div>
@@ -889,16 +912,28 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
             </div>
             <input type="range" id="slContrast" min="-100" max="100" step="1" value="0">
           </div>
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Saturasi</span>
+              <span class="slider-val" id="valSat">0</span>
+            </div>
+            <input type="range" id="slSat" min="-100" max="100" step="1" value="0">
+          </div>
+          <div class="edit-guide-section">
+            <div class="edit-guide-label">⟺ Garis Tengah</div>
+            <div class="edit-guide-hint">Tarik garis cyan di foto untuk cocokkan hidung</div>
+            <button class="btn-guide-reset" id="btnResetGuide">⊕ Reset ke Tengah</button>
+          </div>
         </div>
         <div class="edit-modal-foot">
-          <button class="btn-modal-reset" id="btnReset" title="Kembalikan semua pengaturan (putar, kecerahan, kontras) ke nilai awal">↺ Reset</button>
+          <button class="btn-modal-reset" id="btnReset" title="Kembalikan semua pengaturan ke nilai awal">↺ Reset</button>
           <button class="btn-modal-done" id="btnModalDone" title="Simpan hasil edit dan kembali ke tampilan crop">✓ Selesai Edit</button>
         </div>
       </div>
 
       <!-- PREVIEW KANAN: Canvas + Grid -->
-      <div class="edit-modal-preview">
-        <canvas id="editPreviewCanvas"></canvas>
+      <div class="edit-modal-preview" style="position:relative">
+        <canvas id="editPreviewCanvas" style="cursor:default"></canvas>
       </div>
 
     </div><!-- /.edit-modal-layout -->
