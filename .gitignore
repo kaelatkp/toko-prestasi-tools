@@ -1,0 +1,5 @@
+node_modules/
+ELECTRON-BUILD/
+dist/
+.claude/
+*.blockmap

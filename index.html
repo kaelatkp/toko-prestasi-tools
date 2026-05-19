@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toko Prestasi Tools — Foto · Dokumen · Barcode</title>
+<link rel="icon" href="icon.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+
+/* ── FOOTER ── */
+.app-footer {
+  background: var(--white); border-top: 1.5px solid var(--border);
+  padding: 5px 16px; display: flex; align-items: center; justify-content: space-between;
+  font-size: 10px; color: var(--text-2); font-family: 'DM Mono', monospace;
+  letter-spacing: 0.4px; flex-shrink: 0; gap: 8px;
+}
+.footer-left { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.footer-center { display: flex; align-items: center; justify-content: center; flex: 1; }
+.footer-right { display: flex; align-items: center; gap: 8px; color: var(--text-3); flex-shrink: 0; }
+.footer-brand { color: var(--green-dark); font-weight: 700; }
+.footer-ver { color: var(--text-3); font-weight: 400; }
+.footer-dev {
+  background: none; border: none; padding: 0; cursor: pointer;
+  color: var(--text-2); font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 0.4px;
+  transition: color .15s;
+}
+.footer-dev:hover { color: var(--green-dark); text-decoration: underline; }
+.footer-sep { color: var(--border-2); }
+.footer-idle { display: flex; align-items: center; gap: 5px; }
+.idle-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: idle-pulse 2s ease-in-out infinite; flex-shrink: 0; }
+.idle-dot.warn { background: #f59e0b; }
+.idle-dot.danger { background: var(--red); }
+@keyframes idle-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+.btn-bug {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 9px; font-family: 'DM Mono', monospace; font-weight: 600;
+  color: rgba(244, 63, 94, 0.7); background: transparent;
+  border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 6px;
+  padding: 2px 7px; cursor: pointer; letter-spacing: 0.5px;
+  transition: color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.btn-bug:hover {
+  color: #f43f5e; border-color: rgba(244, 63, 94, 0.6);
+  background: rgba(244, 63, 94, 0.07);
+  box-shadow: 0 0 8px rgba(244, 63, 94, 0.2);
+}
+
+/* ── IDLE SCREENSAVER ── */
+#fp-screensaver {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(145deg, #0a1f14 0%, #0f3320 45%, #0a1f14 100%);
+  cursor: none;
+}
+
+/* ── MODE TABS (Foto | Dokumen) ── */
+.mode-tabs {
+  display: flex; gap: 4px; padding: 8px 12px 0;
+  border-bottom: 1.5px solid var(--border);
+  background: var(--white);
+  flex-shrink: 0;
+}
+.mode-tab {
+  flex: 1; padding: 7px 0; font-size: 12px; font-weight: 600;
+  border: 1.5px solid var(--border); border-bottom: none;
+  border-radius: 8px 8px 0 0; background: var(--bg);
+  color: var(--text-2); cursor: pointer; transition: all .18s;
+  font-family: 'Sora', sans-serif; letter-spacing: .2px;
+}
+.mode-tab:hover { background: var(--green-light); color: var(--green-dark); }
+.mode-tab.active {
+  background: var(--white); color: var(--green-dark);
+  border-color: var(--green-mid); font-weight: 700;
+  position: relative; bottom: -1px;
+}
+
+/* ── DOKUMEN FORM ── */
+.dok-form { display: flex; flex-direction: column; gap: 2px; }
+.dok-section-label {
+  font-size: 10px; font-weight: 700; color: var(--green-dark);
+  letter-spacing: .8px; text-transform: uppercase;
+  margin: 12px 0 4px; padding-left: 2px;
+}
+.dok-section-label:first-child { margin-top: 0; }
+.opt-input {
+  width: 100%; padding: 8px 10px; font-size: 13px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  background: var(--white); color: var(--text);
+  font-family: 'Sora', sans-serif; box-sizing: border-box;
+  transition: border-color .15s;
+}
+.opt-input:focus { outline: none; border-color: var(--green-mid); }
+.opt-textarea {
+  width: 100%; padding: 8px 10px; font-size: 12.5px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  background: var(--white); color: var(--text);
+  font-family: 'Sora', sans-serif; box-sizing: border-box;
+  resize: vertical; line-height: 1.6; transition: border-color .15s;
+}
+.opt-textarea:focus { outline: none; border-color: var(--green-mid); }
+.req-star { color: var(--red); font-weight: 700; margin-left: 2px; }
+
+/* ── WORKSPACE HEADER — DOKUMEN (white + blue accent, konsisten dengan foto) ── */
+.ws-header--dokumen {
+  background: var(--white);
+}
+
+/* ── CLAUDE BUTTON ── */
+.btn-claude-rec {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+  color: #fff !important;
+}
+.btn-claude-rec:hover { filter: brightness(1.1); }
+
+/* ── DOK FLOW TIP ── */
+.dok-flow-tip {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1.5px solid #bfdbfe; border-radius: 10px;
+  padding: 10px 13px; margin: 6px 0 10px; font-size: 12px;
+  color: #1e40af; line-height: 1.5;
+}
+.dok-flow-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── DOKUMEN SIDEBAR GROUPS ── */
+.mod-group-label-dok {
+  font-size: 10px; font-weight: 700; color: var(--text-2);
+  letter-spacing: .7px; text-transform: uppercase;
+  padding: 10px 14px 5px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; user-select: none; transition: color .15s;
+}
+.mod-group-label-dok:hover { color: var(--green-dark); }
+
+/* ── PROMPT HISTORY ── */
+#history-panel { display: none; margin-top: 12px; }
+.hist-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.hist-header > span { font-size: 11px; font-weight: 700; color: var(--text-2); letter-spacing: .3px; }
+.btn-hist-clear { font-size: 10px; padding: 3px 9px; border: 1px solid var(--border); border-radius: 6px; background: var(--white); color: var(--text-3); cursor: pointer; transition: all .15s; }
+.btn-hist-clear:hover { color: var(--red); border-color: var(--red); }
+.hist-row { background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 11px; margin-bottom: 7px; }
+.hist-meta { font-size: 11px; color: var(--text); margin-bottom: 3px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.hist-time { color: var(--text-3); font-weight: 400; font-size: 10px; margin-left: 4px; }
+.hist-preview { font-size: 10px; color: var(--text-3); margin-bottom: 7px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: 'DM Mono', monospace; line-height: 1.5; }
+.btn-hist-restore { font-size: 10px; padding: 3px 12px; background: var(--green-light); color: var(--green-dark); border: 1px solid var(--green-mid); border-radius: 6px; cursor: pointer; font-weight: 700; transition: all .15s; }
+.btn-hist-restore:hover { background: var(--green-mid); color: var(--white); }
+
+/* ── DOWNLOAD BUTTON ── */
+.btn-download-prompt { background: var(--bg) !important; color: var(--text-2) !important; border: 1.5px solid var(--border) !important; }
+.btn-download-prompt:hover { background: var(--border) !important; color: var(--text) !important; }
+
+/* ── REVISI QUICK-ACTION ── */
+.revisi-actions { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-top: 10px; }
+.revisi-label { font-size: 11px; font-weight: 600; color: var(--text-2); margin-bottom: 8px; letter-spacing: 0.02em; }
+.revisi-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn-revisi { padding: 6px 12px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--white); color: var(--text); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.btn-revisi:hover { background: var(--text); color: var(--white); border-color: var(--text); }
+.btn-revisi:active { transform: scale(0.95); }
+
+/* ── KOTA NOTE ── */
+.kota-note { font-size: 10px; color: var(--text-2); font-weight: 400; margin-left: 4px; }
+</style>
+</head>
+<body>
+
+<!-- DRAWER OVERLAY (mobile) -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+
+<!-- SPLASH SCREEN — LOADING V3 -->
+<div id="app-splash">
+  <!-- Layer 0: Code-typing scrolling background -->
+  <div id="spl-code-bg"></div>
+
+  <!-- Layer 1: BIOS pre-boot overlay -->
+  <div id="spl-preboot"></div>
+
+  <!-- Layer 2: Main content (glass panels) -->
+  <div id="spl-main">
+    <div class="spl-top">
+      <div class="spl-brand-row">
+        <div class="spl-brand-icon"><img src="icon.png" alt="icon"></div>
+        <div>
+          <div class="spl-brand-name">Toko Prestasi <span>Tools</span></div>
+          <div class="spl-brand-tagline">Sistem Produktivitas · Foto · Dokumen · Barcode</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spl-loading-area">
+      <div class="spl-pbar-row">
+        <div class="spl-pbar-track"><div class="spl-pbar-fill" id="spl-fill"></div></div>
+        <div class="spl-pct" id="spl-pct">0%</div>
+      </div>
+      <div class="spl-terminal">
+        <div class="spl-term-head">
+          <div class="spl-term-dots">
+            <span class="spl-term-dot" style="background:#e74c3c;"></span>
+            <span class="spl-term-dot" style="background:#f39c12;"></span>
+            <span class="spl-term-dot" style="background:#00C853;"></span>
+          </div>
+          TOKO PRESTASI TOOLS :: INIT LOG
+        </div>
+        <div class="spl-term-body" id="spl-term-body"></div>
+      </div>
+    </div>
+
+    <div class="spl-tip" id="spl-tip"></div>
+
+    <div class="spl-bottom">
+      <div class="spl-info-grid">
+        <div class="spl-info-col">
+          <div class="spl-info-label">Lokasi</div>
+          <div class="spl-info-val">Jl. Poros Sp 4, Marga Mulia, Kongbeng<br>Kutai-Timur, Kalimantan Timur</div>
+        </div>
+        <div class="spl-info-col">
+          <div class="spl-info-label">Kontak & Jam</div>
+          <div class="spl-info-val">
+            <a href="https://wa.me/6281362486065" target="_blank">💬 WA 0813-6248-6065</a><br>
+            ⏰ Buka 07:00 – 21:00
+          </div>
+        </div>
+        <div class="spl-info-col">
+          <div class="spl-info-label">Developer</div>
+          <div class="spl-info-val">
+            Nexus Forge Team
+            <a href="https://wa.me/6281299303888" target="_blank" class="spl-wa-chip">💬 Kritik &amp; Saran</a>
+          </div>
+        </div>
+      </div>
+      <button class="spl-btn-masuk" id="spl-btn" onclick="appMasuk()" style="display:none"></button>
+    </div>
+  </div>
+</div>
+
+<!-- TOOL LOADING OVERLAY -->
+<div id="tool-loading">
+  <div class="tl-icon-area">🧰</div>
+  <div class="tl-title">Memuat <span>Generator Foto</span>...</div>
+  <div class="tl-wrap">
+    <div class="tl-pbar-track"><div class="tl-pbar-fill"></div></div>
+    <div class="tl-pct-row">
+      <div class="tl-pct">0%</div>
+      <div class="tl-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- BERANDA -->
+<div id="beranda">
+  <div class="brnd-header">
+    <div class="brnd-logo">
+      <div class="brnd-logo-icon"><img src="icon.png" alt="icon"></div>
+      <div>
+        <div class="brnd-logo-text">Toko Prestasi <span>Tools</span></div>
+        <div class="brnd-logo-sub">Alat Produktivitas Toko Prestasi</div>
+      </div>
+    </div>
+    <div class="brnd-ver">v2.1</div>
+  </div>
+
+  <div class="brnd-hero">
+    <div class="brnd-hero-title">Semua yang kamu butuhkan, <span>dalam satu tempat</span></div>
+    <div class="brnd-hero-sub">Pilih tool yang kamu butuhkan sekarang</div>
+  </div>
+
+  <div class="brnd-tools">
+    <div class="brnd-tool-card" onclick="openTool('foto')">
+      <div class="brnd-card-icon">📸</div>
+      <div class="brnd-card-title">Generator Prompt Foto</div>
+      <div class="brnd-card-count">25 MODUL FOTO</div>
+      <div class="brnd-card-desc">Buat prompt AI siap pakai untuk edit foto — pasfoto resmi, ganti background, retouch, wisuda, couple, produk, event, dan lebih banyak lagi.</div>
+      <div class="brnd-card-features">
+        <span class="brnd-card-feat">Pasfoto Resmi</span>
+        <span class="brnd-card-feat">Ganti Background</span>
+        <span class="brnd-card-feat">Retouch Wajah</span>
+        <span class="brnd-card-feat">Foto Wisuda</span>
+        <span class="brnd-card-feat">Foto Couple</span>
+        <span class="brnd-card-feat">Foto Produk</span>
+        <span class="brnd-card-feat">Restore Foto</span>
+        <span class="brnd-card-feat">Hapus Objek</span>
+        <span class="brnd-card-feat">Colorize B&W</span>
+        <span class="brnd-card-feat">Enhance HD</span>
+      </div>
+      <div class="brnd-card-cta">Buka Tool →</div>
+    </div>
+    <div class="brnd-tool-card" onclick="openTool('dokumen')">
+      <div class="brnd-card-icon">📄</div>
+      <div class="brnd-card-title">Generator Dokumen</div>
+      <div class="brnd-card-count">28 JENIS DOKUMEN</div>
+      <div class="brnd-card-desc">Buat prompt AI untuk surat, CV, nota, perjanjian, kuasa, undangan, dan dokumen ATK lainnya. Auto-isi tanggal & kota.</div>
+      <div class="brnd-card-features">
+        <span class="brnd-card-feat">Surat Lamaran</span>
+        <span class="brnd-card-feat">CV / Resume</span>
+        <span class="brnd-card-feat">Nota Toko</span>
+        <span class="brnd-card-feat">Surat Keterangan</span>
+        <span class="brnd-card-feat">Kontrak Kerja</span>
+        <span class="brnd-card-feat">Surat Kuasa</span>
+        <span class="brnd-card-feat">Undangan Acara</span>
+        <span class="brnd-card-feat">Berita Acara</span>
+        <span class="brnd-card-feat">Daftar Hadir</span>
+        <span class="brnd-card-feat">Auto Tanggal & Kota</span>
+      </div>
+      <div class="brnd-card-cta">Buka Tool →</div>
+    </div>
+    <div class="brnd-tool-card" onclick="openTool('barcode')">
+      <div class="brnd-card-icon">🏷️</div>
+      <div class="brnd-card-title">Barcode Generator</div>
+      <div class="brnd-card-count">CETAK LABEL TOKO</div>
+      <div class="brnd-card-desc">Buat label barcode produk untuk dicetak — input nama, harga, kode item. Layout otomatis ke kertas A4/F4, orientasi bebas, langsung print.</div>
+      <div class="brnd-card-features">
+        <span class="brnd-card-feat">Format CODE128A</span>
+        <span class="brnd-card-feat">Kertas A4 / F4</span>
+        <span class="brnd-card-feat">Portrait & Landscape</span>
+        <span class="brnd-card-feat">Multi-item Batch</span>
+        <span class="brnd-card-feat">Print Langsung</span>
+        <span class="brnd-card-feat">Auto Layout</span>
+        <span class="brnd-card-feat">Nama & Harga</span>
+        <span class="brnd-card-feat">Zero Setup</span>
+      </div>
+      <div class="brnd-card-cta">Buka Tool →</div>
+    </div>
+    <div class="brnd-tool-card" onclick="window.open('cetak.html','_blank')">
+      <div class="brnd-card-icon">🖨️</div>
+      <div class="brnd-card-title">Cetak Foto Prestasi</div>
+      <div class="brnd-card-count">PRINT STUDIO</div>
+      <div class="brnd-card-desc">Import foto, atur crop & ukuran, susun layout otomatis ke kertas 10R. Print langsung — pasfoto, wisuda, couple, keluarga, produk.</div>
+      <div class="brnd-card-features">
+        <span class="brnd-card-feat">Import Multi-Foto</span>
+        <span class="brnd-card-feat">Crop by Ukuran</span>
+        <span class="brnd-card-feat">Auto-Pack 10R</span>
+        <span class="brnd-card-feat">Rotate & Skew</span>
+        <span class="brnd-card-feat">Print Queue</span>
+        <span class="brnd-card-feat">Brightness/Contrast</span>
+        <span class="brnd-card-feat">Preview Real-Time</span>
+        <span class="brnd-card-feat">Langsung Print</span>
+      </div>
+      <div class="brnd-card-cta">Buka Tool →</div>
+    </div>
+  </div>
+
+  <div class="brnd-footer">Prestasi Tools v2.1 &nbsp;·&nbsp; Nexus Forge &nbsp;·&nbsp; Jl. Poros Sp 4, Kongbeng, Kutai-Timur</div>
+</div>
+
+<!-- APP -->
+<div class="app" style="display:none">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <header class="header">
+      <button class="btn-menu" id="btn-menu" onclick="openDrawer()" aria-label="Buka menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="brand">
+        <div class="brand-icon"><img src="icon.png" alt="icon"></div>
+        <div class="brand-text">
+          <div class="brand-name">
+            Toko Prestasi Tools
+            <span class="brand-badge">FOTO</span>
+          </div>
+          <div class="brand-sub">Peralatan Kerja · Foto · Dokumen · Barcode</div>
+        </div>
+      </div>
+      <a href="cetak.html" target="_blank" class="btn-cetak-shortcut" title="Buka Tools Cetak Foto">🖨️ Cetak Foto</a>
+    </header>
+
+    <!-- BACK TO BERANDA -->
+    <button class="btn-beranda" onclick="goHome()">
+      <span class="btn-beranda-icon">🏠</span>
+      <span class="btn-beranda-arrow">←</span>
+      <span>Beranda</span>
+    </button>
+
+    <div class="sidebar-head">
+      <div class="sidebar-head-label">Semua Layanan</div>
+      <div class="sidebar-head-title">Pilih Layanan</div>
+    </div>
+    <div class="sidebar-search">
+      <input type="text" id="mod-search" class="sidebar-search-input" placeholder="🔍 Cari modul..." oninput="currentMode==='foto'?filterMods(this.value):filterModsDok(this.value)" autocomplete="off">
+    </div>
+
+    <!-- SIDEBAR FOTO -->
+    <div class="sidebar-scroll" id="sidebar-foto-scroll">
+
+      <div class="sidebar-hot-label">🔥 Paling Dicari</div>
+      <div class="mod-card" onclick="setMod('pasfoto')" id="mod-pasfoto">
+        <div class="mod-card-top">
+          <div class="mod-icon-row"><div class="mod-icon">🪪</div><span class="mod-badge hot">HOT</span><span title="Approved by Olz" style="font-size:13px;cursor:default;line-height:1;margin-left:2px;">🎖️</span></div>
+          <button class="mod-info-btn" onclick="showModInfo(event,'pasfoto')">ⓘ</button>
+        </div>
+        <div class="mod-name">Foto Dokumen Resmi</div>
+        <div class="mod-desc">KTP · SIM · Paspor · SKCK · CPNS · KUA · Wisuda & lebih</div>
+      </div>
+      <div class="mod-card" onclick="setMod('background')" id="mod-background">
+        <div class="mod-card-top">
+          <div class="mod-icon-row"><div class="mod-icon">🌄</div><span class="mod-badge hot">HOT</span></div>
+          <button class="mod-info-btn" onclick="showModInfo(event,'background')">ⓘ</button>
+        </div>
+        <div class="mod-name">Ganti Background</div>
+        <div class="mod-desc">Background warna solid atau custom apapun</div>
+      </div>
+
+      <div class="mod-card" onclick="setMod('event_foto')" id="mod-event_foto">
+        <div class="mod-card-top">
+          <div class="mod-icon-row"><div class="mod-icon">🗓️</div><span class="mod-badge hot">HOT</span></div>
+          <button class="mod-info-btn" onclick="showModInfo(event,'event_foto')">ⓘ</button>
+        </div>
+        <div class="mod-name">Foto Event / Momen</div>
+        <div class="mod-desc">Lebaran · HUT RI · Natal · Valentine · Halloween · Imlek — 18 momen</div>
+      </div>
+
+      <div class="mod-group-label" data-group="penampilan" onclick="toggleGroup('penampilan')">
+        👗 Penampilan <span class="mod-group-chevron">▾</span>
+      </div>
+      <div class="mod-group-items" id="group-penampilan">
+
+        <div class="mod-card" onclick="setMod('headwear')" id="mod-headwear">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🧢</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'headwear')">ⓘ</button>
+          </div>
+          <div class="mod-name">Tambah / Ganti Headwear</div>
+          <div class="mod-desc">Hijab, peci, baseball cap, beanie, fedora, sorban</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('outfit')" id="mod-outfit">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">👔</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'outfit')">ⓘ</button>
+          </div>
+          <div class="mod-name">Ganti Pakaian</div>
+          <div class="mod-desc">Formal, kasual, streetwear, adat, seragam, atau referensi</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('rambut')" id="mod-rambut">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">💇</div><span class="mod-badge new">BARU</span></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'rambut')">ⓘ</button>
+          </div>
+          <div class="mod-name">Ganti Warna & Gaya Rambut</div>
+          <div class="mod-desc">Pirang, silver, ombre, bold color — atau gaya baru</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('aksesori')" id="mod-aksesori">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🕶️</div><span class="mod-badge new">BARU</span></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'aksesori')">ⓘ</button>
+          </div>
+          <div class="mod-name">Tambah Aksesori & Perhiasan</div>
+          <div class="mod-desc">Kacamata hitam/minus, anting, kalung, jam tangan</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('tato')" id="mod-tato">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">✒️</div><span class="mod-badge new">BARU</span></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'tato')">ⓘ</button>
+          </div>
+          <div class="mod-name">Tambah Tato Digital</div>
+          <div class="mod-desc">Realistik, minimalis, tribal, Japanese — pilih lokasi & motif</div>
+        </div>
+
+      </div>
+
+      <div class="mod-group-label" data-group="kualitas" onclick="toggleGroup('kualitas')">
+        ✨ Peningkatan Kualitas <span class="mod-group-chevron">▾</span>
+      </div>
+      <div class="mod-group-items" id="group-kualitas">
+
+        <div class="mod-card" onclick="setMod('enhance')" id="mod-enhance">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">✨</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'enhance')">ⓘ</button>
+          </div>
+          <div class="mod-name">Perjelas & Perindah</div>
+          <div class="mod-desc">Tajam, jernih, dan detail — hingga Ultra HD</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('restore')" id="mod-restore">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🖼️</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'restore')">ⓘ</button>
+          </div>
+          <div class="mod-name">Restorasi Foto Lama</div>
+          <div class="mod-desc">Pulihkan foto lama yang rusak, pudar, atau buram</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('colorize')" id="mod-colorize">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🎨</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'colorize')">ⓘ</button>
+          </div>
+          <div class="mod-name">Kolorisasi Foto B&W</div>
+          <div class="mod-desc">Beri warna natural pada foto hitam putih</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('retouch')" id="mod-retouch">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">💆</div><span class="mod-badge new">BARU</span></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'retouch')">ⓘ</button>
+          </div>
+          <div class="mod-name">Retouch Ringan</div>
+          <div class="mod-desc">Haluskan kulit, hilangkan noda & jerawat — natural</div>
+        </div>
+
+      </div>
+
+      <!-- GROUP: Seleksi & Editing -->
+      <div class="mod-group-label" data-group="seleksi" onclick="toggleGroup('seleksi')">
+        ✂️ Seleksi &amp; Editing <span class="mod-group-chevron">▾</span>
+      </div>
+      <div class="mod-group-items" id="group-seleksi">
+
+        <div class="mod-card" onclick="setMod('hapus_bg')" id="mod-hapus_bg">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">✂️</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'hapus_bg')">ⓘ</button>
+          </div>
+          <div class="mod-name">Hapus Background</div>
+          <div class="mod-desc">Transparan (PNG), warna solid, atau suasana baru — presisi tinggi</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('hapus_objek')" id="mod-hapus_objek">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🧹</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'hapus_objek')">ⓘ</button>
+          </div>
+          <div class="mod-name">Hapus Objek / Orang</div>
+          <div class="mod-desc">Hapus orang, benda, watermark — area terisi natural</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('ganti_pose')" id="mod-ganti_pose">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🕺</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'ganti_pose')">ⓘ</button>
+          </div>
+          <div class="mod-name">Ganti Pose</div>
+          <div class="mod-desc">Ubah pose & komposisi — wajah tidak berubah sedikitpun</div>
+        </div>
+
+      </div>
+
+      <!-- GROUP: Foto Orang -->
+      <div class="mod-group-label" data-group="orang" onclick="toggleGroup('orang')">
+        📸 Foto Orang <span class="mod-group-chevron">▾</span>
+      </div>
+      <div class="mod-group-items" id="group-orang">
+
+        <div class="mod-card" onclick="setMod('foto_profil')" id="mod-foto_profil">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">📱</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'foto_profil')">ⓘ</button>
+          </div>
+          <div class="mod-name">Foto Profil Sosial Media</div>
+          <div class="mod-desc">LinkedIn, Instagram, WA, TikTok — crop & background ideal</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('foto_couple')" id="mod-foto_couple">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">💑</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'foto_couple')">ⓘ</button>
+          </div>
+          <div class="mod-name">Foto Couple / Pasangan</div>
+          <div class="mod-desc">Gabung 2 foto jadi 1, rapikan pose & background pilihan</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('foto_keluarga')" id="mod-foto_keluarga">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">👨‍👩‍👧‍👦</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'foto_keluarga')">ⓘ</button>
+          </div>
+          <div class="mod-name">Foto Keluarga</div>
+          <div class="mod-desc">Gabung beberapa foto, poles background — lebaran, ulang tahun</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('foto_wisuda')" id="mod-foto_wisuda">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🎓</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'foto_wisuda')">ⓘ</button>
+          </div>
+          <div class="mod-name">Foto Wisuda</div>
+          <div class="mod-desc">Toga + samir + biretta, background pilihan — wajah tidak berubah</div>
+        </div>
+
+      </div>
+
+      <!-- GROUP: Produk & Bisnis -->
+      <div class="mod-group-label" data-group="produk" onclick="toggleGroup('produk')">
+        🛒 Produk &amp; Bisnis <span class="mod-group-chevron">▾</span>
+      </div>
+      <div class="mod-group-items" id="group-produk">
+
+        <div class="mod-card" onclick="setMod('foto_produk')" id="mod-foto_produk">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">📦</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'foto_produk')">ⓘ</button>
+          </div>
+          <div class="mod-name">Foto Produk Jualan</div>
+          <div class="mod-desc">Background putih studio, lighting pro — siap Shopee/Tokped</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('listing_produk')" id="mod-listing_produk">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🛍️</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'listing_produk')">ⓘ</button>
+          </div>
+          <div class="mod-name">Listing Foto Produk</div>
+          <div class="mod-desc">Brand besar, spek kunci jumbo, watermark toko — siap Shopee/Tokped</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('desain_banner')" id="mod-desain_banner">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🖼️</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'desain_banner')">ⓘ</button>
+          </div>
+          <div class="mod-name">Desain Banner / Poster</div>
+          <div class="mod-desc">Banner promo, grand opening, event — siap sosmed atau cetak</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('label_stiker')" id="mod-label_stiker">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🏷️</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'label_stiker')">ⓘ</button>
+          </div>
+          <div class="mod-name">Label & Stiker Produk</div>
+          <div class="mod-desc">Desain label siap cetak — makanan, minuman, kosmetik, UMKM</div>
+        </div>
+
+      </div>
+
+      <!-- GROUP: Kreatif -->
+      <div class="mod-group-label" data-group="kreatif" onclick="toggleGroup('kreatif')">
+        🎨 Kreatif <span class="mod-group-chevron">▾</span>
+      </div>
+      <div class="mod-group-items" id="group-kreatif">
+
+        <div class="mod-card" onclick="setMod('anime_kartun')" id="mod-anime_kartun">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🎌</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'anime_kartun')">ⓘ</button>
+          </div>
+          <div class="mod-name">Anime / Kartun</div>
+          <div class="mod-desc">Konversi ke anime, Disney-Pixar, chibi, atau ilustrasi digital</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('ilustrasi')" id="mod-ilustrasi">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🖌️</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'ilustrasi')">ⓘ</button>
+          </div>
+          <div class="mod-name">Gaya Ilustrasi Artistik</div>
+          <div class="mod-desc">Cat minyak, cat air, pensil sketch, pop art, geometric</div>
+        </div>
+
+        <div class="mod-card" onclick="setMod('cosplay')" id="mod-cosplay">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🎭</div></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'cosplay')">ⓘ</button>
+          </div>
+          <div class="mod-name">Cosplay Digital</div>
+          <div class="mod-desc">Anime, superhero, game, fantasi — kostum detail, wajah tidak berubah</div>
+        </div>
+
+      </div>
+
+      <!-- GROUP: Dev Choice — always bottom, always glowing -->
+      <div class="mod-group-label dev-group" data-group="dev" onclick="toggleGroup('dev')">
+        ⚡ Dev Choice <span class="mod-group-chevron">▾</span>
+      </div>
+      <div class="mod-group-items" id="group-dev">
+
+        <div class="mod-card dev-card" onclick="setMod('cyberpunk_portrait')" id="mod-cyberpunk_portrait">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🌆</div><span class="mod-badge dev">DEV</span></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'cyberpunk_portrait')">ⓘ</button>
+          </div>
+          <div class="mod-name">Cyberpunk Portrait</div>
+          <div class="mod-desc">Blade Runner 2049 · AI Augmented · Neon City — lock wajah</div>
+        </div>
+
+        <div class="mod-card dev-card" onclick="setMod('cyber_scene')" id="mod-cyber_scene">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🚀</div><span class="mod-badge dev">DEV</span></div>
+            <button class="mod-info-btn" onclick="showModInfo(event,'cyber_scene')">ⓘ</button>
+          </div>
+          <div class="mod-name">Future World</div>
+          <div class="mod-desc">Transform kendaraan, kota, bangunan, manusia → masa depan total</div>
+        </div>
+
+      </div>
+
+    </div><!-- /sidebar-foto-scroll -->
+
+    <!-- SIDEBAR DOKUMEN (hidden by default) -->
+    <div class="sidebar-scroll" id="sidebar-dok-scroll" style="display:none">
+      <div class="sidebar-hot-label">🔥 Paling Dicari</div>
+
+      <div class="mod-card mod-card-dok" onclick="setModDok('lamaran')" id="moddok-lamaran">
+        <div class="mod-card-top">
+          <div class="mod-icon-row"><div class="mod-icon">✉️</div><span class="mod-badge hot">HOT</span></div>
+          <button class="mod-info-btn" onclick="showModInfoDok(event,'lamaran')">ⓘ</button>
+        </div>
+        <div class="mod-name">Surat Lamaran Kerja</div>
+        <div class="mod-desc">Dari toko kecil hingga perusahaan besar — format sesuai konteks</div>
+      </div>
+
+      <div class="mod-card mod-card-dok" onclick="setModDok('cv')" id="moddok-cv">
+        <div class="mod-card-top">
+          <div class="mod-icon-row"><div class="mod-icon">📄</div><span class="mod-badge hot">HOT</span></div>
+          <button class="mod-info-btn" onclick="showModInfoDok(event,'cv')">ⓘ</button>
+        </div>
+        <div class="mod-name">CV / Riwayat Hidup</div>
+        <div class="mod-desc">Berbagai format — modern, kreatif, akademis, fresh graduate</div>
+      </div>
+
+      <div class="mod-card mod-card-dok" onclick="setModDok('izin')" id="moddok-izin">
+        <div class="mod-card-top">
+          <div class="mod-icon-row"><div class="mod-icon">🏖️</div><span class="mod-badge new">BARU</span></div>
+          <button class="mod-info-btn" onclick="showModInfoDok(event,'izin')">ⓘ</button>
+        </div>
+        <div class="mod-name">Surat Izin / Cuti</div>
+        <div class="mod-desc">Izin kerja atau sekolah — sakit, keperluan keluarga, cuti</div>
+      </div>
+
+      <!-- GROUP: Karir -->
+      <div class="mod-group-label-dok" data-group="karir" onclick="toggleGroupDok('karir')">
+        💼 Karir <span class="mod-group-chevron">▾</span>
+      </div>
+      <div class="mod-group-items" id="group-dok-karir">
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('referensi')" id="moddok-referensi">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🏅</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'referensi')">ⓘ</button>
+          </div>
+          <div class="mod-name">Surat Referensi / Rekomendasi</div>
+          <div class="mod-desc">Dari atasan atau rekan untuk lamaran atau studi</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('keterangan')" id="moddok-keterangan">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">📄</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'keterangan')">ⓘ</button>
+          </div>
+          <div class="mod-name">Surat Keterangan Kerja</div>
+          <div class="mod-desc">Bukti resmi masih aktif bekerja di perusahaan</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('resign')" id="moddok-resign">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🚪</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'resign')">ⓘ</button>
+          </div>
+          <div class="mod-name">Surat Pengunduran Diri</div>
+          <div class="mod-desc">Keluar profesional — tidak membakar jembatan</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('dispensasi')" id="moddok-dispensasi">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🗓️</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'dispensasi')">ⓘ</button>
+          </div>
+          <div class="mod-name">Surat Dispensasi</div>
+          <div class="mod-desc">Dispensasi sekolah / kerja untuk kegiatan khusus</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('kenaikan_gaji')" id="moddok-kenaikan_gaji">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">💹</div><span class="mod-badge new">BARU</span></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'kenaikan_gaji')">ⓘ</button>
+          </div>
+          <div class="mod-name">Permohonan Kenaikan Gaji</div>
+          <div class="mod-desc">Ajukan kenaikan gaji profesional — berbasis kinerja & kontribusi</div>
+        </div>
+
+      </div>
+
+      <!-- GROUP: Jual Beli & Sewa -->
+      <div class="mod-group-label-dok" data-group="jualbeli" onclick="toggleGroupDok('jualbeli')">
+        🏠 Jual Beli &amp; Sewa <span class="mod-group-chevron">▾</span>
+      </div>
+      <div class="mod-group-items" id="group-dok-jualbeli">
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('jb_kendaraan')" id="moddok-jb_kendaraan">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🚗</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'jb_kendaraan')">ⓘ</button>
+          </div>
+          <div class="mod-name">Jual Beli Kendaraan</div>
+          <div class="mod-desc">Motor / mobil — kwitansi + surat pernyataan bawah tangan</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('jb_tanah')" id="moddok-jb_tanah">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🗺️</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'jb_tanah')">ⓘ</button>
+          </div>
+          <div class="mod-name">Jual Beli Tanah / Rumah</div>
+          <div class="mod-desc">Bawah tangan — sebelum proses notaris / AJB</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('sewa')" id="moddok-sewa">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🔑</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'sewa')">ⓘ</button>
+          </div>
+          <div class="mod-name">Perjanjian Sewa</div>
+          <div class="mod-desc">Rumah, kos, kontrakan, ruko — hak &amp; kewajiban dua pihak</div>
+        </div>
+
+      </div>
+
+      <!-- GROUP: Perjanjian -->
+      <div class="mod-group-label-dok" data-group="perjanjian" onclick="toggleGroupDok('perjanjian')">
+        📑 Perjanjian <span class="mod-group-chevron">▾</span>
+      </div>
+      <div class="mod-group-items" id="group-dok-perjanjian">
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('hutang')" id="moddok-hutang">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">💰</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'hutang')">ⓘ</button>
+          </div>
+          <div class="mod-name">Perjanjian Hutang Piutang</div>
+          <div class="mod-desc">Pinjaman pribadi / usaha — nominal, tenor, &amp; konsekuensi</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('kerjasama')" id="moddok-kerjasama">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🤝</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'kerjasama')">ⓘ</button>
+          </div>
+          <div class="mod-name">Perjanjian Kerjasama Usaha</div>
+          <div class="mod-desc">Bagi hasil, hak, kewajiban, &amp; klausul keluar</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('kontrak_kerja')" id="moddok-kontrak_kerja">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">📑</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'kontrak_kerja')">ⓘ</button>
+          </div>
+          <div class="mod-name">Kontrak Kerja / PKWT</div>
+          <div class="mod-desc">Perjanjian kerja waktu tertentu — hak &amp; kewajiban karyawan</div>
+        </div>
+
+      </div>
+
+      <!-- GROUP: Kuasa & Pernyataan -->
+      <div class="mod-group-label-dok" data-group="kuasa" onclick="toggleGroupDok('kuasa')">
+        🖊️ Kuasa &amp; Pernyataan <span class="mod-group-chevron">▾</span>
+      </div>
+      <div class="mod-group-items" id="group-dok-kuasa">
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('kuasa')" id="moddok-kuasa">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">✍️</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'kuasa')">ⓘ</button>
+          </div>
+          <div class="mod-name">Surat Kuasa</div>
+          <div class="mod-desc">Kuasa umum / khusus — pengurusan, pengambilan, perwakilan</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('pernyataan')" id="moddok-pernyataan">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">📜</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'pernyataan')">ⓘ</button>
+          </div>
+          <div class="mod-name">Surat Pernyataan</div>
+          <div class="mod-desc">Kesanggupan, kejujuran, ahli waris, &amp; berbagai jenis lainnya</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('domisili')" id="moddok-domisili">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">📍</div><span class="mod-badge new">BARU</span></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'domisili')">ⓘ</button>
+          </div>
+          <div class="mod-name">Surat Keterangan Domisili</div>
+          <div class="mod-desc">Keterangan tempat tinggal dari RT/RW atau kelurahan</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('pengantar')" id="moddok-pengantar">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">📮</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'pengantar')">ⓘ</button>
+          </div>
+          <div class="mod-name">Surat Pengantar RT/RW</div>
+          <div class="mod-desc">Pengantar ke kelurahan untuk KTP, BPJS, nikah, akta, dll</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('sktm')" id="moddok-sktm">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🤲</div><span class="mod-badge new">BARU</span></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'sktm')">ⓘ</button>
+          </div>
+          <div class="mod-name">SKTM — Tdk Mampu</div>
+          <div class="mod-desc">Dari RT/RW / kelurahan — beasiswa, keringanan biaya, bansos</div>
+        </div>
+
+      </div>
+
+      <!-- GROUP: Bisnis & Usaha -->
+      <div class="mod-group-label-dok" data-group="bisnis" onclick="toggleGroupDok('bisnis')">
+        📊 Bisnis &amp; Usaha <span class="mod-group-chevron">▾</span>
+      </div>
+      <div class="mod-group-items" id="group-dok-bisnis">
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('penawaran')" id="moddok-penawaran">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">📤</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'penawaran')">ⓘ</button>
+          </div>
+          <div class="mod-name">Surat Penawaran / Proposal</div>
+          <div class="mod-desc">Penawaran produk, jasa, atau kerjasama untuk klien</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('berita_acara')" id="moddok-berita_acara">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">📝</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'berita_acara')">ⓘ</button>
+          </div>
+          <div class="mod-name">Berita Acara Serah Terima</div>
+          <div class="mod-desc">BA pekerjaan, barang, jabatan — ditandatangani dua pihak</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('teguran')" id="moddok-teguran">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">⚠️</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'teguran')">ⓘ</button>
+          </div>
+          <div class="mod-name">Surat Teguran / SP</div>
+          <div class="mod-desc">SP1 / SP2 / SP3 karyawan — dasar hukum &amp; tindak lanjut</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('undangan')" id="moddok-undangan">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">📩</div></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'undangan')">ⓘ</button>
+          </div>
+          <div class="mod-name">Undangan Rapat / Acara</div>
+          <div class="mod-desc">Rapat, sosialisasi, atau acara resmi perusahaan</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('nota')" id="moddok-nota">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🧾</div><span class="mod-badge new">BARU</span></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'nota')">ⓘ</button>
+          </div>
+          <div class="mod-name">Nota / Kwitansi Pembayaran</div>
+          <div class="mod-desc">Bukti bayar transaksi toko, jasa, sewa, atau pinjaman</div>
+        </div>
+
+      </div>
+
+      <!-- GROUP: Undangan & Desain -->
+      <div class="mod-group-label-dok" data-group="undangan" onclick="toggleGroupDok('undangan')">
+        🎍 Undangan &amp; Desain <span class="mod-group-chevron">▾</span>
+      </div>
+      <div class="mod-group-items" id="group-dok-undangan">
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('undangan_nikah')" id="moddok-undangan_nikah">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">💍</div><span class="mod-badge new">BARU</span></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'undangan_nikah')">ⓘ</button>
+          </div>
+          <div class="mod-name">Desain Undangan Pernikahan</div>
+          <div class="mod-desc">Cover + halaman detail — dual prompt siap pakai, 7 template pilihan</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('undangan_khitanan')" id="moddok-undangan_khitanan">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🤲</div><span class="mod-badge new">BARU</span></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'undangan_khitanan')">ⓘ</button>
+          </div>
+          <div class="mod-name">Desain Undangan Khitanan</div>
+          <div class="mod-desc">Desain undangan tasyakuran khitan — 7 template islami &amp; modern</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('undangan_aqiqah')" id="moddok-undangan_aqiqah">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">👶</div><span class="mod-badge new">BARU</span></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'undangan_aqiqah')">ⓘ</button>
+          </div>
+          <div class="mod-name">Desain Undangan Aqiqah / Syukuran</div>
+          <div class="mod-desc">Tasyakuran lahiran, aqiqah, atau syukuran — 7 pilihan tema</div>
+        </div>
+
+        <div class="mod-card mod-card-dok" onclick="setModDok('undangan_ultah')" id="moddok-undangan_ultah">
+          <div class="mod-card-top">
+            <div class="mod-icon-row"><div class="mod-icon">🎂</div><span class="mod-badge new">BARU</span></div>
+            <button class="mod-info-btn" onclick="showModInfoDok(event,'undangan_ultah')">ⓘ</button>
+          </div>
+          <div class="mod-name">Desain Undangan Ulang Tahun</div>
+          <div class="mod-desc">Ultah anak hingga dewasa — 13 tema pesta + 7 template desain</div>
+        </div>
+
+      </div>
+
+    </div><!-- /sidebar-dok-scroll -->
+
+    <!-- SIDEBAR BARCODE (hidden by default) -->
+    <div class="sidebar-scroll" id="sidebar-barcode-scroll" style="display:none">
+
+      <div class="bc-section-header">🏪 Identitas Toko</div>
+      <div class="bc-identity bc-identity-row">
+        <div class="bc-field-wrap" style="flex:1.5">
+          <label>Nama Toko</label>
+          <input type="text" id="bc-nama-toko" value="Toko Prestasi" placeholder="Nama toko" oninput="bcRenderPreview()" title="Nama toko yang dicetak di header halaman barcode">
+        </div>
+        <div class="bc-field-wrap" style="flex:1">
+          <label>Dibuat Oleh <span style="font-weight:400;font-size:8px;opacity:.7">(opsional)</span></label>
+          <input type="text" id="bc-created-by" placeholder="Nama kasir" oninput="bcRenderPreview()" title="Nama kasir atau operator (opsional) — ditampilkan kecil di footer halaman">
+        </div>
+      </div>
+
+      <div class="bc-section-header">📐 Layout Cetak</div>
+      <div class="bc-layout">
+        <div class="bc-layout-top-row">
+          <div class="bc-field-wrap" style="flex:1.2">
+            <label>Ukuran</label>
+            <select id="bc-paper-size" onchange="bcRenderPreview()" title="Pilih ukuran kertas printer. A4 untuk printer standar, F4/Folio untuk kertas panjang">
+              <option value="A4">A4 (210×297 mm)</option>
+              <option value="F4">F4 / Folio (215×330 mm)</option>
+            </select>
+          </div>
+          <div class="bc-field-wrap" style="flex:1">
+            <label>Orientasi</label>
+            <div class="bc-orient-btns">
+              <button class="bc-orient-btn" id="bc-btn-portrait" onclick="bcSetOrient('portrait')" title="Orientasi Portrait: kertas berdiri, lebih banyak baris">▯ Portrait</button>
+              <button class="bc-orient-btn active" id="bc-btn-landscape" onclick="bcSetOrient('landscape')" title="Orientasi Landscape: kertas tidur, lebih banyak kolom — cocok untuk barcode kecil">▭ Landscape</button>
+            </div>
+          </div>
+        </div>
+        <div class="bc-grid-fields">
+          <div class="bc-field-wrap">
+            <label>Kolom</label>
+            <input type="number" id="bc-cols" value="10" min="1" max="20" oninput="bcRenderPreview()" style="text-align:center;" title="Jumlah kolom barcode per baris (1–20)">
+          </div>
+          <div class="bc-field-wrap">
+            <label>Baris</label>
+            <input type="number" id="bc-rows" value="10" min="1" max="30" oninput="bcRenderPreview()" style="text-align:center;" title="Jumlah baris barcode per halaman (1–30)">
+          </div>
+          <div class="bc-field-wrap">
+            <label>Gap (mm)</label>
+            <input type="number" id="bc-gap" value="2" min="0" max="10" step="0.5" oninput="bcRenderPreview()" style="text-align:center;" title="Jarak antar barcode dalam mm. Lebih besar = lebih mudah dipotong, ukuran barcode lebih kecil">
+          </div>
+          <div class="bc-field-wrap">
+            <label>Margin (mm)</label>
+            <input type="number" id="bc-margin" value="2" min="0" max="20" oninput="bcRenderPreview()" style="text-align:center;" title="Margin tepi halaman dalam mm — jarak dari tepi kertas ke barcode pertama">
+          </div>
+        </div>
+        <button class="bc-btn-reset" onclick="bcResetLayoutDefault()" title="Kembalikan semua pengaturan layout ke nilai default (Landscape, 10×10, Gap 2mm, Margin 2mm)">↺ Reset Default</button>
+      </div>
+
+      <div class="bc-section-header">📦 Data Produk</div>
+      <div id="bc-entries-wrap"></div>
+
+    </div><!-- /sidebar-barcode-scroll -->
+
+    <div class="bc-print-footer" id="bc-print-footer" style="display:none">
+      <button class="bc-btn-cetak" onclick="bcCetak()" title="Susun semua produk ke halaman kertas lalu buka dialog cetak printer">🖨️ Cetak Barcode</button>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- WELCOME FOTO -->
+    <div class="welcome" id="welcome">
+      <div class="welcome-scroll">
+
+        <!-- HERO -->
+        <div class="wlc-hero">
+          <div class="wlc-hero-badge">✦ Prompt Master — Foto & Dokumen</div>
+          <div class="wlc-hero-title">Prompt foto & penampilan<br><span>siap pakai dalam detik</span></div>
+          <div class="wlc-hero-sub">Pilih layanan, atur opsi, dan Toko Prestasi generate prompt-nya. Berlaku untuk foto, penampilan, hingga dokumen resmi. Buka Gemini atau ChatGPT, paste prompt — selesai.</div>
+          <button class="wlc-cta" onclick="document.querySelector('#sidebar-foto-scroll .mod-card').click()">Mulai Sekarang →</button>
+        </div>
+
+        <!-- TRUST BAR -->
+        <div class="wlc-trust">
+          <div class="wlc-trust-item"><span class="wlc-trust-icon">🛡️</span> Wajah tidak diubah</div>
+          <div class="wlc-trust-sep"></div>
+          <div class="wlc-trust-item"><span class="wlc-trust-icon">🔒</span> Zero API, zero billing</div>
+          <div class="wlc-trust-sep"></div>
+          <div class="wlc-trust-item"><span class="wlc-trust-icon">⚡</span> Prompt siap dalam detik</div>
+          <div class="wlc-trust-sep"></div>
+          <div class="wlc-trust-item"><span class="wlc-trust-icon">📱</span> Tanpa install aplikasi</div>
+        </div>
+
+        <!-- FEATURE GRID -->
+        <div id="event-ticker-slot"></div>
+
+        <div class="wlc-section-label">25 Modul Tersedia</div>
+
+        <div class="wlc-grid-group-label wlc-group-hot">🔥 Paling Dicari</div>
+        <div class="wlc-grid wlc-grid-featured">
+          <div class="wlc-card wlc-card-hot" onclick="setMod('pasfoto')">
+            <div class="wlc-card-icon">🪪</div>
+            <div class="wlc-card-name">Foto Dokumen Resmi</div>
+            <div class="wlc-card-desc">KTP · SIM · Paspor · SKCK · Lamaran · CPNS · Dinas · KUA · Wisuda — background sesuai aturan</div>
+            <span class="wlc-card-tag hot">🔥 HOT</span>
+          </div>
+          <div class="wlc-card wlc-card-hot" onclick="setMod('background')">
+            <div class="wlc-card-icon">🌄</div>
+            <div class="wlc-card-name">Ganti Background</div>
+            <div class="wlc-card-desc">Ganti latar belakang foto — warna solid atau deskripsi background apapun</div>
+            <span class="wlc-card-tag hot">🔥 HOT</span>
+          </div>
+          <div class="wlc-card wlc-card-hot" onclick="setMod('event_foto')" style="grid-column:1/-1">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <div class="wlc-card-icon" style="font-size:28px;flex-shrink:0">🗓️</div>
+              <div style="flex:1;min-width:180px">
+                <div class="wlc-card-name" style="margin-bottom:3px">Foto Event / Momen</div>
+                <div class="wlc-card-desc">Lebaran · HUT RI · Natal · Valentine · Halloween · Imlek · Kartini — 18 momen Indonesia & internasional. Tema foto otomatis aktif saat momen tiba.</div>
+              </div>
+            </div>
+            <span class="wlc-card-tag hot">🔥 HOT</span>
+          </div>
+        </div>
+
+        <div class="wlc-grid-group-label">Penampilan</div>
+        <div class="wlc-grid">
+          <div class="wlc-card" onclick="setMod('headwear')">
+            <div class="wlc-card-icon">🧢</div>
+            <div class="wlc-card-name">Tambah / Ganti Headwear</div>
+            <div class="wlc-card-desc">Hijab, peci, cap, beanie, fedora, sorban</div>
+            <span class="wlc-card-tag penampilan">Penampilan</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('outfit')">
+            <div class="wlc-card-icon">👔</div>
+            <div class="wlc-card-name">Ganti Pakaian</div>
+            <div class="wlc-card-desc">Formal, kasual, streetwear, adat, seragam, referensi</div>
+            <span class="wlc-card-tag penampilan">Penampilan</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('rambut')">
+            <div class="wlc-card-icon">💇</div>
+            <div class="wlc-card-name">Ganti Warna & Gaya Rambut</div>
+            <div class="wlc-card-desc">Pirang, silver, ombre, bold color — atau gaya baru</div>
+            <span class="wlc-card-tag penampilan">Penampilan</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('aksesori')">
+            <div class="wlc-card-icon">🕶️</div>
+            <div class="wlc-card-name">Tambah Aksesori & Perhiasan</div>
+            <div class="wlc-card-desc">Kacamata hitam/minus, anting pria/wanita, kalung, jam</div>
+            <span class="wlc-card-tag penampilan">Penampilan</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('tato')">
+            <div class="wlc-card-icon">✒️</div>
+            <div class="wlc-card-name">Tambah Tato Digital</div>
+            <div class="wlc-card-desc">Realistik, minimalis, tribal, Japanese — bebas desain</div>
+            <span class="wlc-card-tag penampilan">Penampilan</span>
+          </div>
+        </div>
+
+        <div class="wlc-grid-group-label">✨ Peningkatan Kualitas</div>
+        <div class="wlc-grid">
+          <div class="wlc-card" onclick="setMod('enhance')">
+            <div class="wlc-card-icon">✨</div>
+            <div class="wlc-card-name">Perjelas & Perindah</div>
+            <div class="wlc-card-desc">Tajam, jernih, hingga Ultra HD</div>
+            <span class="wlc-card-tag kualitas">Kualitas</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('restore')">
+            <div class="wlc-card-icon">🖼️</div>
+            <div class="wlc-card-name">Restorasi Foto Lama</div>
+            <div class="wlc-card-desc">Pulihkan foto rusak, pudar, buram</div>
+            <span class="wlc-card-tag kualitas">Kualitas</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('colorize')">
+            <div class="wlc-card-icon">🎨</div>
+            <div class="wlc-card-name">Kolorisasi B&W</div>
+            <div class="wlc-card-desc">Warnai foto hitam putih</div>
+            <span class="wlc-card-tag kualitas">Kualitas</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('retouch')">
+            <div class="wlc-card-icon">💆</div>
+            <div class="wlc-card-name">Retouch Ringan</div>
+            <div class="wlc-card-desc">Haluskan kulit, hilangkan noda & jerawat — natural</div>
+            <span class="wlc-card-tag kualitas">Kualitas</span>
+          </div>
+        </div>
+
+        <div class="wlc-grid-group-label">✂️ Editing Foto</div>
+        <div class="wlc-grid">
+          <div class="wlc-card" onclick="setMod('hapus_objek')">
+            <div class="wlc-card-icon">🧹</div>
+            <div class="wlc-card-name">Hapus Objek / Orang</div>
+            <div class="wlc-card-desc">Hapus orang, benda, watermark — terisi natural</div>
+            <span class="wlc-card-tag" style="background:#fee2e2;color:#991b1b">Editing</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('foto_produk')">
+            <div class="wlc-card-icon">📦</div>
+            <div class="wlc-card-name">Foto Produk Jualan</div>
+            <div class="wlc-card-desc">Background putih studio — siap Shopee / Tokopedia</div>
+            <span class="wlc-card-tag" style="background:#fee2e2;color:#991b1b">Editing</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('foto_couple')">
+            <div class="wlc-card-icon">💑</div>
+            <div class="wlc-card-name">Foto Couple / Pasangan</div>
+            <div class="wlc-card-desc">Gabung 2 foto jadi 1, rapikan pose &amp; background pilihan</div>
+            <span class="wlc-card-tag" style="background:#fee2e2;color:#991b1b">Editing</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('foto_profil')">
+            <div class="wlc-card-icon">📱</div>
+            <div class="wlc-card-name">Foto Profil Sosial Media</div>
+            <div class="wlc-card-desc">LinkedIn, Instagram, WA, TikTok — crop & background ideal</div>
+            <span class="wlc-card-tag" style="background:#fee2e2;color:#991b1b">Editing</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('foto_wisuda')">
+            <div class="wlc-card-icon">🎓</div>
+            <div class="wlc-card-name">Foto Wisuda</div>
+            <div class="wlc-card-desc">Toga + samir + biretta, background pilihan — wajah tidak berubah</div>
+            <span class="wlc-card-tag" style="background:#fee2e2;color:#991b1b">Editing</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('hapus_bg')">
+            <div class="wlc-card-icon">✂️</div>
+            <div class="wlc-card-name">Hapus / Ganti Background</div>
+            <div class="wlc-card-desc">Transparan, warna solid, atau suasana baru — presisi tinggi</div>
+            <span class="wlc-card-tag" style="background:#fee2e2;color:#991b1b">Editing</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('foto_keluarga')">
+            <div class="wlc-card-icon">👨‍👩‍👧‍👦</div>
+            <div class="wlc-card-name">Foto Keluarga</div>
+            <div class="wlc-card-desc">Gabung beberapa foto, poles background — lebaran, ulang tahun</div>
+            <span class="wlc-card-tag" style="background:#fee2e2;color:#991b1b">Editing</span>
+          </div>
+        </div>
+
+        <div class="wlc-grid-group-label">🎨 Foto Kreatif</div>
+        <div class="wlc-grid">
+          <div class="wlc-card" onclick="setMod('ganti_pose')">
+            <div class="wlc-card-icon">🕺</div>
+            <div class="wlc-card-name">Ganti Pose</div>
+            <div class="wlc-card-desc">Ubah pose & komposisi — wajah tidak berubah sedikitpun</div>
+            <span class="wlc-card-tag" style="background:#ede9fe;color:#5b21b6">Kreatif</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('anime_kartun')">
+            <div class="wlc-card-icon">🎌</div>
+            <div class="wlc-card-name">Anime / Kartun</div>
+            <div class="wlc-card-desc">Konversi ke anime, Disney-Pixar, chibi, atau ilustrasi digital</div>
+            <span class="wlc-card-tag" style="background:#ede9fe;color:#5b21b6">Kreatif</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('ilustrasi')">
+            <div class="wlc-card-icon">🖌️</div>
+            <div class="wlc-card-name">Gaya Ilustrasi Artistik</div>
+            <div class="wlc-card-desc">Cat minyak, cat air, pensil sketch, pop art, geometric</div>
+            <span class="wlc-card-tag" style="background:#ede9fe;color:#5b21b6">Kreatif</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('cosplay')">
+            <div class="wlc-card-icon">🎭</div>
+            <div class="wlc-card-name">Cosplay Digital</div>
+            <div class="wlc-card-desc">Anime, superhero, game, fantasi — kostum detail, wajah tidak berubah</div>
+            <span class="wlc-card-tag" style="background:#ede9fe;color:#5b21b6">Kreatif</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('desain_banner')">
+            <div class="wlc-card-icon">🖼️</div>
+            <div class="wlc-card-name">Desain Banner / Poster</div>
+            <div class="wlc-card-desc">Banner promo, grand opening, event — siap sosmed atau cetak</div>
+            <span class="wlc-card-tag" style="background:#ede9fe;color:#5b21b6">Kreatif</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('listing_produk')">
+            <div class="wlc-card-icon">🛍️</div>
+            <div class="wlc-card-name">Listing Foto Produk</div>
+            <div class="wlc-card-desc">Brand besar, spek jumbo, watermark toko — siap Shopee/Tokped</div>
+            <span class="wlc-card-tag" style="background:#dcfce7;color:#166534">Editing</span>
+          </div>
+        </div>
+
+        <!-- HOW IT WORKS -->
+        <div class="wlc-section-label">Cara Pakai</div>
+        <div class="wlc-steps">
+          <div class="wlc-step">
+            <div class="wlc-step-num">1</div>
+            <div class="wlc-step-body">
+              <div class="wlc-step-title">Pilih Layanan</div>
+              <div class="wlc-step-desc">Klik salah satu dari 25 modul di atas atau di sidebar kiri</div>
+            </div>
+          </div>
+          <div class="wlc-step-arrow">→</div>
+          <div class="wlc-step">
+            <div class="wlc-step-num">2</div>
+            <div class="wlc-step-body">
+              <div class="wlc-step-title">Atur & Generate</div>
+              <div class="wlc-step-desc">Atur opsi (warna, jenis kelamin, dll), klik Generate Prompt</div>
+            </div>
+          </div>
+          <div class="wlc-step-arrow">→</div>
+          <div class="wlc-step">
+            <div class="wlc-step-num">3</div>
+            <div class="wlc-step-body">
+              <div class="wlc-step-title">Buka Platform & Paste</div>
+              <div class="wlc-step-desc">Klik Gemini atau ChatGPT — prompt tersalin otomatis. Upload foto, paste, generate</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /welcome foto -->
+
+    <!-- WELCOME DOKUMEN (hidden by default) -->
+    <div class="welcome" id="welcome-dok" style="display:none">
+      <div class="welcome-scroll">
+
+        <!-- HERO -->
+        <div class="wlc-hero">
+          <div class="wlc-hero-badge">✦ Generator Surat &amp; Dokumen ATK</div>
+          <div class="wlc-hero-title">Dokumen apapun, siap<br><span>dalam hitungan detik</span></div>
+          <div class="wlc-hero-sub">Lamaran, CV, surat perjanjian, jual beli, surat kuasa, nota, dan banyak lagi. Isi form, generate prompt, kirim ke AI — dokumen langsung jadi, tinggal cetak.</div>
+          <button class="wlc-cta" onclick="document.querySelector('#sidebar-dok-scroll .mod-card').click()">Mulai Sekarang →</button>
+        </div>
+
+        <!-- TRUST BAR -->
+        <div class="wlc-trust">
+          <div class="wlc-trust-item"><span class="wlc-trust-icon">🤖</span> Claude direkomendasikan</div>
+          <div class="wlc-trust-sep"></div>
+          <div class="wlc-trust-item"><span class="wlc-trust-icon">🔒</span> Zero API, zero billing</div>
+          <div class="wlc-trust-sep"></div>
+          <div class="wlc-trust-item"><span class="wlc-trust-icon">⚡</span> Prompt siap dalam detik</div>
+          <div class="wlc-trust-sep"></div>
+          <div class="wlc-trust-item"><span class="wlc-trust-icon">📄</span> 28 Jenis Dokumen</div>
+        </div>
+
+        <!-- GRID DOKUMEN -->
+        <div class="wlc-section-label">28 Jenis Dokumen Tersedia</div>
+
+        <div class="wlc-grid-group-label wlc-group-hot">🔥 Paling Dicari</div>
+        <div class="wlc-grid wlc-grid-featured">
+          <div class="wlc-card wlc-card-hot" onclick="setModDok('lamaran')">
+            <div class="wlc-card-icon">✉️</div>
+            <div class="wlc-card-name">Surat Lamaran Kerja</div>
+            <div class="wlc-card-desc">Dari toko kecil, UKM, sekolah hingga BUMN &amp; perusahaan besar — tone &amp; format otomatis disesuaikan</div>
+            <span class="wlc-card-tag hot">🔥 HOT</span>
+          </div>
+          <div class="wlc-card wlc-card-hot" onclick="setModDok('cv')">
+            <div class="wlc-card-icon">📋</div>
+            <div class="wlc-card-name">CV / Riwayat Hidup</div>
+            <div class="wlc-card-desc">Format profesional modern, kreatif, akademis, fresh graduate, atau senior eksekutif</div>
+            <span class="wlc-card-tag hot">🔥 HOT</span>
+          </div>
+          <div class="wlc-card wlc-card-hot" onclick="setModDok('izin')">
+            <div class="wlc-card-icon">🏖️</div>
+            <div class="wlc-card-name">Surat Izin / Cuti</div>
+            <div class="wlc-card-desc">Izin kerja atau sekolah — sakit, keperluan keluarga, cuti tahunan, terlambat</div>
+            <span class="wlc-card-tag hot">🔥 HOT</span>
+          </div>
+        </div>
+
+        <div class="wlc-grid-group-label">💼 Karir</div>
+        <div class="wlc-grid">
+          <div class="wlc-card" onclick="setModDok('referensi')">
+            <div class="wlc-card-icon">🏅</div>
+            <div class="wlc-card-name">Surat Referensi</div>
+            <div class="wlc-card-desc">Rekomendasi dari atasan atau rekan</div>
+            <span class="wlc-card-tag" style="background:#e0f2fe;color:#0369a1">Karir</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('keterangan')">
+            <div class="wlc-card-icon">📄</div>
+            <div class="wlc-card-name">Keterangan Kerja</div>
+            <div class="wlc-card-desc">Bukti masih aktif bekerja di perusahaan</div>
+            <span class="wlc-card-tag" style="background:#e0f2fe;color:#0369a1">Karir</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('resign')">
+            <div class="wlc-card-icon">🚪</div>
+            <div class="wlc-card-name">Pengunduran Diri</div>
+            <div class="wlc-card-desc">Resign profesional, tidak bakar jembatan</div>
+            <span class="wlc-card-tag" style="background:#e0f2fe;color:#0369a1">Karir</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('dispensasi')">
+            <div class="wlc-card-icon">📋</div>
+            <div class="wlc-card-name">Surat Dispensasi</div>
+            <div class="wlc-card-desc">Izin khusus dari sekolah / kantor untuk kegiatan tertentu</div>
+            <span class="wlc-card-tag" style="background:#e0f2fe;color:#0369a1">Karir</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('kenaikan_gaji')">
+            <div class="wlc-card-icon">💹</div>
+            <div class="wlc-card-name">Kenaikan Gaji</div>
+            <div class="wlc-card-desc">Permohonan kenaikan gaji berbasis kinerja &amp; kontribusi</div>
+            <span class="wlc-card-tag" style="background:#e0f2fe;color:#0369a1">Karir</span>
+          </div>
+        </div>
+
+        <div class="wlc-grid-group-label">🏠 Jual Beli &amp; Sewa</div>
+        <div class="wlc-grid">
+          <div class="wlc-card" onclick="setModDok('jb_kendaraan')">
+            <div class="wlc-card-icon">🚗</div>
+            <div class="wlc-card-name">Jual Beli Kendaraan</div>
+            <div class="wlc-card-desc">Motor / mobil — kwitansi + pernyataan bawah tangan</div>
+            <span class="wlc-card-tag" style="background:#fef9c3;color:#854d0e">Jual Beli</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('jb_tanah')">
+            <div class="wlc-card-icon">🏠</div>
+            <div class="wlc-card-name">Jual Beli Tanah/Rumah</div>
+            <div class="wlc-card-desc">Bawah tangan sebelum proses notaris / AJB</div>
+            <span class="wlc-card-tag" style="background:#fef9c3;color:#854d0e">Jual Beli</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('sewa')">
+            <div class="wlc-card-icon">🔑</div>
+            <div class="wlc-card-name">Perjanjian Sewa</div>
+            <div class="wlc-card-desc">Kos, kontrakan, ruko — hak &amp; kewajiban dua pihak</div>
+            <span class="wlc-card-tag" style="background:#fef9c3;color:#854d0e">Jual Beli</span>
+          </div>
+        </div>
+
+        <div class="wlc-grid-group-label">📑 Perjanjian</div>
+        <div class="wlc-grid">
+          <div class="wlc-card" onclick="setModDok('hutang')">
+            <div class="wlc-card-icon">💰</div>
+            <div class="wlc-card-name">Hutang Piutang</div>
+            <div class="wlc-card-desc">Nominal, tenor, bunga, &amp; konsekuensi</div>
+            <span class="wlc-card-tag" style="background:#fce7f3;color:#9d174d">Perjanjian</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('kerjasama')">
+            <div class="wlc-card-icon">🤝</div>
+            <div class="wlc-card-name">Kerjasama Usaha</div>
+            <div class="wlc-card-desc">Bagi hasil, hak, kewajiban, &amp; klausul keluar</div>
+            <span class="wlc-card-tag" style="background:#fce7f3;color:#9d174d">Perjanjian</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('kontrak_kerja')">
+            <div class="wlc-card-icon">📑</div>
+            <div class="wlc-card-name">Kontrak Kerja / PKWT</div>
+            <div class="wlc-card-desc">Hak &amp; kewajiban karyawan waktu tertentu</div>
+            <span class="wlc-card-tag" style="background:#fce7f3;color:#9d174d">Perjanjian</span>
+          </div>
+        </div>
+
+        <div class="wlc-grid-group-label">🖊️ Kuasa &amp; Pernyataan</div>
+        <div class="wlc-grid">
+          <div class="wlc-card" onclick="setModDok('kuasa')">
+            <div class="wlc-card-icon">🖊️</div>
+            <div class="wlc-card-name">Surat Kuasa</div>
+            <div class="wlc-card-desc">Kuasa umum / khusus — pengurusan &amp; perwakilan</div>
+            <span class="wlc-card-tag" style="background:#ede9fe;color:#5b21b6">Kuasa</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('pernyataan')">
+            <div class="wlc-card-icon">📜</div>
+            <div class="wlc-card-name">Surat Pernyataan</div>
+            <div class="wlc-card-desc">Kesanggupan, kejujuran, ahli waris, dll</div>
+            <span class="wlc-card-tag" style="background:#ede9fe;color:#5b21b6">Kuasa</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('domisili')">
+            <div class="wlc-card-icon">🏠</div>
+            <div class="wlc-card-name">Keterangan Domisili</div>
+            <div class="wlc-card-desc">Dari RT/RW atau kelurahan untuk keperluan administrasi</div>
+            <span class="wlc-card-tag" style="background:#ede9fe;color:#5b21b6">Kuasa</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('pengantar')">
+            <div class="wlc-card-icon">📮</div>
+            <div class="wlc-card-name">Pengantar RT/RW</div>
+            <div class="wlc-card-desc">Pengantar ke kelurahan untuk KTP, BPJS, nikah, akta, dll</div>
+            <span class="wlc-card-tag" style="background:#ede9fe;color:#5b21b6">Kuasa</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('sktm')">
+            <div class="wlc-card-icon">📋</div>
+            <div class="wlc-card-name">SKTM — Tdk Mampu</div>
+            <div class="wlc-card-desc">Dari RT/RW / kelurahan untuk beasiswa, keringanan biaya, bansos</div>
+            <span class="wlc-card-tag" style="background:#ede9fe;color:#5b21b6">Kuasa</span>
+          </div>
+        </div>
+
+        <div class="wlc-grid-group-label">📊 Bisnis &amp; Usaha</div>
+        <div class="wlc-grid">
+          <div class="wlc-card" onclick="setModDok('penawaran')">
+            <div class="wlc-card-icon">📊</div>
+            <div class="wlc-card-name">Penawaran / Proposal</div>
+            <div class="wlc-card-desc">Tawarkan produk, jasa, atau kerjasama ke klien</div>
+            <span class="wlc-card-tag" style="background:#d1fae5;color:#065f46">Bisnis</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('berita_acara')">
+            <div class="wlc-card-icon">📋</div>
+            <div class="wlc-card-name">Berita Acara</div>
+            <div class="wlc-card-desc">Serah terima pekerjaan, barang, atau jabatan</div>
+            <span class="wlc-card-tag" style="background:#d1fae5;color:#065f46">Bisnis</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('teguran')">
+            <div class="wlc-card-icon">⚠️</div>
+            <div class="wlc-card-name">Surat Teguran / SP</div>
+            <div class="wlc-card-desc">SP1 / SP2 / SP3 karyawan sesuai UU</div>
+            <span class="wlc-card-tag" style="background:#d1fae5;color:#065f46">Bisnis</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('undangan')">
+            <div class="wlc-card-icon">📩</div>
+            <div class="wlc-card-name">Undangan Rapat / Acara</div>
+            <div class="wlc-card-desc">Rapat, sosialisasi, atau acara resmi</div>
+            <span class="wlc-card-tag" style="background:#d1fae5;color:#065f46">Bisnis</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('nota')">
+            <div class="wlc-card-icon">🧾</div>
+            <div class="wlc-card-name">Nota / Kwitansi</div>
+            <div class="wlc-card-desc">Bukti bayar transaksi toko, jasa, atau pinjaman</div>
+            <span class="wlc-card-tag" style="background:#d1fae5;color:#065f46">Bisnis</span>
+          </div>
+        </div>
+
+        <div class="wlc-grid-group-label">🎍 Undangan &amp; Desain Cetak</div>
+        <div class="wlc-grid">
+          <div class="wlc-card" onclick="setModDok('undangan_nikah')">
+            <div class="wlc-card-icon">💍</div>
+            <div class="wlc-card-name">Undangan Pernikahan</div>
+            <div class="wlc-card-desc">Dual prompt: halaman depan + belakang, 7 template pilihan</div>
+            <span class="wlc-card-tag" style="background:#fce7f3;color:#9d174d">Desain</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('undangan_khitanan')">
+            <div class="wlc-card-icon">🤲</div>
+            <div class="wlc-card-name">Undangan Khitanan</div>
+            <div class="wlc-card-desc">Tasyakuran khitan — islami &amp; modern</div>
+            <span class="wlc-card-tag" style="background:#fce7f3;color:#9d174d">Desain</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('undangan_aqiqah')">
+            <div class="wlc-card-icon">👶</div>
+            <div class="wlc-card-name">Undangan Aqiqah / Syukuran</div>
+            <div class="wlc-card-desc">Tasyakuran lahiran, aqiqah, syukuran bayi</div>
+            <span class="wlc-card-tag" style="background:#fce7f3;color:#9d174d">Desain</span>
+          </div>
+          <div class="wlc-card" onclick="setModDok('undangan_ultah')">
+            <div class="wlc-card-icon">🎂</div>
+            <div class="wlc-card-name">Undangan Ulang Tahun</div>
+            <div class="wlc-card-desc">13 tema pesta anak–dewasa + 7 template gaya</div>
+            <span class="wlc-card-tag" style="background:#fce7f3;color:#9d174d">Desain</span>
+          </div>
+        </div>
+
+        <!-- CARA PAKAI -->
+        <div class="wlc-section-label">Cara Pakai</div>
+        <div class="wlc-steps">
+          <div class="wlc-step">
+            <div class="wlc-step-num">1</div>
+            <div class="wlc-step-body">
+              <div class="wlc-step-title">Pilih Jenis Dokumen</div>
+              <div class="wlc-step-desc">Lamaran, perjanjian, nota, desain undangan — 28 pilihan tersedia</div>
+            </div>
+          </div>
+          <div class="wlc-step-arrow">→</div>
+          <div class="wlc-step">
+            <div class="wlc-step-num">2</div>
+            <div class="wlc-step-body">
+              <div class="wlc-step-title">Isi Form &amp; Generate</div>
+              <div class="wlc-step-desc">Isi data wajib + opsional, klik Generate Prompt</div>
+            </div>
+          </div>
+          <div class="wlc-step-arrow">→</div>
+          <div class="wlc-step">
+            <div class="wlc-step-num">3</div>
+            <div class="wlc-step-body">
+              <div class="wlc-step-title">Buka Claude &amp; Paste</div>
+              <div class="wlc-step-desc">Prompt tersalin otomatis. AI tulis, revisi, ketik "finalize" → dokumen HTML siap cetak, klik Print → PDF</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /welcome-dok -->
+
+    <!-- BARCODE MAIN (hidden by default) -->
+    <div id="welcome-barcode" style="display:none">
+      <div class="bc-stat-bar">
+        <div class="bc-stats">
+          <span class="bc-stat-pill bc-stat-green" id="bc-total-count">0 barcode</span>
+          <span class="bc-stat-pill" id="bc-total-pages">0 halaman</span>
+        </div>
+        <div class="bc-zoom-controls">
+          <button class="bc-zoom-btn" onclick="bcZoomOut()" title="Zoom Out (Ctrl+Scroll)">−</button>
+          <span class="bc-zoom-label" id="bc-zoom-label">75%</span>
+          <button class="bc-zoom-btn" onclick="bcZoomIn()" title="Zoom In (Ctrl+Scroll)">＋</button>
+          <button class="bc-zoom-btn" onclick="bcZoomReset()" title="Reset Zoom" style="font-size:12px;">⊙</button>
+        </div>
+      </div>
+      <div class="bc-paper-wrap" id="bc-paper-wrap">
+        <div class="bc-empty-msg">Isi data produk di panel kiri untuk melihat preview barcode</div>
+      </div>
+      <canvas id="bc-canvas" style="display:none;"></canvas>
+    </div><!-- /welcome-barcode -->
+
+    <!-- WORKSPACE (shared foto + dokumen) -->
+    <div class="workspace" id="workspace">
+      <div class="ws-body" id="ws-body">
+        <!-- Injected by app.js -->
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- MOD INFO TOOLTIP -->
+<div class="mod-tooltip" id="mod-tooltip"></div>
+
+<!-- IDLE SCREENSAVER -->
+<div id="fp-screensaver"></div>
+
+<!-- FOOTER -->
+<footer class="app-footer no-print">
+  <div class="footer-left">
+    <span>🧰 <strong class="footer-brand">Toko Prestasi Tools</strong> <span class="footer-ver">v2.1</span></span>
+    <span class="footer-sep">·</span>
+    <div class="footer-idle">
+      <span class="idle-dot" id="idle-dot"></span>
+      <span id="idle-label">Aktif</span>
+    </div>
+  </div>
+  <div class="footer-center" id="footer-ping"></div>
+  <div class="footer-right">
+    <button class="footer-dev" onclick="openNexusForge()">Nexus Forge</button>
+    <span class="footer-sep">·</span>
+    <button class="btn-bug" onclick="laporkanBug()" title="Laporkan bug ke developer via WhatsApp">&#x1F41B; Bug?</button>
+    <span class="footer-sep">·</span>
+    <span id="footer-clock-full">—</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script src="app-core.js"></script>
+<script src="app-foto.js"></script>
+<script src="app-dokumen.js"></script>
+<script src="app-barcode.js"></script>
+<script>
+/* ── CLOCK (footer only) ── */
+(function() {
+  const DAYS = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  function pad(n, len) { return String(n).padStart(len || 2, '0'); }
+  function tickClock() {
+    const now = new Date();
+    const h = pad(now.getHours()), m = pad(now.getMinutes()), s = pad(now.getSeconds());
+    const ms = pad(now.getMilliseconds(), 3);
+    const micro = ms + pad(Math.floor(Math.random() * 1000), 3);
+    const day = DAYS[now.getDay()];
+    const date = pad(now.getDate()) + ' ' + MONTHS[now.getMonth()] + ' ' + now.getFullYear();
+    const fEl = document.getElementById('footer-clock-full');
+    if (fEl) fEl.textContent = day + ' ' + date + ' ' + h + ':' + m + ':' + s + '.' + micro;
+    requestAnimationFrame(tickClock);
+  }
+  tickClock();
+})();
+
+/* ── IDLE DETECTION → app-screensaver.js ── */
+// initScreensaver() dipanggil di blok init bawah
+
+
+</script>
+<script src="app-screensaver.js"></script>
+<script>
+/* ── INIT ALL MODULES ── */
+initFoto();
+initDokPanel();
+initBarcode();
+initScreensaver();
+initPingWidget();
+startSplashLoading();
+
+/* ── EVENT AUTO-HOT: COMING SOON INFO ── */
+function showEventSoonInfo() {
+  const events = [
+    '🕌 Lebaran / Idul Fitri (Hijriah)',
+    '🐑 Idul Adha (Hijriah)',
+    '🇮🇩 HUT Kemerdekaan RI — 17 Agustus',
+    '👩 Hari Ibu — 22 Desember',
+    '🌸 Hari Kartini — 21 April',
+    '👶 Hari Anak Nasional — 23 Juli',
+    '🎄 Natal — 25 Desember',
+    '💝 Valentine — 14 Februari',
+    '👻 Halloween — 31 Oktober',
+    '🎊 Tahun Baru — 1 Januari',
+    '🎑 Tahun Baru Imlek',
+    '🏮 Hari Raya Nyepi',
+  ];
+  const modal = document.createElement('div');
+  modal.id = 'event-soon-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:16px';
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:16px;padding:24px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);font-family:'Sora',sans-serif">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <span style="font-size:28px">🗓️</span>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#92400e">Foto Event / Momen Spesial</div>
+          <span style="font-size:10px;font-weight:700;background:#fff8e1;color:#b45309;border:1px solid #fcd34d;border-radius:20px;padding:2px 8px">🔜 SEGERA HADIR</span>
+        </div>
+      </div>
+      <p style="font-size:12px;color:#6b7280;margin:12px 0 6px">Fitur ini akan otomatis mendeteksi momen hari ini dan memunculkan modul foto tema khusus di bagian <strong>🔥 HOT</strong>:</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 16px">
+        ${events.map(e => `<span style="font-size:11px;background:#fffbeb;border:1px solid #fde68a;border-radius:20px;padding:3px 10px;color:#92400e">${e}</span>`).join('')}
+      </div>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 12px;font-size:11.5px;color:#166534;margin-bottom:16px">
+        💡 Setiap momen akan punya modul foto khusus — <strong>tanpa teks</strong> (foto tema saja) dan <strong>dengan teks</strong> (ucapan + tema). Naik otomatis saat momen tiba, hilang saat lewat.
+      </div>
+      <button onclick="document.getElementById('event-soon-modal').remove()" style="width:100%;padding:10px;background:var(--green,#00C853);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif">Oke, Ditunggu! 👍</button>
+    </div>`;
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  document.body.appendChild(modal);
+}
+
+/* ── NEXUS FORGE MODAL ── */
+function openNexusForge() {
+  if (document.getElementById('nexus-modal')) return;
+  const ROLES = [
+    { tier:'COMMAND', items:[
+      { img:'KAELA',  name:'KAELA',  role:'Lead AI Architect · Command Center · Dispatch' },
+    ]},
+    { tier:'WORKFLOW CORE', items:[
+      { img:'CIPHER', name:'CIPHER', role:'Business Analyst · BRD · Acceptance Criteria' },
+      { img:'LYRA',   name:'LYRA',   role:'UX/Design · Wireframe · Design Spec' },
+      { img:'RAVEN',  name:'RAVEN',  role:'Senior Backend Dev · Web Engine · Data Pipeline' },
+      { img:'ZANE',   name:'ZANE',   role:'Frontend Dev · HTML/CSS/JS · Rendering Layer' },
+      { img:'MARCUS', name:'MARCUS', role:'Security Review' },
+    ]},
+    { tier:'QA & SPECIALIST', items:[
+      { img:'DRAKE',  name:'DRAKE',  role:'Debug Specialist · Root Cause Analysis' },
+      { img:'VECTOR', name:'VECTOR', role:'QA Functional Tester' },
+      { img:'PRISM',  name:'PRISM',  role:'Data QA · Verifikasi Kalkulasi Bisnis' },
+    ]},
+    { tier:'SUPPORT', items:[
+      { img:'NOVA',   name:'NOVA',   role:'Documentation · README · User Guide' },
+      { img:'REED',   name:'REED',   role:'Patch Archive · Session State · Bug Registry' },
+    ]},
+    { tier:'EKSTERNAL', items:[
+      { img:'SEIRA',  name:'SEIRA',  role:'Brainstorm · Eksplorasi Konsep · ChatGPT' },
+    ]},
+  ];
+
+  let rolesHtml = '';
+  ROLES.forEach(group => {
+    rolesHtml += `<div style="font-size:8px;font-weight:700;color:#bbb;letter-spacing:2px;font-family:'DM Mono',monospace;margin:10px 0 6px;text-transform:uppercase;">${group.tier}</div>`;
+    rolesHtml += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">`;
+    group.items.forEach(r => {
+      rolesHtml += `
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#f8fdf9;border-radius:10px;border:1.5px solid #e2f0e8;">
+          <img src="crew/NEXUS_FORGE_${r.img}.png" onclick="nfLightbox(this.src,'${r.name} — ${r.role}')" style="width:38px;height:38px;border-radius:8px;object-fit:cover;flex-shrink:0;display:block;cursor:zoom-in;transition:transform .15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+          <div style="min-width:0;">
+            <div style="font-size:11px;font-weight:800;color:#1a2e1f;letter-spacing:.3px;">${r.name}</div>
+            <div style="font-size:9px;color:#6b8f72;margin-top:1px;line-height:1.3;">${r.role}</div>
+          </div>
+        </div>`;
+    });
+    rolesHtml += `</div>`;
+  });
+
+  const m = document.createElement('div');
+  m.id = 'nexus-modal';
+  m.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);padding:16px;backdrop-filter:blur(4px)';
+  m.innerHTML = `
+  <div style="background:#fff;border-radius:20px;padding:0;max-width:560px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.3);font-family:'Sora',sans-serif;">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#00C853,#00963a);padding:20px 22px 18px;position:relative;flex-shrink:0;">
+      <button onclick="document.getElementById('nexus-modal').remove()" style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.2);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <img src="crew/NEXUS_FORGE_OLAN.png" onclick="nfLightbox(this.src,'OLAN — Project Director')" style="width:58px;height:58px;border-radius:14px;object-fit:cover;flex-shrink:0;display:block;border:2px solid rgba(255,255,255,0.3);cursor:zoom-in;">
+        <div>
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:2.5px;font-family:'DM Mono',monospace;">PROJECT DIRECTOR</div>
+          <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px;line-height:1.1;">OLAN</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px;">Nexus Forge · Toko Prestasi · Kongbeng, Kutai Timur</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:8px;">
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.9);font-family:'DM Mono',monospace;">NEXUS FORGE</div>
+        <div style="font-size:9px;color:rgba(255,255,255,0.5);font-family:'DM Mono',monospace;">Smart Contract v12.5 · 12 AI Roles · Powered by Claude</div>
+      </div>
+    </div>
+    <!-- Scrollable team -->
+    <div style="overflow-y:auto;padding:16px 20px 20px;flex:1;">
+      <div style="font-size:9px;font-weight:700;color:#aaa;letter-spacing:2px;font-family:'DM Mono',monospace;margin-bottom:8px;">AI TEAM · 12 ROLES</div>
+      ${rolesHtml}
+      <div style="margin-top:16px;padding-top:12px;border-top:1.5px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:9px;color:#bbb;font-family:'DM Mono',monospace;">Toko Prestasi Tools v2.1 · Nexus Forge</div>
+        <a href="https://wa.me/6281299303888" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#00C853;text-decoration:none;font-family:'DM Mono',monospace;">💬 WhatsApp</a>
+      </div>
+    </div>
+  </div>`;
+  m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+  document.body.appendChild(m);
+}
+
+function nfLightbox(src, caption) {
+  if (document.getElementById('nf-lightbox')) return;
+  const lb = document.createElement('div');
+  lb.id = 'nf-lightbox';
+  lb.style.cssText = 'position:fixed;inset:0;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.85);cursor:zoom-out;padding:20px;';
+  lb.innerHTML = `
+    <img src="${src}" style="max-width:min(420px,90vw);max-height:70vh;border-radius:18px;object-fit:contain;box-shadow:0 24px 80px rgba(0,0,0,.6);display:block;animation:lb-in .2s ease;">
+    <div style="margin-top:14px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.75);font-family:'Sora',sans-serif;text-align:center;letter-spacing:.2px;">${caption}</div>
+    <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.35);font-family:'DM Mono',monospace;">klik mana saja untuk tutup</div>
+  `;
+  lb.addEventListener('click', () => lb.remove());
+  document.body.appendChild(lb);
+  if (!document.getElementById('lb-style')) {
+    const s = document.createElement('style');
+    s.id = 'lb-style';
+    s.textContent = '@keyframes lb-in{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}';
+    document.head.appendChild(s);
+  }
+}
+</script>
+
+<!-- ── UPDATE NOTIF (Electron only) ── -->
+<div id="update-banner" style="
+  display:none; position:fixed; bottom:48px; left:50%; transform:translateX(-50%);
+  z-index:99999; background:#0a2e1a; border:1.5px solid #00c853;
+  border-radius:999px; padding:8px 20px 8px 14px;
+  display:none; align-items:center; gap:10px;
+  font-family:'DM Mono',monospace; font-size:12px; color:#00e676;
+  box-shadow:0 4px 24px rgba(0,200,83,0.25); cursor:pointer;
+  animation:ub-in .35s cubic-bezier(.22,1,.36,1);
+" onclick="if(window.electronAPI) window.electronAPI.doReload()">
+  <span style="font-size:15px;animation:ub-spin 1.5s linear infinite;display:inline-block">🔄</span>
+  <span id="update-banner-txt">Update tersedia — klik untuk reload</span>
+</div>
+<style>
+  @keyframes ub-in   { from{opacity:0;transform:translateX(-50%) translateY(16px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+  @keyframes ub-spin { to{transform:rotate(360deg)} }
+</style>
+<script>
+if (window.electronAPI) {
+  window.electronAPI.onUpdateAvailable(function(ver) {
+    var b = document.getElementById('update-banner');
+    var t = document.getElementById('update-banner-txt');
+    if (t) t.textContent = 'Update v' + ver + ' tersedia — klik untuk reload';
+    if (b) b.style.display = 'flex';
+  });
+}
+</script>
+
+</body>
+</html>

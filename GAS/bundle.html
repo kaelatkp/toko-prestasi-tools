@@ -1,0 +1,2638 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foto Prestasi — Toko Prestasi</title>
+<style id="crew-mode-style">
+#btn-api-key, #btn-sync { display: none !important; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #00C853;
+  --green-dark: #009c3e;
+  --green-dim: #007a30;
+  --green-light: #edfbf3;
+  --green-mid: #b6f0cc;
+  --green-glow: rgba(0,200,83,0.18);
+  --text: #0f1f14;
+  --text-2: #3a5c45;
+  --text-3: #5a7265;
+  --border: #d4e8da;
+  --border-2: #c2deca;
+  --bg: #f2faf5;
+  --bg-2: #e8f5ed;
+  --white: #ffffff;
+  --red: #e53935;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05);
+  --shadow-green: 0 4px 20px rgba(0,200,83,0.22);
+  --sidebar-w: 272px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--white);
+  border-bottom: 2px solid var(--green-mid);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: 56px;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-icon {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  box-shadow: var(--shadow-green);
+  flex-shrink: 0;
+}
+.brand-name {
+  font-size: 14px; font-weight: 800;
+  letter-spacing: -0.3px; color: var(--text);
+  display: flex; align-items: center; gap: 7px;
+}
+.brand-badge {
+  background: var(--text); color: var(--green);
+  font-size: 7px; font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  border-radius: 4px; padding: 2px 6px; letter-spacing: 1px;
+}
+.brand-sub { font-size: 10px; color: var(--text-3); margin-top: 1px; }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.btn-api {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 6px 12px;
+  color: var(--text-3); font-size: 11px; font-weight: 600;
+  cursor: pointer; font-family: 'Sora', sans-serif; transition: all .15s;
+}
+.btn-api:hover { border-color: var(--green); color: var(--text); }
+.api-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--border); flex-shrink: 0; transition: background .2s;
+}
+.btn-api.connected .api-dot { background: var(--green); box-shadow: 0 0 6px var(--green-glow); }
+.btn-api.connected { border-color: var(--green-mid); color: var(--text-2); }
+
+/* ── LAYOUT ── */
+.app {
+  display: flex;
+  flex: 1;
+  min-height: 0; /* critical: allows flex children to shrink */
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--white);
+  border-right: 1.5px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sidebar-head {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-head-label {
+  font-size: 8px; font-weight: 700; color: var(--text-3);
+  letter-spacing: 1.8px; text-transform: uppercase;
+  font-family: 'DM Mono', monospace; margin-bottom: 2px;
+}
+.sidebar-head-title { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+.sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px; }
+.sidebar-scroll::-webkit-scrollbar { width: 3px; }
+.sidebar-scroll::-webkit-scrollbar-thumb { background: var(--green-mid); border-radius: 4px; }
+
+.mod-group-label {
+  font-size: 8px; font-weight: 700; color: var(--text-3);
+  letter-spacing: 1.8px; text-transform: uppercase;
+  font-family: 'DM Mono', monospace; margin: 12px 4px 5px;
+}
+.mod-group-label:first-child { margin-top: 4px; }
+.mod-card {
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 10px 12px;
+  margin-bottom: 4px; cursor: pointer; transition: all .15s; position: relative;
+}
+.mod-card:hover { border-color: var(--green); background: var(--green-light); }
+.mod-card.active { border-color: var(--green); background: var(--green-light); box-shadow: 0 0 0 3px var(--green-glow); }
+.mod-icon { font-size: 17px; margin-bottom: 3px; }
+.mod-name { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.mod-card.active .mod-name { color: var(--green-dark); }
+.mod-desc { font-size: 10px; color: var(--text-3); line-height: 1.4; }
+.mod-badge {
+  position: absolute; top: 8px; right: 8px;
+  font-size: 7px; font-weight: 700;
+  font-family: 'DM Mono', monospace; letter-spacing: 0.5px;
+  padding: 2px 5px; border-radius: 4px;
+}
+.mod-badge.new { background: var(--green-light); color: var(--green-dark); border: 1px solid var(--green-mid); }
+
+/* ── MAIN ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ── WELCOME ── */
+.welcome {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+.welcome::-webkit-scrollbar { width: 4px; }
+.welcome::-webkit-scrollbar-thumb { background: var(--green-mid); border-radius: 4px; }
+
+.welcome-scroll {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 28px 48px;
+  display: flex; flex-direction: column; gap: 36px;
+}
+
+/* hero */
+.wlc-hero {
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 36px 36px 32px;
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 16px; position: relative; overflow: hidden;
+}
+.wlc-hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--green), var(--green-dark));
+}
+.wlc-hero-badge {
+  display: inline-flex; align-items: center;
+  background: var(--green-light); color: var(--green-dark);
+  border: 1px solid var(--green-mid);
+  border-radius: 99px; padding: 4px 12px;
+  font-size: 10px; font-weight: 700;
+  font-family: 'DM Mono', monospace; letter-spacing: 0.5px;
+  width: fit-content;
+}
+.wlc-hero-title {
+  font-size: 32px; font-weight: 800; color: var(--text);
+  letter-spacing: -0.8px; line-height: 1.2;
+}
+.wlc-hero-title span { color: var(--green-dark); }
+.wlc-hero-sub {
+  font-size: 13px; color: var(--text-3); line-height: 1.7;
+  max-width: 520px;
+}
+.wlc-cta {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--green); color: var(--white);
+  border: none; border-radius: 10px; padding: 12px 24px;
+  font-size: 13px; font-weight: 700;
+  font-family: 'Sora', sans-serif; cursor: pointer;
+  width: fit-content; transition: all .15s;
+  box-shadow: var(--shadow-green); margin-top: 4px;
+}
+.wlc-cta:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+/* trust bar */
+.wlc-trust {
+  display: flex; align-items: center; gap: 0;
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 14px 20px;
+  flex-wrap: wrap; gap: 8px;
+}
+.wlc-trust-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600; color: var(--text-2);
+  flex: 1; min-width: 140px;
+}
+.wlc-trust-icon { font-size: 14px; flex-shrink: 0; }
+.wlc-trust-sep {
+  width: 1px; height: 20px; background: var(--border);
+  flex-shrink: 0;
+}
+
+/* section label */
+.wlc-section-label {
+  font-size: 8px; font-weight: 700; color: var(--text-3);
+  letter-spacing: 2px; text-transform: uppercase;
+  font-family: 'DM Mono', monospace;
+  margin-bottom: -24px;
+}
+
+/* feature grid */
+.wlc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 10px;
+}
+.wlc-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 16px 14px 14px;
+  cursor: pointer; transition: all .15s;
+  display: flex; flex-direction: column; gap: 4px;
+  position: relative; overflow: hidden;
+}
+.wlc-card:hover {
+  border-color: var(--green); background: var(--green-light);
+  transform: translateY(-2px); box-shadow: var(--shadow-green);
+}
+.wlc-card-icon { font-size: 22px; margin-bottom: 4px; }
+.wlc-card-name { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.3; }
+.wlc-card-desc { font-size: 10px; color: var(--text-3); line-height: 1.4; margin-top: 2px; }
+.wlc-card-tag {
+  display: inline-block; margin-top: 8px;
+  font-size: 8px; font-weight: 700;
+  font-family: 'DM Mono', monospace; letter-spacing: 0.5px;
+  padding: 2px 7px; border-radius: 4px; width: fit-content;
+}
+.wlc-card-tag.doc { background: #e8f0fe; color: #1a56db; }
+.wlc-card-tag.kualitas { background: var(--green-light); color: var(--green-dark); }
+.wlc-card-tag.kreatif { background: #fdf4ff; color: #9333ea; }
+
+/* how it works */
+.wlc-steps {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 20px;
+  flex-wrap: wrap;
+}
+.wlc-step {
+  flex: 1; min-width: 160px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.wlc-step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--green); color: var(--white);
+  font-size: 12px; font-weight: 800;
+  font-family: 'DM Mono', monospace;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.wlc-step-title { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.wlc-step-desc { font-size: 10px; color: var(--text-3); line-height: 1.5; }
+.wlc-step-arrow {
+  color: var(--border-2); font-size: 18px; font-weight: 300;
+  padding-top: 4px; flex-shrink: 0; align-self: flex-start;
+  margin-top: 3px;
+}
+
+@media (max-width: 768px) {
+  .welcome-scroll { padding: 16px 14px 32px; gap: 24px; }
+  .wlc-hero { padding: 22px 18px 20px; }
+  .wlc-hero-title { font-size: 24px; }
+  .wlc-hero-sub { font-size: 12px; }
+  .wlc-trust { padding: 12px 14px; }
+  .wlc-trust-sep { display: none; }
+  .wlc-trust-item { min-width: 120px; }
+  .wlc-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+  .wlc-steps { flex-direction: column; gap: 12px; }
+  .wlc-step-arrow { display: none; }
+}
+
+/* ── WORKSPACE ── */
+.workspace { flex: 1; display: none; flex-direction: column; overflow: hidden; min-height: 0; }
+.workspace.show { display: flex; }
+
+.ws-header {
+  padding: 12px 20px 10px;
+  border-bottom: 1.5px solid var(--border);
+  background: var(--white);
+  flex-shrink: 0;
+}
+.ws-header-label { font-size: 8px; font-weight: 700; color: var(--text-3); letter-spacing: 1.8px; text-transform: uppercase; font-family: 'DM Mono', monospace; margin-bottom: 1px; }
+.ws-header-title { font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+.ws-header-desc { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+.ws-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+}
+.ws-body::-webkit-scrollbar { width: 4px; }
+.ws-body::-webkit-scrollbar-thumb { background: var(--green-mid); border-radius: 4px; }
+
+/* ── ACTION BAR ── */
+.action-bar {
+  padding: 12px 20px;
+  border-top: 1.5px solid var(--border);
+  background: var(--white);
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+.btn-proses {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--green); color: var(--white);
+  border: none; border-radius: 10px; padding: 11px 22px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: 'Sora', sans-serif; transition: all .15s;
+  box-shadow: var(--shadow-green);
+}
+.btn-proses:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
+.btn-proses:active:not(:disabled) { transform: translateY(0); }
+.btn-proses:disabled { background: #c0ccc4; box-shadow: none; cursor: not-allowed; opacity: 0.7; }
+.btn-reset {
+  background: none; border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 10px 16px;
+  font-size: 12px; font-weight: 600; color: var(--text-3);
+  cursor: pointer; font-family: 'Sora', sans-serif; transition: all .15s;
+}
+.btn-reset:hover { border-color: var(--red); color: var(--red); }
+.action-hint { font-size: 10px; color: var(--text-3); margin-left: auto; }
+
+/* ── SECTION CARDS ── */
+.section-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.section-head {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  font-size: 9px; font-weight: 700; color: var(--text-3);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  font-family: 'DM Mono', monospace;
+}
+.section-body { padding: 14px; }
+
+/* ── UPLOAD ── */
+.upload-grid { display: grid; gap: 10px; }
+.upload-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.upload-zone {
+  border: 2px dashed var(--border-2);
+  border-radius: 10px;
+  padding: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 5px;
+  cursor: pointer; transition: all .2s;
+  text-align: center; position: relative;
+  height: 140px;
+  background: var(--bg);
+  overflow: hidden;
+}
+.upload-zone:hover { border-color: var(--green); background: var(--green-light); }
+.upload-zone.has-file { border-color: var(--green); border-style: solid; background: var(--bg); padding: 0; }
+.upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2; }
+.upload-icon { font-size: 24px; }
+.upload-label { font-size: 11px; font-weight: 700; color: var(--text-2); }
+.upload-sub { font-size: 10px; color: var(--text-3); }
+.upload-fname {
+  font-size: 9px; font-weight: 600; color: var(--green-dark);
+  font-family: 'DM Mono', monospace;
+  position: absolute; bottom: 6px; left: 8px; right: 8px;
+  text-align: center; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+  z-index: 1;
+}
+.upload-preview {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: none;
+}
+.upload-zone.has-file .upload-preview { display: block; }
+.upload-zone.has-file .upload-icon,
+.upload-zone.has-file .upload-label,
+.upload-zone.has-file .upload-sub { display: none; }
+
+/* ── NOTE BOX ── */
+.note-box {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: var(--green-light); border: 1px solid var(--green-mid);
+  border-radius: 8px; padding: 9px 11px;
+  font-size: 11px; color: var(--text-2); line-height: 1.6;
+  margin-bottom: 12px;
+}
+.note-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── OPTIONS ── */
+.opt-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.opt-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 130px; margin-bottom: 10px; }
+.opt-group:last-child { margin-bottom: 0; }
+.opt-label {
+  font-size: 9px; font-weight: 700; color: var(--text-3);
+  letter-spacing: 0.5px; text-transform: uppercase;
+  font-family: 'DM Mono', monospace;
+}
+.opt-select, .opt-input {
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 7px 10px;
+  font-size: 12px; font-weight: 600; color: var(--text);
+  font-family: 'Sora', sans-serif; outline: none;
+  transition: border-color .15s; width: 100%;
+}
+.opt-select:focus, .opt-input:focus { border-color: var(--green); }
+.opt-textarea {
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 8px 10px;
+  font-size: 11px; color: var(--text);
+  font-family: 'Sora', sans-serif; outline: none;
+  transition: border-color .15s; width: 100%;
+  resize: vertical; min-height: 60px; line-height: 1.5;
+}
+.opt-textarea:focus { border-color: var(--green); }
+.opt-textarea::placeholder { color: var(--text-3); }
+
+/* ── COLOR CHIPS ── */
+.color-row { display: flex; gap: 7px; flex-wrap: wrap; }
+.color-chip {
+  width: 30px; height: 30px; border-radius: 7px;
+  cursor: pointer; border: 2px solid transparent;
+  transition: all .15s; flex-shrink: 0;
+}
+.color-chip:hover { transform: scale(1.1); }
+.color-chip.selected { border-color: var(--text); box-shadow: 0 0 0 3px rgba(15,31,20,0.15); }
+.color-chip-custom {
+  width: 30px; height: 30px; border-radius: 7px;
+  border: 2px dashed var(--border-2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 15px; transition: all .15s;
+  position: relative; overflow: hidden; flex-shrink: 0;
+}
+.color-chip-custom input[type=color] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+
+/* ── LOADING ── */
+.loading-panel {
+  display: none; flex-direction: column;
+  align-items: center; gap: 12px; padding: 28px;
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 12px; text-align: center; flex-shrink: 0;
+}
+.loading-panel.show { display: flex; }
+.loading-spinner {
+  width: 44px; height: 44px;
+  border: 3px solid var(--green-mid);
+  border-top-color: var(--green);
+  border-radius: 50%; animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.loading-sub { font-size: 11px; color: var(--text-3); }
+.loading-bar-wrap {
+  width: 100%; max-width: 280px;
+  background: var(--bg); border-radius: 99px; height: 4px; overflow: hidden;
+}
+.loading-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--green-dark));
+  border-radius: 99px; width: 0%; transition: width .4s ease;
+}
+.loading-steps { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.loading-step {
+  font-size: 9px; font-weight: 600;
+  font-family: 'DM Mono', monospace;
+  padding: 3px 7px; border-radius: 4px;
+  background: var(--bg); color: var(--text-3);
+  border: 1px solid var(--border); transition: all .3s;
+}
+.loading-step.active { background: var(--green-light); color: var(--green-dark); border-color: var(--green-mid); }
+.loading-step.done { background: var(--green); color: white; border-color: var(--green); }
+
+/* ── RESULT ── */
+.result-panel {
+  display: none; flex-direction: column; gap: 0;
+  background: var(--white); border: 1.5px solid var(--green-mid);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 0 0 3px var(--green-glow);
+  flex-shrink: 0;
+}
+.result-panel.show { display: flex; }
+.result-head {
+  padding: 9px 14px;
+  background: var(--green-light); border-bottom: 1px solid var(--green-mid);
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; font-weight: 700; color: var(--green-dark);
+}
+.result-img-wrap {
+  padding: 14px;
+  display: flex; justify-content: center; align-items: center;
+  background: #f8f8f8;
+  max-height: 340px;
+  overflow: hidden;
+}
+.result-img {
+  max-width: 100%;
+  max-height: 300px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  display: block;
+}
+.result-actions { padding: 10px 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── BEFORE/AFTER SLIDER ── */
+.btn-toggle-compare {
+  margin-left: auto;
+  background: none; border: 1.5px solid var(--green-mid);
+  border-radius: 6px; padding: 3px 10px;
+  font-size: 10px; font-weight: 700; color: var(--green-dark);
+  cursor: pointer; font-family: 'Sora', sans-serif;
+  transition: all .15s; letter-spacing: 0.3px;
+}
+.btn-toggle-compare:hover { background: var(--green-light); }
+.btn-toggle-compare.active { background: var(--green); color: white; border-color: var(--green); }
+
+.slider-wrap { padding: 14px; background: #f0f0f0; }
+.slider-container {
+  position: relative; width: 100%; max-height: 300px;
+  overflow: hidden; border-radius: 8px;
+  cursor: col-resize; user-select: none;
+  display: flex; align-items: center; justify-content: center;
+  background: #e8e8e8;
+}
+.slider-img {
+  display: block; max-width: 100%; max-height: 300px;
+  width: auto; height: auto; object-fit: contain;
+}
+.slider-before { position: relative; z-index: 1; }
+.slider-after-wrap {
+  position: absolute; inset: 0;
+  clip-path: inset(0 0 0 50%);
+  z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  transition: clip-path 0s;
+}
+.slider-after { max-width: 100%; max-height: 300px; width: auto; height: auto; object-fit: contain; }
+.slider-divider {
+  position: absolute; top: 0; bottom: 0; left: 50%;
+  width: 3px; background: white;
+  box-shadow: 0 0 8px rgba(0,0,0,0.35);
+  z-index: 3; cursor: col-resize;
+  transform: translateX(-50%);
+}
+.slider-handle {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 36px; height: 36px; border-radius: 50%;
+  background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--text);
+}
+.slider-handle::before { content: '⇄'; font-weight: 700; }
+.slider-label {
+  position: absolute; top: 8px;
+  font-size: 9px; font-weight: 700;
+  font-family: 'DM Mono', monospace; letter-spacing: 1.5px;
+  padding: 3px 8px; border-radius: 4px;
+  background: rgba(0,0,0,0.5); color: white;
+  pointer-events: none; z-index: 4;
+}
+.slider-label-left { left: 8px; }
+.slider-label-right { right: 8px; }
+.btn-download {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--green); color: white;
+  border: none; border-radius: 8px; padding: 9px 18px;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  font-family: 'Sora', sans-serif; transition: background .15s;
+}
+.btn-download:hover { background: var(--green-dark); }
+.btn-whatsapp {
+  display: flex; align-items: center; gap: 6px;
+  background: #25D366; color: white;
+  border: none; border-radius: 8px; padding: 9px 18px;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  font-family: 'Sora', sans-serif; transition: background .15s;
+}
+.btn-whatsapp:hover { background: #1da851; }
+.btn-retry {
+  background: none; border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 8px 14px;
+  font-size: 12px; font-weight: 600; color: var(--text-3);
+  cursor: pointer; font-family: 'Sora', sans-serif; transition: all .15s;
+}
+.btn-retry:hover { border-color: var(--green); color: var(--green-dark); }
+
+/* ── ERROR ── */
+.error-panel {
+  display: none; background: #fff5f5;
+  border: 1.5px solid #fecaca; border-radius: 10px;
+  padding: 12px 14px; font-size: 12px; color: var(--red);
+  font-weight: 600; line-height: 1.5; flex-shrink: 0;
+}
+.error-panel.show { display: block; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(15,31,20,0.5); backdrop-filter: blur(4px);
+  z-index: 1000; align-items: center; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--white); border-radius: 16px;
+  width: 420px; max-width: calc(100vw - 32px);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.18); overflow: hidden;
+}
+.modal-head { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); }
+.modal-title { font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+.modal-sub { font-size: 12px; color: var(--text-3); margin-top: 4px; line-height: 1.5; }
+.modal-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 12px; }
+.modal-label { font-size: 10px; font-weight: 700; color: var(--text-3); letter-spacing: 1px; text-transform: uppercase; font-family: 'DM Mono', monospace; margin-bottom: 5px; }
+.modal-input {
+  width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 10px 13px; font-size: 13px; color: var(--text);
+  font-family: 'DM Mono', monospace; outline: none; transition: border-color .15s;
+}
+.modal-input:focus { border-color: var(--green); }
+.modal-foot { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+.btn-save {
+  background: var(--green); color: white; border: none;
+  border-radius: 8px; padding: 10px 22px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: 'Sora', sans-serif; transition: background .15s;
+}
+.btn-save:hover { background: var(--green-dark); }
+.btn-cancel {
+  background: none; border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 9px 16px; font-size: 12px; font-weight: 600; color: var(--text-3);
+  cursor: pointer; font-family: 'Sora', sans-serif; transition: all .15s;
+}
+.btn-cancel:hover { border-color: var(--text-3); color: var(--text); }
+.api-info {
+  background: var(--green-light); border: 1px solid var(--green-mid);
+  border-radius: 8px; padding: 10px 12px; font-size: 11px; color: var(--text-2); line-height: 1.6;
+}
+.api-info a { color: var(--green-dark); font-weight: 700; }
+
+/* ── MOBILE RESPONSIVE ── */
+.btn-menu {
+  display: none;
+  flex-direction: column; justify-content: center; gap: 5px;
+  width: 36px; height: 36px;
+  background: none; border: none; cursor: pointer;
+  padding: 6px; margin-right: 4px; flex-shrink: 0;
+}
+.btn-menu span {
+  display: block; height: 2px; border-radius: 2px;
+  background: var(--text); transition: all .2s;
+}
+
+.drawer-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(15,31,20,0.45);
+  z-index: 200;
+}
+.drawer-overlay.show { display: block; }
+
+@media (max-width: 768px) {
+  body { overflow: hidden; }
+
+  .btn-menu { display: flex; }
+
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0;
+    width: 288px; max-width: 85vw;
+    z-index: 300;
+    transform: translateX(-100%);
+    transition: transform .25s cubic-bezier(.4,0,.2,1);
+    box-shadow: var(--shadow-lg);
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  .app { overflow: hidden; }
+
+  .main { width: 100%; min-width: 0; }
+
+  .ws-header { padding: 10px 14px 8px; }
+  .ws-header-title { font-size: 15px; }
+
+  .ws-body { padding: 12px 14px; gap: 12px; }
+
+  .action-bar { padding: 10px 14px; gap: 8px; flex-wrap: wrap; }
+  .btn-proses { font-size: 12px; padding: 10px 16px; }
+  .action-hint { width: 100%; text-align: center; margin-left: 0; order: -1; }
+
+  .section-body { padding: 12px; }
+
+  .result-img-wrap { max-height: 260px; }
+  .result-img { max-height: 220px; }
+
+  .slider-container { max-height: 220px; }
+  .slider-img { max-height: 220px; }
+  .slider-after { max-height: 220px; }
+
+  .modal { width: calc(100vw - 24px); }
+
+  .welcome { padding: 24px 20px; }
+  .welcome-title { font-size: 20px; }
+  .welcome-steps { gap: 6px; }
+  .welcome-step { font-size: 10px; padding: 6px 10px; }
+}
+#toast-container {
+  position: fixed; bottom: 20px; right: 20px;
+  display: flex; flex-direction: column; gap: 8px;
+  z-index: 9999; pointer-events: none;
+}
+.toast {
+  padding: 10px 16px;
+  border-radius: 9px; font-size: 12px; font-weight: 600;
+  font-family: 'Sora', sans-serif; line-height: 1.4;
+  box-shadow: var(--shadow-lg);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity .22s ease, transform .22s ease;
+  max-width: 320px;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast-success { background: var(--green); color: var(--white); }
+.toast-error { background: var(--red); color: var(--white); }
+
+/* ── HISTORY ── */
+#wlc-history-wrap { display: none; }
+.wlc-history-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.wlc-hist-clear {
+  background: none; border: 1.5px solid var(--border);
+  border-radius: 6px; padding: 4px 10px;
+  font-size: 10px; font-weight: 600; color: var(--text-3);
+  cursor: pointer; font-family: 'Sora', sans-serif; transition: all .15s;
+}
+.wlc-hist-clear:hover { border-color: var(--red); color: var(--red); }
+.wlc-hist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.wlc-hist-item {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 10px; overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: all .15s;
+}
+.wlc-hist-item:hover { border-color: var(--green); box-shadow: var(--shadow-green); transform: translateY(-2px); }
+.wlc-hist-thumb {
+  width: 100%; aspect-ratio: 1;
+  object-fit: cover; display: block;
+  background: var(--bg);
+}
+.wlc-hist-meta {
+  padding: 7px 9px 4px; flex: 1;
+}
+.wlc-hist-label {
+  font-size: 10px; font-weight: 700; color: var(--text);
+  line-height: 1.3; margin-bottom: 2px;
+}
+.wlc-hist-ts {
+  font-size: 9px; color: var(--text-3);
+  font-family: 'DM Mono', monospace;
+}
+.wlc-hist-dl {
+  margin: 0 9px 8px; width: calc(100% - 18px);
+  background: var(--green-light); border: 1px solid var(--green-mid);
+  border-radius: 6px; padding: 5px;
+  font-size: 11px; cursor: pointer; transition: background .15s;
+  color: var(--green-dark);
+}
+.wlc-hist-dl:hover { background: var(--green); color: white; border-color: var(--green); }
+
+@media (max-width: 768px) {
+  .wlc-hist-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+}
+
+/* ── UPLOAD ZONE ERROR STATE ── */
+.upload-zone.zone-has-error {
+  border-color: var(--red);
+  background: #fff5f5;
+}
+.upload-zone.zone-has-error:hover { border-color: var(--red); background: #fff5f5; }
+.zone-error {
+  font-size: 10px; font-weight: 600; color: var(--red);
+  font-family: 'DM Mono', monospace;
+  margin-top: 4px; padding: 5px 10px;
+  background: #fff5f5; border: 1px solid #fecaca;
+  border-radius: 6px; line-height: 1.4;
+}
+
+
+/* ── SCROLLBAR SIDEBAR — tebal & enak diklik ── */
+.sidebar-scroll::-webkit-scrollbar { width: 8px; }
+.sidebar-scroll::-webkit-scrollbar-track { background: transparent; border-radius: 8px; }
+.sidebar-scroll::-webkit-scrollbar-thumb { background: var(--green-mid); border-radius: 8px; border: 2px solid var(--white); }
+.sidebar-scroll::-webkit-scrollbar-thumb:hover { background: var(--green); }
+.sidebar-scroll { scrollbar-width: auto; scrollbar-color: var(--green-mid) transparent; }
+
+/* ── HEADER RIGHT ── */
+.header-right { display: flex; align-items: center; gap: 10px; }
+.btn-sync {
+  display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 9px;
+  border: 1.5px solid var(--green-mid); background: var(--green-light);
+  color: var(--green-dark); font-size: 12px; font-weight: 700; font-family: 'Sora', inherit;
+  cursor: pointer; transition: background .15s, transform .1s; flex-shrink: 0;
+}
+.btn-sync:hover { background: var(--green-mid); transform: translateY(-1px); }
+.btn-sync:active { transform: translateY(0); }
+.btn-sync.syncing .sync-icon { animation: sync-spin 1s linear infinite; display: inline-block; }
+@keyframes sync-spin { to { transform: rotate(360deg); } }
+.sync-icon { display: inline-block; }
+
+/* ── BTN API KEY ── */
+.btn-api-key {
+  display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 9px;
+  border: 1.5px solid var(--border-2); background: var(--bg-2);
+  color: var(--text-2); font-size: 12px; font-weight: 700; font-family: 'Sora', inherit;
+  cursor: pointer; transition: background .15s, border-color .15s, transform .1s; flex-shrink: 0;
+}
+.btn-api-key:hover { border-color: var(--green-mid); background: var(--green-light); color: var(--green-dark); transform: translateY(-1px); }
+.btn-api-key:active { transform: translateY(0); }
+.btn-api-key.key-set { border-color: var(--green-mid); color: var(--green-dark); background: var(--green-light); }
+
+/* ── MODAL API KEY ── */
+.api-modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.45); backdrop-filter: blur(3px);
+  align-items: center; justify-content: center;
+}
+.api-modal-overlay.show { display: flex; }
+.api-modal {
+  background: var(--white); border-radius: 16px; padding: 28px 28px 24px;
+  width: 100%; max-width: 420px; box-shadow: var(--shadow-lg);
+  border: 1.5px solid var(--border); position: relative;
+}
+.api-modal-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.api-modal-sub { font-size: 12px; color: var(--text-3); margin-bottom: 18px; line-height: 1.5; }
+.api-modal-label { font-size: 11px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+.api-modal-input-wrap { position: relative; }
+.api-modal-input {
+  width: 100%; padding: 10px 40px 10px 12px; border-radius: 9px;
+  border: 1.5px solid var(--border); background: var(--bg-2);
+  font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text);
+  outline: none; box-sizing: border-box; transition: border-color .15s;
+}
+.api-modal-input:focus { border-color: var(--green-mid); }
+.api-modal-toggle {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; font-size: 15px; color: var(--text-3);
+  padding: 2px; line-height: 1;
+}
+.api-modal-status { font-size: 11px; margin-top: 7px; min-height: 16px; }
+.api-modal-status.ok { color: var(--green-dark); }
+.api-modal-status.err { color: var(--red); }
+.api-modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+.api-modal-save {
+  flex: 1; padding: 10px; border-radius: 9px; border: none;
+  background: var(--green); color: var(--white);
+  font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s;
+}
+.api-modal-save:hover { background: var(--green-dark); }
+.api-modal-clear {
+  padding: 10px 14px; border-radius: 9px; border: 1.5px solid var(--border);
+  background: var(--bg-2); color: var(--text-2);
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s;
+}
+.api-modal-clear:hover { background: var(--border); }
+.api-modal-close {
+  position: absolute; top: 14px; right: 16px; background: none; border: none;
+  font-size: 18px; color: var(--text-3); cursor: pointer; line-height: 1; padding: 2px;
+}
+.api-modal-close:hover { color: var(--text); }
+
+/* ── FOOTER ── */
+.app-footer {
+  background: var(--white); border-top: 1.5px solid var(--border);
+  padding: 7px 24px; display: flex; align-items: center; justify-content: space-between;
+  font-size: 10px; color: var(--text-2); font-family: 'DM Mono', monospace;
+  letter-spacing: 0.4px; flex-shrink: 0; flex-wrap: wrap; gap: 6px;
+}
+.footer-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.footer-brand { color: var(--green-dark); font-weight: 700; }
+.footer-sep { color: var(--border-2); }
+.footer-idle { display: flex; align-items: center; gap: 5px; }
+.idle-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: idle-pulse 2s ease-in-out infinite; flex-shrink: 0; }
+.idle-dot.warn { background: #f59e0b; }
+.idle-dot.danger { background: var(--red); }
+@keyframes idle-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+.footer-right { color: var(--text-3); font-size: 9.5px; }
+
+/* ── IDLE SCREENSAVER ── */
+#fp-screensaver {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(145deg, #0a1f14 0%, #0f3320 45%, #0a1f14 100%);
+  cursor: none;
+}
+
+</style>
+
+
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="btn-menu" id="btn-menu" onclick="openDrawer()" aria-label="Buka menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="brand">
+    <div class="brand-icon">📸</div>
+    <div class="brand-text">
+      <div class="brand-name">
+        Toko Prestasi
+        <span class="brand-badge">FOTO</span>
+      </div>
+      <div class="brand-sub">Editor Foto Dokumen Profesional</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn-api-key" id="btn-api-key" onclick="bukaModalApiKey()" title="Set API Key Gemini">
+      <span>🔑</span> API Key
+    </button>
+    <button class="btn-sync" id="btn-sync" onclick="jalankanSync()" title="Sync ke GAS (segera hadir)">
+      <span class="sync-icon">⟳</span> Sync
+    </button>
+  </div>
+</header>
+
+<!-- DRAWER OVERLAY (mobile) -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-head-label">Modul Editing</div>
+      <div class="sidebar-head-title">Pilih Layanan</div>
+    </div>
+    <div class="sidebar-scroll">
+
+      <div class="mod-group-label">Foto Dokumen</div>
+
+      <div class="mod-card" onclick="setMod('pasfoto')" id="mod-pasfoto">
+        <div class="mod-icon">🪪</div>
+        <div class="mod-name">Pas Foto Resmi</div>
+        <div class="mod-desc">Ganti background, rapikan penampilan untuk dokumen resmi</div>
+      </div>
+
+      <div class="mod-card" onclick="setMod('lamaran')" id="mod-lamaran">
+        <div class="mod-icon">💼</div>
+        <div class="mod-name">Foto Lamaran Kerja</div>
+        <div class="mod-desc">Foto formal profesional untuk melamar pekerjaan</div>
+      </div>
+
+      <div class="mod-card" onclick="setMod('kua')" id="mod-kua">
+        <div class="mod-icon">💍</div>
+        <div class="mod-name">Foto KUA / Nikah</div>
+        <div class="mod-desc">Rapikan foto pasangan untuk dokumen pernikahan</div>
+      </div>
+
+      <div class="mod-card" onclick="setMod('beasiswa')" id="mod-beasiswa">
+        <div class="mod-icon">🎓</div>
+        <div class="mod-name">Foto Beasiswa / CPNS</div>
+        <div class="mod-desc">Foto formal untuk pendaftaran beasiswa & CPNS</div>
+      </div>
+
+      <div class="mod-group-label">Peningkatan Kualitas</div>
+
+      <div class="mod-card" onclick="setMod('enhance')" id="mod-enhance">
+        <div class="mod-icon">✨</div>
+        <div class="mod-name">Perjelas & Perindah</div>
+        <div class="mod-desc">Tingkatkan kualitas, ketajaman, dan pencahayaan foto</div>
+      </div>
+
+      <div class="mod-card" onclick="setMod('restore')" id="mod-restore">
+        <div class="mod-icon">🖼️</div>
+        <div class="mod-name">Restorasi Foto Lama</div>
+        <div class="mod-desc">Pulihkan foto lama yang rusak, pudar, atau buram</div>
+      </div>
+
+      <div class="mod-card" onclick="setMod('colorize')" id="mod-colorize">
+        <div class="mod-icon">🎨</div>
+        <div class="mod-name">Kolorisasi Foto B&W</div>
+        <div class="mod-desc">Beri warna pada foto hitam putih secara natural</div>
+        <span class="mod-badge new">BARU</span>
+      </div>
+
+      <div class="mod-group-label">Kreatif</div>
+
+      <div class="mod-card" onclick="setMod('background')" id="mod-background">
+        <div class="mod-icon">🌄</div>
+        <div class="mod-name">Ganti Background</div>
+        <div class="mod-desc">Ganti latar foto dengan background apapun yang diinginkan</div>
+      </div>
+
+      <div class="mod-card" onclick="setMod('outfit')" id="mod-outfit">
+        <div class="mod-icon">👔</div>
+        <div class="mod-name">Ganti Pakaian Formal</div>
+        <div class="mod-desc">Ubah pakaian menjadi formal/jas/seragam</div>
+        <span class="mod-badge new">BARU</span>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- WELCOME -->
+    <div class="welcome" id="welcome">
+      <div class="welcome-scroll">
+
+        <!-- HERO -->
+        <div class="wlc-hero">
+          <div class="wlc-hero-badge">✦ Editor Foto Dokumen</div>
+          <div class="wlc-hero-title">Foto profesional<br><span>dalam hitungan detik</span></div>
+          <div class="wlc-hero-sub">Upload foto, pilih layanan, dan Toko Prestasi mengerjakannya. Wajah dijamin tidak berubah — hanya background, pakaian, dan kualitas yang diperbaiki.</div>
+          <button class="wlc-cta" onclick="document.querySelector('.sidebar-scroll .mod-card').click()">Mulai Sekarang →</button>
+        </div>
+
+        <!-- TRUST BAR -->
+        <div class="wlc-trust">
+          <div class="wlc-trust-item"><span class="wlc-trust-icon">🛡️</span> Wajah tidak diubah</div>
+          <div class="wlc-trust-sep"></div>
+          <div class="wlc-trust-item"><span class="wlc-trust-icon">🔒</span> Foto tidak disimpan</div>
+          <div class="wlc-trust-sep"></div>
+          <div class="wlc-trust-item"><span class="wlc-trust-icon">⚡</span> Hasil dalam 30–60 detik</div>
+          <div class="wlc-trust-sep"></div>
+          <div class="wlc-trust-item"><span class="wlc-trust-icon">📱</span> Tanpa install aplikasi</div>
+        </div>
+
+        <!-- FEATURE GRID -->
+        <div class="wlc-section-label">9 Layanan Tersedia</div>
+        <div class="wlc-grid">
+          <div class="wlc-card" onclick="setMod('pasfoto')">
+            <div class="wlc-card-icon">🪪</div>
+            <div class="wlc-card-name">Pas Foto Resmi</div>
+            <div class="wlc-card-desc">KTP, SIM, paspor, dokumen resmi</div>
+            <span class="wlc-card-tag doc">Dokumen</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('lamaran')">
+            <div class="wlc-card-icon">💼</div>
+            <div class="wlc-card-name">Foto Lamaran Kerja</div>
+            <div class="wlc-card-desc">Formal profesional, standar HRD</div>
+            <span class="wlc-card-tag doc">Dokumen</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('kua')">
+            <div class="wlc-card-icon">💍</div>
+            <div class="wlc-card-name">Foto KUA / Nikah</div>
+            <div class="wlc-card-desc">Dokumen pernikahan resmi</div>
+            <span class="wlc-card-tag doc">Dokumen</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('beasiswa')">
+            <div class="wlc-card-icon">🎓</div>
+            <div class="wlc-card-name">Beasiswa / CPNS</div>
+            <div class="wlc-card-desc">LPDP, CPNS, SNBT, dan lainnya</div>
+            <span class="wlc-card-tag doc">Dokumen</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('enhance')">
+            <div class="wlc-card-icon">✨</div>
+            <div class="wlc-card-name">Perjelas & Perindah</div>
+            <div class="wlc-card-desc">Tajam, jernih, hingga Ultra HD</div>
+            <span class="wlc-card-tag kualitas">Kualitas</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('restore')">
+            <div class="wlc-card-icon">🖼️</div>
+            <div class="wlc-card-name">Restorasi Foto Lama</div>
+            <div class="wlc-card-desc">Pulihkan foto rusak, pudar, buram</div>
+            <span class="wlc-card-tag kualitas">Kualitas</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('colorize')">
+            <div class="wlc-card-icon">🎨</div>
+            <div class="wlc-card-name">Kolorisasi B&W</div>
+            <div class="wlc-card-desc">Warnai foto hitam putih secara natural</div>
+            <span class="wlc-card-tag kualitas">Kualitas</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('background')">
+            <div class="wlc-card-icon">🌄</div>
+            <div class="wlc-card-name">Ganti Background</div>
+            <div class="wlc-card-desc">Warna solid atau background custom</div>
+            <span class="wlc-card-tag kreatif">Kreatif</span>
+          </div>
+          <div class="wlc-card" onclick="setMod('outfit')">
+            <div class="wlc-card-icon">👔</div>
+            <div class="wlc-card-name">Ganti Pakaian Formal</div>
+            <div class="wlc-card-desc">Jas, kemeja, toga, seragam CPNS</div>
+            <span class="wlc-card-tag kreatif">Kreatif</span>
+          </div>
+        </div>
+
+        <!-- HOW IT WORKS -->
+        <div class="wlc-section-label">Cara Pakai</div>
+        <div class="wlc-steps">
+          <div class="wlc-step">
+            <div class="wlc-step-num">1</div>
+            <div class="wlc-step-body">
+              <div class="wlc-step-title">Pilih Layanan</div>
+              <div class="wlc-step-desc">Klik salah satu dari 9 modul editing di atas atau di sidebar kiri</div>
+            </div>
+          </div>
+          <div class="wlc-step-arrow">→</div>
+          <div class="wlc-step">
+            <div class="wlc-step-num">2</div>
+            <div class="wlc-step-body">
+              <div class="wlc-step-title">Upload Foto</div>
+              <div class="wlc-step-desc">Upload foto yang ingin diproses — format JPG, PNG, atau WEBP, maksimal 10MB</div>
+            </div>
+          </div>
+          <div class="wlc-step-arrow">→</div>
+          <div class="wlc-step">
+            <div class="wlc-step-num">3</div>
+            <div class="wlc-step-body">
+              <div class="wlc-step-title">Proses & Unduh</div>
+              <div class="wlc-step-desc">Atur opsi, klik Proses — hasil siap diunduh dalam hitungan detik</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORY -->
+        <div id="wlc-history-wrap"></div>
+
+      </div>
+    </div>
+
+    <!-- WORKSPACE -->
+    <div class="workspace" id="workspace">
+      <div class="ws-header">
+        <div class="ws-header-label" id="ws-label">Modul</div>
+        <div class="ws-header-title" id="ws-title">—</div>
+        <div class="ws-header-desc" id="ws-desc">—</div>
+      </div>
+
+      <div class="ws-body" id="ws-body">
+        <!-- Injected by app.js -->
+      </div>
+
+      <div class="action-bar">
+        <button class="btn-proses" id="btn-proses" onclick="proses()">
+          ⚡ Proses Sekarang
+        </button>
+        <button class="btn-reset" onclick="resetUpload()">Reset</button>
+        <div class="action-hint" id="action-hint">Upload foto untuk mulai</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL API KEY -->
+<div class="api-modal-overlay" id="api-modal-overlay" onclick="tutupModalApiKeyLuar(event)">
+  <div class="api-modal">
+    <button class="api-modal-close" onclick="tutupModalApiKey()" title="Tutup">✕</button>
+    <div class="api-modal-title">🔑 Set API Key Gemini</div>
+    <div class="api-modal-sub">Paste API Key Gemini kamu di sini. Key disimpan di browser (localStorage) dan tidak pernah dikirim ke server selain Gemini.<br>Dapatkan di: <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--green-dark)">aistudio.google.com/apikey</a></div>
+    <div class="api-modal-label">API Key</div>
+    <div class="api-modal-input-wrap">
+      <input class="api-modal-input" id="api-modal-input" type="password" placeholder="AIza..." autocomplete="off" spellcheck="false">
+      <button class="api-modal-toggle" id="api-modal-toggle" onclick="toggleShowApiKey()" title="Tampilkan/sembunyikan">👁</button>
+    </div>
+    <div class="api-modal-status" id="api-modal-status"></div>
+    <div class="api-modal-actions">
+      <button class="api-modal-save" onclick="simpanApiKey()">Simpan Key</button>
+      <button class="api-modal-clear" onclick="hapusApiKey()">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- IDLE SCREENSAVER -->
+<div id="fp-screensaver"></div>
+
+<!-- FOOTER -->
+<footer class="app-footer no-print">
+  <div class="footer-left">
+    <span>Foto Prestasi v1.0 &mdash; Editor Foto Dokumen Profesional</span>
+    <span class="footer-sep">|</span>
+    <span>Dibuat oleh <span class="footer-brand">Nexus Forge</span></span>
+    <span class="footer-sep">|</span>
+    <span>9 Modul &bull; Gemini API &bull; Offline App</span>
+    <span class="footer-sep">|</span>
+    <div class="footer-idle">
+      <span class="idle-dot" id="idle-dot"></span>
+      <span id="idle-label">Aktif</span>
+    </div>
+  </div>
+  <div class="footer-right" id="footer-clock-full">—</div>
+</footer>
+
+
+
+<script>
+/* ── CLOCK (footer only) ── */
+(function() {
+  const DAYS = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  function pad(n, len) { return String(n).padStart(len || 2, '0'); }
+  function tickClock() {
+    const now = new Date();
+    const h = pad(now.getHours()), m = pad(now.getMinutes()), s = pad(now.getSeconds());
+    const ms = pad(now.getMilliseconds(), 3);
+    const micro = ms + pad(Math.floor(Math.random() * 1000), 3);
+    const day = DAYS[now.getDay()];
+    const date = pad(now.getDate()) + ' ' + MONTHS[now.getMonth()] + ' ' + now.getFullYear();
+    const fEl = document.getElementById('footer-clock-full');
+    if (fEl) fEl.textContent = day + ' ' + date + ' ' + h + ':' + m + ':' + s + '.' + micro;
+    requestAnimationFrame(tickClock);
+  }
+  tickClock();
+})();
+
+/* ── IDLE DETECTION + COUNTER ── */
+(function() {
+  const IDLE_LIMIT = 5 * 60 * 1000;
+  const IDLE_WARN  = 3 * 60 * 1000;
+  let lastActive = Date.now();
+  let ssActive = false;
+
+  const dot   = document.getElementById('idle-dot');
+  const label = document.getElementById('idle-label');
+
+  function updateIdleUI() {
+    const elapsed = Date.now() - lastActive;
+    const secs = Math.floor(elapsed / 1000);
+    if (elapsed < IDLE_WARN) {
+      if (dot) { dot.className = 'idle-dot'; }
+      if (label) label.textContent = 'Aktif';
+    } else if (elapsed < IDLE_LIMIT) {
+      if (dot) { dot.className = 'idle-dot warn'; }
+      const rem = Math.ceil((IDLE_LIMIT - elapsed) / 1000);
+      if (label) label.textContent = 'Idle ' + secs + 'd — SS ' + rem + 'd';
+    } else {
+      if (dot) { dot.className = 'idle-dot danger'; }
+      if (label) label.textContent = 'Screensaver';
+    }
+  }
+  setInterval(updateIdleUI, 1000);
+
+  /* ── SCREENSAVER ── */
+  const ss = document.getElementById('fp-screensaver');
+  let rafId, intervals = [], scanY = 0, floatEls = [], termLines = [];
+
+  const BRAND_PHRASES = [
+    '▸ FOTO PRESTASI • TOKO PRESTASI ◂',
+    '▸ EDITOR FOTO DOKUMEN PROFESIONAL ◂',
+    '▸ NEXUS FORGE • INTERNAL TOOLS ◂',
+    '▸ 9 MODUL AKTIF • GEMINI POWERED ◂',
+  ];
+  const TERM_LINES = [
+    '> initializing foto-prestasi engine...',
+    '> loading gemini vision module [OK]',
+    '> wajah_rule: ACTIVE — face lock ON',
+    '> modul: pasfoto lamaran kua beasiswa',
+    '> modul: enhance restore colorize outfit',
+    '> history: localStorage READY',
+    '> sync: waiting for GAS endpoint...',
+    '> status: OFFLINE MODE — all clear',
+    '> nexus_forge: build PASSING',
+    '> idle timeout: 300s',
+  ];
+  const MAX_TERM = 10;
+  let termIdx = 0;
+
+  function rnd(a,b){ return Math.random()*(b-a)+a; }
+  function randHex(n){ let s=''; for(let i=0;i<n;i++) s+='0123456789ABCDEF'[Math.floor(Math.random()*16)]; return s; }
+
+  function createBg(){
+    const bg = document.createElement('canvas');
+    bg.style.cssText='position:absolute;inset:0;width:100%;height:100%;opacity:0.07;pointer-events:none;';
+    bg.width = window.innerWidth; bg.height = window.innerHeight;
+    ss.appendChild(bg);
+    const ctx = bg.getContext('2d');
+    ctx.strokeStyle='#00C853'; ctx.lineWidth=1;
+    for(let x=0;x<bg.width;x+=40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,bg.height); ctx.stroke(); }
+    for(let y=0;y<bg.height;y+=40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(bg.width,y); ctx.stroke(); }
+  }
+
+  function createScan(){
+    const el = document.createElement('div');
+    el.id='fp-scan';
+    el.style.cssText='position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,#00C853,transparent);opacity:0.5;pointer-events:none;z-index:3;';
+    ss.appendChild(el);
+    return el;
+  }
+  let scanEl;
+
+  function createTerminal(){
+    const wrap = document.createElement('div');
+    wrap.style.cssText='position:absolute;bottom:80px;left:40px;width:420px;background:rgba(4,18,8,0.8);border:1px solid #00C85333;border-radius:10px;padding:12px 14px;font-family:"DM Mono",monospace;font-size:11px;z-index:10;pointer-events:none;';
+    const head = document.createElement('div');
+    head.style.cssText='color:#00C853;font-weight:700;letter-spacing:2px;margin-bottom:8px;font-size:10px;';
+    head.textContent = '▸ FOTO PRESTASI TERMINAL';
+    wrap.appendChild(head);
+    const body = document.createElement('div');
+    body.id='fp-term-body';
+    body.style.cssText='color:#00e676;line-height:1.7;max-height:160px;overflow:hidden;';
+    wrap.appendChild(body);
+    ss.appendChild(wrap);
+    return body;
+  }
+  let termBody;
+
+  function addTermLine(){
+    if(!termBody) return;
+    const txt = TERM_LINES[termIdx % TERM_LINES.length]; termIdx++;
+    const line = document.createElement('div');
+    line.style.opacity='0'; line.style.transition='opacity .3s';
+    line.textContent = txt;
+    termBody.appendChild(line);
+    termLines.push(line);
+    if(termLines.length > MAX_TERM){ const old = termLines.shift(); old.remove(); }
+    requestAnimationFrame(()=>{ line.style.opacity='1'; });
+    termBody.scrollTop = termBody.scrollHeight;
+  }
+
+  function createWatermark(){
+    const el = document.createElement('div');
+    el.style.cssText='position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-family:"DM Mono",monospace;font-size:10px;font-weight:700;color:#00C85355;letter-spacing:3px;text-transform:uppercase;pointer-events:none;white-space:nowrap;z-index:20;text-shadow:0 0 14px #00C853;';
+    el.textContent='▸ FOTO PRESTASI • NEXUS FORGE • TOKO PRESTASI ◂';
+    ss.appendChild(el);
+  }
+
+  function createHex(){
+    const el = document.createElement('div');
+    el.id='fp-hex';
+    el.style.cssText='position:absolute;bottom:80px;right:24px;font-family:"DM Mono",monospace;font-size:9px;color:#00C85355;letter-spacing:1px;pointer-events:none;line-height:1.7;text-align:right;z-index:5;';
+    ss.appendChild(el);
+    return el;
+  }
+  let hexEl;
+
+  function updateHex(){
+    if(!hexEl) return;
+    let out='';
+    for(let r=0;r<6;r++){
+      let row=randHex(2)+' ';
+      for(let c=0;c<8;c++) row+=('0'+Math.floor(Math.random()*256).toString(16).toUpperCase()).slice(-2)+' ';
+      out+=row+'<br>';
+    }
+    hexEl.innerHTML=out;
+  }
+
+  function createStatus(){
+    const wrap = document.createElement('div');
+    wrap.style.cssText='position:absolute;top:16px;left:16px;display:flex;flex-direction:column;gap:6px;z-index:20;pointer-events:none;';
+    const items=['SYSTEM ONLINE','GEMINI READY','WAJAH LOCK ON','HISTORY LOADED','OFFLINE MODE'];
+    items.forEach((txt,i)=>{
+      const p = document.createElement('div');
+      p.style.cssText='display:flex;align-items:center;gap:8px;background:rgba(4,18,8,0.75);border:1px solid #00C85344;border-radius:6px;padding:4px 10px;font-family:"DM Mono",monospace;font-size:9.5px;color:#00e676;letter-spacing:1px;opacity:0;transition:opacity .5s;';
+      p.innerHTML='<span style="width:7px;height:7px;border-radius:50%;background:#00C853;display:inline-block;box-shadow:0 0 6px #00C853;animation:fp-dot 1s ease-in-out infinite;"></span>'+txt;
+      wrap.appendChild(p);
+      setTimeout(()=>{ p.style.opacity='1'; }, i*400+300);
+    });
+    ss.appendChild(wrap);
+  }
+
+  if(!document.getElementById('fp-ss-style')){
+    const sty=document.createElement('style');
+    sty.id='fp-ss-style';
+    sty.textContent='@keyframes fp-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}';
+    document.head.appendChild(sty);
+  }
+
+  function loop(){
+    scanY=(scanY+1.5)%window.innerHeight;
+    if(scanEl) scanEl.style.transform='translateY('+scanY+'px)';
+    rafId=requestAnimationFrame(loop);
+  }
+
+  function showSS(){
+    if(ssActive) return; ssActive=true;
+    ss.style.display='block'; ss.innerHTML='';
+    scanY=0; termLines=[]; termIdx=0;
+    createBg(); scanEl=createScan(); termBody=createTerminal();
+    hexEl=createHex(); createStatus(); createWatermark();
+    const tInt=setInterval(addTermLine, 900); intervals.push(tInt);
+    const hInt=setInterval(updateHex, 300); intervals.push(hInt);
+    setTimeout(()=>{ for(let i=0;i<6;i++) setTimeout(addTermLine, i*200); }, 200);
+    loop();
+  }
+
+  function hideSS(){
+    if(!ssActive) return; ssActive=false;
+    cancelAnimationFrame(rafId);
+    intervals.forEach(x=>{ clearInterval(x); }); intervals=[];
+    ss.style.display='none'; ss.innerHTML='';
+  }
+
+  function resetTimer(){
+    lastActive=Date.now();
+    if(ssActive) hideSS();
+  }
+
+  ['mousemove','mousedown','keydown','scroll','touchstart','click','wheel']
+    .forEach(ev=>document.addEventListener(ev, resetTimer, {passive:true}));
+
+  setInterval(()=>{
+    if(!ssActive && Date.now()-lastActive >= IDLE_LIMIT) showSS();
+  }, 1000);
+})();
+
+/* ── SYNC — delegate ke syncConfig() di app.js ── */
+function jalankanSync(){ if(typeof syncConfig === 'function') syncConfig(); }
+</script>
+
+<script>
+const IS_CREW_MODE = true;
+const CREW_GAS_URL = window.location.href.split('?')[0];
+/* ════════════════════════════════════
+   STATE
+════════════════════════════════════ */
+let apiKey = '';
+let currentMod = null;
+let uploadedFiles = {};
+let resultBlob = null;
+let loadingBarInt = null;
+
+const BG_COLORS = [
+  { hex: '#FF0000', name: 'Merah' },
+  { hex: '#0000FF', name: 'Biru' },
+  { hex: '#FFFFFF', name: 'Putih' },
+  { hex: '#808080', name: 'Abu-abu' },
+  { hex: '#000080', name: 'Biru Navy' },
+  { hex: '#2d5a27', name: 'Hijau Tua' },
+];
+let selectedColor = '#FF0000';
+
+const GAS_URL = ''; // Isi setelah deploy GAS — contoh: 'https://script.google.com/macros/s/xxx/exec'
+
+const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.webp'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const HISTORY_MAX = 6;
+const HISTORY_KEY = 'prestasi_history';
+
+/* ════════════════════════════════════
+   FACE LOCK RULE
+════════════════════════════════════ */
+const WAJAH_RULE = `
+ATURAN WAJIB — TIDAK BOLEH DILANGGAR:
+- DILARANG KERAS mengubah wajah, fitur wajah, identitas, ekspresi, atau karakteristik fisik subjek dalam bentuk apapun
+- DILARANG mengubah bentuk mata, hidung, mulut, alis, kontur wajah, atau warna kulit
+- DILARANG mengganti, memperhalus, atau merekonstruksi wajah — wajah harus identik 100% dengan foto asli
+- DILARANG mengubah postur tubuh secara drastis
+- Semua penyesuaian HANYA boleh pada: background, pakaian, pencahayaan, dan kualitas foto`;
+
+/* ════════════════════════════════════
+   MODULE DEFINITIONS
+════════════════════════════════════ */
+const MODS = {
+  pasfoto: {
+    label: 'Foto Dokumen',
+    title: 'Pas Foto Resmi',
+    desc: 'Ganti background & rapikan penampilan untuk dokumen resmi (KTP, SIM, paspor, dll)',
+    slots: [{ key: 'main', label: 'Upload Foto', sub: 'JPG / PNG / WEBP' }],
+    options: () => renderOpsiBackground() + renderOpsiExtra('Keterangan tambahan (opsional)', 'Contoh: foto tampak depan, ekspresi serius'),
+    prompt: buildPromptPasFoto,
+  },
+  lamaran: {
+    label: 'Foto Dokumen',
+    title: 'Foto Lamaran Kerja',
+    desc: 'Foto formal profesional dengan jas/kemeja formal, background sesuai standar HRD',
+    slots: [{ key: 'main', label: 'Upload Foto', sub: 'JPG / PNG / WEBP' }],
+    options: () => renderOpsiBackground() + renderOpsiGender() + renderOpsiExtra('Keterangan tambahan (opsional)', 'Contoh: kemeja putih, dasi hitam'),
+    prompt: buildPromptLamaran,
+  },
+  kua: {
+    label: 'Foto Dokumen',
+    title: 'Foto KUA / Pernikahan',
+    desc: 'Rapikan foto pasangan untuk dokumen pernikahan resmi',
+    slots: [{ key: 'main', label: 'Upload Foto Pasangan', sub: 'JPG / PNG / WEBP' }],
+    options: () => renderOpsiBackground() + renderOpsiExtra('Keterangan tambahan (opsional)', 'Contoh: foto berdampingan, baju batik'),
+    prompt: buildPromptKUA,
+  },
+  beasiswa: {
+    label: 'Foto Dokumen',
+    title: 'Foto Beasiswa / CPNS',
+    desc: 'Foto formal sesuai standar pendaftaran beasiswa dan CPNS',
+    slots: [{ key: 'main', label: 'Upload Foto', sub: 'JPG / PNG / WEBP' }],
+    options: () => renderOpsiBackground() + renderOpsiGender() + renderOpsiExtra('Jenis pendaftaran (opsional)', 'Contoh: LPDP, CPNS Kemenkeu, SNBT'),
+    prompt: buildPromptBeasiswa,
+  },
+  enhance: {
+    label: 'Peningkatan Kualitas',
+    title: 'Perjelas & Perindah Foto',
+    desc: 'Tingkatkan kualitas, ketajaman, pencahayaan, dan detail foto',
+    slots: [{ key: 'main', label: 'Upload Foto', sub: 'JPG / PNG / WEBP' }],
+    options: () => renderOpsiEnhanceLevel() + renderOpsiExtra('Fokus perbaikan (opsional)', 'Contoh: perbaiki pencahayaan, hilangkan noise'),
+    prompt: buildPromptEnhance,
+  },
+  restore: {
+    label: 'Peningkatan Kualitas',
+    title: 'Restorasi Foto Lama',
+    desc: 'Pulihkan foto lama yang rusak, pudar, buram, atau tergores',
+    slots: [{ key: 'main', label: 'Upload Foto Lama', sub: 'JPG / PNG / WEBP / Scan' }],
+    options: () => renderOpsiRestoreMode() + renderOpsiExtra('Catatan kerusakan (opsional)', 'Contoh: ada sobekan di pojok kanan, warna kekuningan'),
+    prompt: buildPromptRestore,
+  },
+  colorize: {
+    label: 'Peningkatan Kualitas',
+    title: 'Kolorisasi Foto Hitam Putih',
+    desc: 'Tambahkan warna natural pada foto hitam putih atau sepia',
+    slots: [{ key: 'main', label: 'Upload Foto B&W', sub: 'JPG / PNG / WEBP' }],
+    options: () => renderOpsiColorizeStyle() + renderOpsiExtra('Keterangan era/konteks (opsional)', 'Contoh: foto tahun 1970an, suasana pedesaan'),
+    prompt: buildPromptColorize,
+  },
+  background: {
+    label: 'Kreatif',
+    title: 'Ganti Background',
+    desc: 'Ganti latar belakang foto dengan background warna solid atau deskripsi custom',
+    slots: [{ key: 'main', label: 'Upload Foto', sub: 'JPG / PNG / WEBP' }],
+    options: () => renderOpsiBackground() + renderOpsiBackgroundCustom() + renderOpsiExtra('Deskripsi background custom (opsional)', 'Contoh: perpustakaan modern, taman bunga, studio foto profesional'),
+    prompt: buildPromptBackground,
+  },
+  outfit: {
+    label: 'Kreatif',
+    title: 'Ganti Pakaian Formal',
+    desc: 'Ubah pakaian menjadi jas, kemeja formal, seragam, atau pakaian resmi lainnya',
+    slots: [{ key: 'main', label: 'Upload Foto', sub: 'JPG / PNG / WEBP' }],
+    options: () => renderOpsiOutfit() + renderOpsiGender() + renderOpsiExtra('Detail pakaian yang diinginkan (opsional)', 'Contoh: jas hitam dasi merah, kemeja putih berdasi'),
+    prompt: buildPromptOutfit,
+  },
+};
+
+/* ════════════════════════════════════
+   INIT
+════════════════════════════════════ */
+function init() {
+  updateApiUI();
+  renderHistorySection();
+}
+
+/* ════════════════════════════════════
+   DRAWER (mobile)
+════════════════════════════════════ */
+function openDrawer() {
+  document.querySelector('.sidebar').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('show');
+}
+function closeDrawer() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('show');
+}
+
+/* ════════════════════════════════════
+   MODULE SWITCHING
+════════════════════════════════════ */
+function setMod(key) {
+  currentMod = key;
+  uploadedFiles = {};
+  resultBlob = null;
+  selectedColor = '#FF0000';
+
+  document.querySelectorAll('.mod-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('mod-' + key)?.classList.add('active');
+
+  const mod = MODS[key];
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('workspace').classList.add('show');
+  document.getElementById('ws-label').textContent = mod.label;
+  document.getElementById('ws-title').textContent = mod.title;
+  document.getElementById('ws-desc').textContent = mod.desc;
+
+  renderWorkspace(mod);
+  closeDrawer();
+}
+
+function renderWorkspace(mod) {
+  const body = document.getElementById('ws-body');
+  let html = '';
+
+  // Upload section
+  html += `<div class="section-card">
+    <div class="section-head">Upload Foto</div>
+    <div class="section-body">
+      <div class="note-box">
+        <span class="note-icon">🛡️</span>
+        <span><strong>Wajah dijamin tidak berubah.</strong> Toko Prestasi hanya mengubah background, pakaian, atau kualitas foto — identitas dan wajah tetap dipertahankan sepenuhnya.</span>
+      </div>
+      <div class="upload-grid${mod.slots.length > 1 ? ' cols-2' : ''}">`;
+
+  mod.slots.forEach(slot => {
+    html += `
+      <div class="upload-zone" id="zone-${slot.key}" onclick="triggerUpload('${slot.key}')">
+        <input type="file" id="file-${slot.key}" accept="image/*" onchange="handleFile('${slot.key}', this)">
+        <img class="upload-preview" id="preview-${slot.key}" src="" alt="">
+        <div class="upload-icon">📁</div>
+        <div class="upload-label">${slot.label}</div>
+        <div class="upload-sub">${slot.sub}</div>
+        <div class="upload-fname" id="fname-${slot.key}"></div>
+      </div>`;
+  });
+
+  html += `</div></div></div>`;
+
+  // Options section
+  const optsHtml = mod.options ? mod.options() : '';
+  if (optsHtml) {
+    html += `<div class="section-card">
+      <div class="section-head">Pengaturan</div>
+      <div class="section-body">${optsHtml}</div>
+    </div>`;
+  }
+
+  // Loading
+  html += `<div class="loading-panel" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-title" id="loading-title">Sedang memproses…</div>
+    <div class="loading-sub" id="loading-sub">Mohon tunggu sebentar</div>
+    <div class="loading-bar-wrap"><div class="loading-bar" id="loading-bar"></div></div>
+    <div class="loading-steps">
+      <span class="loading-step" id="lstep-0">Membaca foto</span>
+      <span class="loading-step" id="lstep-1">Menganalisis</span>
+      <span class="loading-step" id="lstep-2">Memproses</span>
+      <span class="loading-step" id="lstep-3">Finishing</span>
+    </div>
+  </div>`;
+
+  html += `<div class="error-panel" id="error-panel"></div>`;
+
+  html += `<div class="result-panel" id="result-panel">
+    <div class="result-head">
+      ✅ Foto Selesai Diproses
+      <button class="btn-toggle-compare" id="btn-compare" onclick="toggleCompare()" title="Bandingkan sebelum/sesudah">⇄ Bandingkan</button>
+    </div>
+    <div class="result-img-wrap" id="result-img-wrap">
+      <img class="result-img" id="result-img" src="" alt="Hasil">
+    </div>
+    <div class="slider-wrap" id="slider-wrap" style="display:none">
+      <div class="slider-container" id="slider-container">
+        <img class="slider-img slider-before" id="slider-before" src="" alt="Sebelum">
+        <div class="slider-after-wrap" id="slider-after-wrap">
+          <img class="slider-img slider-after" id="slider-after" src="" alt="Sesudah">
+        </div>
+        <div class="slider-divider" id="slider-divider">
+          <div class="slider-handle"></div>
+        </div>
+        <span class="slider-label slider-label-left">SEBELUM</span>
+        <span class="slider-label slider-label-right">SESUDAH</span>
+      </div>
+    </div>
+    <div class="result-actions">
+      <button class="btn-download" onclick="downloadResult()">⬇️ Unduh Foto</button>
+      <button class="btn-whatsapp" onclick="shareToWhatsApp()">💬 Bagikan ke WA</button>
+      <button class="btn-retry" onclick="proses()">🔄 Proses Ulang</button>
+    </div>
+  </div>`;
+
+  body.innerHTML = html;
+  if (document.getElementById('color-chips')) renderColorChips();
+}
+
+/* ════════════════════════════════════
+   OPTIONS RENDERERS
+════════════════════════════════════ */
+function renderOpsiBackground() {
+  return `<div class="opt-group">
+    <div class="opt-label">Warna Background</div>
+    <div class="color-row" id="color-chips"></div>
+  </div>`;
+}
+
+function renderColorChips() {
+  const container = document.getElementById('color-chips');
+  if (!container) return;
+  let html = BG_COLORS.map(c =>
+    `<div class="color-chip${c.hex === selectedColor ? ' selected' : ''}"
+      style="background:${c.hex};" title="${c.name}"
+      onclick="selectColor('${c.hex}', this)"></div>`
+  ).join('');
+  html += `<div class="color-chip-custom" title="Warna custom">
+    <span>+</span>
+    <input type="color" value="${selectedColor}" oninput="selectColorCustom(this.value)">
+  </div>`;
+  container.innerHTML = html;
+}
+
+function selectColor(hex, el) {
+  selectedColor = hex;
+  document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectColorCustom(hex) {
+  selectedColor = hex;
+  document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('selected'));
+}
+
+function renderOpsiGender() {
+  return `<div class="opt-group">
+    <div class="opt-label">Jenis Kelamin</div>
+    <select class="opt-select" id="gender">
+      <option value="pria">Pria</option>
+      <option value="wanita">Wanita</option>
+    </select>
+  </div>`;
+}
+
+function renderOpsiExtra(label, placeholder) {
+  return `<div class="opt-group">
+    <div class="opt-label">${label}</div>
+    <textarea class="opt-textarea" id="extra" placeholder="${placeholder}"></textarea>
+  </div>`;
+}
+
+function renderOpsiEnhanceLevel() {
+  return `<div class="opt-group">
+    <div class="opt-label">Level Peningkatan</div>
+    <select class="opt-select" id="enhance-level">
+      <option value="standard">Standard — perbaikan natural</option>
+      <option value="high" selected>High Definition — tajam & jernih</option>
+      <option value="ultra">Ultra HD — maksimal, sangat detail</option>
+    </select>
+  </div>`;
+}
+
+function renderOpsiRestoreMode() {
+  return `<div class="opt-group">
+    <div class="opt-label">Mode Restorasi</div>
+    <select class="opt-select" id="restore-mode">
+      <option value="standard">Standard — perbaikan umum</option>
+      <option value="heavy">Heavy — kerusakan parah</option>
+      <option value="colorize">Restore + Kolorisasi</option>
+    </select>
+  </div>`;
+}
+
+function renderOpsiColorizeStyle() {
+  return `<div class="opt-group">
+    <div class="opt-label">Gaya Kolorisasi</div>
+    <select class="opt-select" id="colorize-style">
+      <option value="natural">Natural — warna realistis</option>
+      <option value="vivid">Vivid — warna cerah & kuat</option>
+      <option value="vintage">Vintage — hangat & klasik</option>
+    </select>
+  </div>`;
+}
+
+function renderOpsiBackgroundCustom() {
+  return `<div class="opt-group">
+    <div class="opt-label">Atau Pilih Background Preset</div>
+    <select class="opt-select" id="bg-preset">
+      <option value="">— Gunakan warna di atas —</option>
+      <option value="studio profesional dengan pencahayaan lembut">Studio foto profesional</option>
+      <option value="perpustakaan modern dengan rak buku">Perpustakaan modern</option>
+      <option value="taman bunga yang indah di luar ruangan">Taman bunga</option>
+      <option value="ruang kantor modern yang rapi">Kantor modern</option>
+      <option value="pantai dengan langit biru cerah">Pantai & langit biru</option>
+      <option value="ruang belajar dengan buku-buku">Ruang belajar</option>
+    </select>
+  </div>`;
+}
+
+function renderOpsiOutfit() {
+  return `<div class="opt-group">
+    <div class="opt-label">Jenis Pakaian</div>
+    <select class="opt-select" id="outfit-type">
+      <option value="jas formal hitam dengan dasi">Jas formal + dasi</option>
+      <option value="kemeja putih formal berkerah">Kemeja putih formal</option>
+      <option value="kemeja batik formal">Kemeja batik formal</option>
+      <option value="seragam CPNS / ASN">Seragam CPNS/ASN</option>
+      <option value="kebaya formal wanita">Kebaya formal</option>
+      <option value="baju wisuda toga">Toga wisuda</option>
+    </select>
+  </div>`;
+}
+
+/* ════════════════════════════════════
+   FILE HANDLING
+════════════════════════════════════ */
+function triggerUpload(key) {
+  document.getElementById('file-' + key)?.click();
+}
+
+function handleFile(key, input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const zone = document.getElementById('zone-' + key);
+  const fname = document.getElementById('fname-' + key);
+
+  // Validasi format — cek MIME type + ekstensi sebagai fallback
+  const ext = '.' + file.name.split('.').pop().toLowerCase();
+  const validType = ALLOWED_TYPES.includes(file.type) || ALLOWED_EXTS.includes(ext);
+  if (!validType) {
+    showZoneError(key, '⚠️ Format tidak didukung. Gunakan JPG, PNG, atau WEBP.');
+    zone.classList.add('zone-has-error');
+    input.value = '';
+    return;
+  }
+
+  // Validasi ukuran
+  if (file.size > MAX_FILE_SIZE) {
+    showZoneError(key, `⚠️ File terlalu besar (${formatFileSize(file.size)}). Maksimal 10MB.`);
+    zone.classList.add('zone-has-error');
+    input.value = '';
+    return;
+  }
+
+  clearZoneError(key);
+  zone.classList.remove('zone-has-error');
+  uploadedFiles[key] = file;
+  zone.classList.add('has-file');
+  fname.textContent = `${file.name} · ${formatFileSize(file.size)}`;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('preview-' + key).src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
+  updateActionHint();
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+function showZoneError(key, msg) {
+  const zone = document.getElementById('zone-' + key);
+  if (!zone) return;
+  clearZoneError(key);
+  const el = document.createElement('div');
+  el.className = 'zone-error';
+  el.id = 'zone-err-' + key;
+  el.textContent = msg;
+  zone.after(el);
+}
+
+function clearZoneError(key) {
+  document.getElementById('zone-err-' + key)?.remove();
+  document.getElementById('zone-' + key)?.classList.remove('zone-has-error');
+}
+
+function updateActionHint() {
+  const mod = MODS[currentMod];
+  if (!mod) return;
+  const needed = mod.slots.length;
+  const have = Object.keys(uploadedFiles).length;
+  const hint = document.getElementById('action-hint');
+  if (have >= needed) {
+    hint.textContent = 'Siap diproses ✓';
+    hint.style.color = 'var(--green-dark)';
+  } else {
+    hint.textContent = `Upload ${needed - have} foto lagi`;
+    hint.style.color = 'var(--text-3)';
+  }
+}
+
+function resetUpload() {
+  uploadedFiles = {};
+  resultBlob = null;
+  if (currentMod) setMod(currentMod);
+}
+
+/* ════════════════════════════════════
+   PROMPT BUILDERS
+════════════════════════════════════ */
+function getColorName(hex) {
+  const map = {
+    '#FF0000': 'merah', '#0000FF': 'biru', '#FFFFFF': 'putih',
+    '#808080': 'abu-abu', '#000080': 'biru navy', '#2D5A27': 'hijau tua'
+  };
+  return map[hex.toUpperCase()] || hex;
+}
+function getExtra() { return document.getElementById('extra')?.value?.trim() || ''; }
+function getGender() { return document.getElementById('gender')?.value || 'pria'; }
+
+function buildPromptPasFoto() {
+  const colorName = getColorName(selectedColor);
+  const extra = getExtra();
+  return `Kamu adalah editor foto profesional berpengalaman. Edit foto ini menjadi pas foto resmi berkualitas tinggi.
+
+Yang harus dilakukan:
+1. Ganti background menjadi warna ${colorName} (${selectedColor}) yang solid, merata, dan bersih
+2. Pastikan batas antara subjek dan background terlihat natural dan rapi
+3. Rapikan penampilan umum: rambut dan pakaian
+4. Perbaiki pencahayaan agar merata, frontal, dan profesional
+5. Tingkatkan kualitas foto secara keseluruhan agar layak untuk dokumen resmi
+${extra ? '\nPermintaan khusus: ' + extra : ''}
+${WAJAH_RULE}`;
+}
+
+function buildPromptLamaran() {
+  const colorName = getColorName(selectedColor);
+  const gender = getGender();
+  const extra = getExtra();
+  return `Kamu adalah editor foto profesional. Edit foto ini menjadi foto lamaran kerja yang profesional dan formal.
+
+Yang harus dilakukan:
+1. Ganti background menjadi warna ${colorName} (${selectedColor}) yang solid dan bersih
+2. Pastikan subjek mengenakan pakaian formal berkerah yang sesuai (gender: ${gender}) — kemeja/jas rapi
+3. Rapikan penampilan: rambut tertata, pakaian rapi dan bersih
+4. Perbaiki pencahayaan agar merata, profesional, dan bersih
+5. Tingkatkan kualitas dan ketajaman foto
+${extra ? '\nPermintaan khusus: ' + extra : ''}
+${WAJAH_RULE}`;
+}
+
+function buildPromptKUA() {
+  const colorName = getColorName(selectedColor);
+  const extra = getExtra();
+  return `Kamu adalah editor foto profesional. Rapikan foto pasangan ini untuk dokumen KUA/pernikahan resmi.
+
+Yang harus dilakukan:
+1. Ganti background menjadi warna ${colorName} (${selectedColor}) yang solid dan merata
+2. Rapikan penampilan kedua orang secara keseluruhan
+3. Perbaiki pencahayaan agar merata dan profesional
+4. Pastikan komposisi foto tampak formal dan rapi
+5. Tingkatkan kualitas foto secara keseluruhan
+${extra ? '\nPermintaan khusus: ' + extra : ''}
+${WAJAH_RULE}`;
+}
+
+function buildPromptBeasiswa() {
+  const colorName = getColorName(selectedColor);
+  const gender = getGender();
+  const extra = getExtra();
+  return `Kamu adalah editor foto profesional. Edit foto ini sesuai standar foto formal pendaftaran beasiswa/CPNS.
+
+Yang harus dilakukan:
+1. Ganti background menjadi warna ${colorName} (${selectedColor}) yang solid dan merata
+2. Pastikan subjek mengenakan pakaian formal resmi (gender: ${gender})
+3. Rapikan penampilan secara keseluruhan — tampak serius dan profesional
+4. Perbaiki pencahayaan agar merata dan bersih
+5. Tingkatkan kualitas dan ketajaman foto
+${extra ? '\nKonteks pendaftaran: ' + extra : ''}
+${WAJAH_RULE}`;
+}
+
+function buildPromptEnhance() {
+  const levelMap = {
+    standard: 'kualitas HD yang natural dan realistis',
+    high: 'kualitas tinggi yang tajam dan jernih',
+    ultra: 'kualitas ultra HD maksimal dengan detail penuh'
+  };
+  const level = levelMap[document.getElementById('enhance-level')?.value] || 'kualitas tinggi';
+  const extra = getExtra();
+  return `Kamu adalah editor foto profesional spesialis peningkatan kualitas gambar. Tingkatkan foto ini menjadi ${level}.
+
+Yang harus dilakukan:
+1. Tingkatkan ketajaman (sharpness) dan kejelasan detail
+2. Perbaiki noise, grain, dan artifact
+3. Optimalkan pencahayaan dan kontras secara natural
+4. Perbaiki warna agar terlihat hidup dan akurat
+5. Pertahankan nuansa dan suasana foto asli
+${extra ? '\nFokus perbaikan: ' + extra : ''}
+${WAJAH_RULE}
+- JANGAN ubah komposisi, objek, atau konten foto`;
+}
+
+function buildPromptRestore() {
+  const modeMap = {
+    standard: 'perbaikan umum foto lama',
+    heavy: 'restorasi intensif untuk kerusakan parah',
+    colorize: 'restorasi lengkap disertai pewarnaan natural'
+  };
+  const mode = modeMap[document.getElementById('restore-mode')?.value] || 'perbaikan umum';
+  const extra = getExtra();
+  return `Kamu adalah editor foto profesional spesialis restorasi foto lama. Pulihkan foto ini dengan mode: ${mode}.
+
+Yang harus dilakukan:
+1. Perbaiki kerusakan fisik: goresan, noda, sobek, lipatan, bercak
+2. Perbaiki warna yang pudar, menguning, atau memudar
+3. Tingkatkan ketajaman dan detail yang hilang karena usia
+4. Bersihkan grain dan noise berlebihan
+5. Pertahankan karakter dan suasana historis foto
+${extra ? '\nCatatan kerusakan: ' + extra : ''}
+${WAJAH_RULE}
+- Pertahankan nuansa historis — jangan buat terlihat terlalu modern`;
+}
+
+function buildPromptColorize() {
+  const styleMap = {
+    natural: 'natural dan realistis sesuai konteks',
+    vivid: 'cerah dan vivid dengan warna kuat',
+    vintage: 'hangat dan klasik bernuansa vintage'
+  };
+  const style = styleMap[document.getElementById('colorize-style')?.value] || 'natural';
+  const extra = getExtra();
+  return `Kamu adalah editor foto profesional spesialis kolorisasi. Beri warna pada foto hitam putih ini dengan gaya ${style}.
+
+Yang harus dilakukan:
+1. Analisis konteks foto (orang, tempat, pakaian, era) untuk menentukan warna yang tepat
+2. Beri warna natural pada kulit, rambut, dan mata sesuai konteks
+3. Beri warna pakaian yang realistis dan sesuai era
+4. Beri warna latar dan lingkungan yang natural
+5. Pastikan pencahayaan dan bayangan tetap konsisten setelah pewarnaan
+${extra ? '\nKonteks/era: ' + extra : ''}
+${WAJAH_RULE}`;
+}
+
+function buildPromptBackground() {
+  const preset = document.getElementById('bg-preset')?.value;
+  const extra = getExtra();
+  let bgDesc = preset || `warna ${getColorName(selectedColor)} (${selectedColor}) yang solid dan merata`;
+  if (extra) bgDesc = extra;
+  return `Kamu adalah editor foto profesional. Ganti background foto ini dengan: ${bgDesc}.
+
+Yang harus dilakukan:
+1. Hapus background asli secara bersih dan presisi
+2. Ganti dengan background baru: ${bgDesc}
+3. Pastikan batas antara subjek dan background terlihat natural
+4. Sesuaikan pencahayaan subjek dengan background baru
+5. Hasilkan foto yang terlihat natural dan mulus
+${WAJAH_RULE}`;
+}
+
+function buildPromptOutfit() {
+  const outfitType = document.getElementById('outfit-type')?.value || 'jas formal';
+  const gender = getGender();
+  const extra = getExtra();
+  return `Kamu adalah editor foto profesional. Ubah pakaian subjek (gender: ${gender}) dalam foto ini menjadi: ${outfitType}.
+
+Yang harus dilakukan:
+1. Ganti pakaian menjadi ${outfitType} yang rapi dan natural
+2. Pastikan pakaian baru terlihat sesuai dengan postur dan proporsi tubuh
+3. Sesuaikan pencahayaan dan bayangan pada pakaian baru
+4. Rapikan tampilan keseluruhan agar terlihat profesional
+5. Pertahankan background asli atau bersihkan jika diperlukan
+${extra ? '\nDetail pakaian: ' + extra : ''}
+${WAJAH_RULE}`;
+}
+
+/* ════════════════════════════════════
+   API CALL
+════════════════════════════════════ */
+async function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+async function proses() {
+  if (!IS_CREW_MODE && !apiKey) { showError('API Key belum diset. Hubungi pengelola Toko Prestasi.'); return; }
+
+  const mod = MODS[currentMod];
+  if (!mod) return;
+
+  const needed = mod.slots.length;
+  const have = Object.keys(uploadedFiles).length;
+  if (have < needed) {
+    showError(`Upload ${needed === 1 ? 'foto terlebih dahulu' : needed + ' foto terlebih dahulu'}!`);
+    return;
+  }
+
+  hideResult();
+  hideError();
+  showLoading();
+
+  try {
+    setLoadingStep(0);
+    const prompt = mod.prompt();
+    const parts = [{ text: prompt }];
+
+    if (!IS_CREW_MODE) {
+      for (const [, file] of Object.entries(uploadedFiles)) {
+        const b64 = await fileToBase64(file);
+        parts.push({ inline_data: { mime_type: file.type || 'image/jpeg', data: b64 } });
+      }
+    }
+
+    setLoadingStep(1);
+
+    let resp, data;
+    if (IS_CREW_MODE) {
+      const images = [];
+      for (const [, file] of Object.entries(uploadedFiles)) {
+        const b64 = await fileToBase64(file);
+        images.push({ mimeType: file.type || 'image/jpeg', data: b64 });
+      }
+      resp = await fetch(CREW_GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'generate', prompt, images }),
+      });
+      setLoadingStep(2);
+      data = await resp.json();
+      if (data?.error) throw new Error(data.error);
+    } else {
+      resp = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts }],
+            generationConfig: { responseModalities: ['image', 'text'], temperature: 0.7 }
+          })
+        }
+      );
+      setLoadingStep(2);
+      data = await resp.json();
+      if (!resp.ok) throw new Error(data?.error?.message || 'Gagal terhubung. Coba lagi.');
+    }
+
+    setLoadingStep(3);
+
+    let imgData = null, imgMime = 'image/png';
+    if (IS_CREW_MODE) {
+      imgData = data?.data || null;
+      imgMime = data?.mimeType || 'image/png';
+    } else {
+      for (const cand of (data?.candidates || [])) {
+        for (const part of (cand?.content?.parts || [])) {
+          if (part?.inline_data?.data) {
+            imgData = part.inline_data.data;
+            imgMime = part.inline_data.mime_type || 'image/png';
+            break;
+          }
+        }
+        if (imgData) break;
+      }
+    }
+
+    if (!imgData) {
+      const msg = data?.candidates?.[0]?.content?.parts?.filter(p => p.text).map(p => p.text).join(' ') || '';
+      throw new Error('Tidak ada hasil gambar.' + (msg ? ' Info: ' + msg.slice(0, 200) : ' Coba lagi dengan foto berbeda.'));
+    }
+
+    hideLoading();
+    showResult(`data:${imgMime};base64,${imgData}`, imgData, imgMime);
+
+  } catch (err) {
+    hideLoading();
+    showError('❌ ' + (err.message || 'Terjadi kesalahan. Coba lagi.'));
+  }
+}
+
+/* ════════════════════════════════════
+   LOADING UI
+════════════════════════════════════ */
+const LOADING_STEPS = [
+  { title: 'Membaca foto…',       sub: 'Menyiapkan gambar untuk diproses' },
+  { title: 'Menganalisis foto…',  sub: 'Toko Prestasi sedang menganalisis gambar' },
+  { title: 'Memproses foto…',     sub: 'Toko Prestasi sedang bekerja, mohon tunggu 30–60 detik' },
+  { title: 'Finishing…',          sub: 'Hampir selesai!' },
+];
+
+function showLoading() {
+  document.getElementById('loading')?.classList.add('show');
+  document.getElementById('loading-bar').style.width = '0%';
+  let pct = 0;
+  loadingBarInt = setInterval(() => {
+    pct = Math.min(85, pct + Math.random() * 3);
+    document.getElementById('loading-bar').style.width = pct + '%';
+  }, 500);
+}
+
+function setLoadingStep(step) {
+  for (let i = 0; i <= 3; i++) {
+    const el = document.getElementById('lstep-' + i);
+    if (!el) continue;
+    el.className = 'loading-step' + (i < step ? ' done' : i === step ? ' active' : '');
+  }
+  const s = LOADING_STEPS[step];
+  if (s) {
+    document.getElementById('loading-title').textContent = s.title;
+    document.getElementById('loading-sub').textContent = s.sub;
+  }
+}
+
+function hideLoading() {
+  document.getElementById('loading')?.classList.remove('show');
+  if (loadingBarInt) { clearInterval(loadingBarInt); loadingBarInt = null; }
+  document.getElementById('loading-bar').style.width = '100%';
+}
+
+/* ════════════════════════════════════
+   RESULT
+════════════════════════════════════ */
+function showResult(dataUrl, b64, mime) {
+  resultBlob = { b64, mime };
+  const panel = document.getElementById('result-panel');
+  const img = document.getElementById('result-img');
+  if (!panel || !img) return;
+
+  // Reset ke mode normal dulu
+  const sliderWrap = document.getElementById('slider-wrap');
+  const imgWrap = document.getElementById('result-img-wrap');
+  const btnCompare = document.getElementById('btn-compare');
+  if (sliderWrap) sliderWrap.style.display = 'none';
+  if (imgWrap) imgWrap.style.display = 'flex';
+  if (btnCompare) btnCompare.classList.remove('active');
+
+  img.src = dataUrl;
+
+  // Simpan URL original untuk slider
+  const originalFile = uploadedFiles['main'];
+  if (originalFile) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const beforeImg = document.getElementById('slider-before');
+      const afterImg = document.getElementById('slider-after');
+      if (beforeImg) beforeImg.src = e.target.result;
+      if (afterImg) afterImg.src = dataUrl;
+      initSlider();
+    };
+    reader.readAsDataURL(originalFile);
+  }
+
+  panel.classList.add('show');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  saveToHistory(dataUrl, currentMod);
+}
+/* ════════════════════════════════════
+   HISTORY
+════════════════════════════════════ */
+function saveToHistory(dataUrl, modKey) {
+  const history = loadHistory();
+  const entry = {
+    id: Date.now(),
+    mod: modKey,
+    label: MODS[modKey]?.title || modKey,
+    thumb: resizeForHistory(dataUrl),
+    dataUrl,
+    ts: new Date().toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }),
+  };
+  history.unshift(entry);
+  if (history.length > HISTORY_MAX) history.length = HISTORY_MAX;
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch (_) {}
+  renderHistorySection();
+}
+
+function resizeForHistory(dataUrl) {
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 120; canvas.height = 120;
+    const img = new Image();
+    img.src = dataUrl;
+    const ctx = canvas.getContext('2d');
+    const draw = () => {
+      const s = Math.min(120 / img.naturalWidth, 120 / img.naturalHeight);
+      const w = img.naturalWidth * s, h = img.naturalHeight * s;
+      ctx.drawImage(img, (120 - w) / 2, (120 - h) / 2, w, h);
+    };
+    if (img.complete) draw(); else img.onload = draw;
+    return canvas.toDataURL('image/jpeg', 0.6);
+  } catch (_) { return dataUrl; }
+}
+
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (_) { return []; }
+}
+
+function clearHistory() {
+  localStorage.removeItem(HISTORY_KEY);
+  renderHistorySection();
+  showToast('Riwayat dihapus', 'success');
+}
+
+function downloadFromHistory(id) {
+  const entry = loadHistory().find(e => e.id === id);
+  if (!entry) return;
+  const a = document.createElement('a');
+  a.href = entry.dataUrl;
+  a.download = `toko-prestasi-${entry.mod}-${entry.id}.jpg`;
+  a.click();
+}
+
+function renderHistorySection() {
+  const container = document.getElementById('wlc-history-wrap');
+  if (!container) return;
+  const history = loadHistory();
+  if (!history.length) {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = 'block';
+  const thumbsHtml = history.map(e => `
+    <div class="wlc-hist-item" title="${e.label} — ${e.ts}">
+      <img class="wlc-hist-thumb" src="${e.thumb || e.dataUrl}" alt="${e.label}">
+      <div class="wlc-hist-meta">
+        <div class="wlc-hist-label">${e.label}</div>
+        <div class="wlc-hist-ts">${e.ts}</div>
+      </div>
+      <button class="wlc-hist-dl" onclick="downloadFromHistory(${e.id})" title="Unduh ulang">⬇</button>
+    </div>`).join('');
+  container.innerHTML = `
+    <div class="wlc-history-head">
+      <div class="wlc-section-label" style="margin-bottom:0">Riwayat Hasil</div>
+      <button class="wlc-hist-clear" onclick="clearHistory()">Hapus semua</button>
+    </div>
+    <div class="wlc-hist-grid">${thumbsHtml}</div>`;
+}
+
+function hideResult() { document.getElementById('result-panel')?.classList.remove('show'); }
+
+function toggleCompare() {
+  const sliderWrap = document.getElementById('slider-wrap');
+  const imgWrap = document.getElementById('result-img-wrap');
+  const btn = document.getElementById('btn-compare');
+  const isCompare = sliderWrap.style.display !== 'none';
+  sliderWrap.style.display = isCompare ? 'none' : 'block';
+  imgWrap.style.display = isCompare ? 'flex' : 'none';
+  btn.classList.toggle('active', !isCompare);
+  if (!isCompare) initSlider();
+}
+
+function initSlider() {
+  const container = document.getElementById('slider-container');
+  const divider = document.getElementById('slider-divider');
+  const afterWrap = document.getElementById('slider-after-wrap');
+  if (!container || !divider || !afterWrap) return;
+
+  let dragging = false;
+  let pct = 50;
+
+  function setPosition(x) {
+    const rect = container.getBoundingClientRect();
+    pct = Math.min(100, Math.max(0, ((x - rect.left) / rect.width) * 100));
+    divider.style.left = pct + '%';
+    afterWrap.style.clipPath = `inset(0 0 0 ${pct}%)`;
+  }
+
+  // Init posisi awal
+  divider.style.left = '50%';
+  afterWrap.style.clipPath = 'inset(0 0 0 50%)';
+
+  divider.addEventListener('mousedown', () => { dragging = true; });
+  divider.addEventListener('touchstart', () => { dragging = true; }, { passive: true });
+
+  document.addEventListener('mousemove', e => { if (dragging) setPosition(e.clientX); });
+  document.addEventListener('touchmove', e => { if (dragging) setPosition(e.touches[0].clientX); }, { passive: true });
+  document.addEventListener('mouseup', () => { dragging = false; });
+  document.addEventListener('touchend', () => { dragging = false; });
+
+  container.addEventListener('click', e => { if (!dragging) setPosition(e.clientX); });
+}
+
+function downloadResult() {
+  if (!resultBlob) return;
+  const ext = resultBlob.mime.includes('png') ? 'png' : 'jpg';
+  const ts = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
+  const a = document.createElement('a');
+  a.href = `data:${resultBlob.mime};base64,${resultBlob.b64}`;
+  a.download = `toko-prestasi-${currentMod}-${ts}.${ext}`;
+  a.click();
+}
+
+function shareToWhatsApp() {
+  if (!resultBlob) return;
+  const label = MODS[currentMod]?.title || 'Foto';
+  const msg = `✅ *${label}* selesai diproses oleh Toko Prestasi!\n\nFoto sudah saya unduh dan siap digunakan. 📸\n\n_Editor Foto Dokumen Profesional — tokoprestasi_`;
+  downloadResult();
+  showToast('Foto diunduh — silakan kirim ke WhatsApp', 'success');
+  setTimeout(() => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  }, 800);
+}
+
+/* ════════════════════════════════════
+   ERROR
+════════════════════════════════════ */
+function showError(msg) {
+  const p = document.getElementById('error-panel');
+  if (!p) return;
+  p.textContent = msg;
+  p.classList.add('show');
+  p.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function hideError() { document.getElementById('error-panel')?.classList.remove('show'); }
+
+/* ════════════════════════════════════
+   TOAST
+════════════════════════════════════ */
+function showToast(msg, type = 'success') {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => {
+    toast.classList.remove('show');
+    toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+  }, 3000);
+}
+
+/* ════════════════════════════════════
+   API KEY — config.js (default) + localStorage (override)
+════════════════════════════════════ */
+const API_KEY_STORAGE = 'prestasi_api_key';
+
+function resolveApiKey() {
+  const stored = localStorage.getItem(API_KEY_STORAGE);
+  return (stored && stored.trim()) || (typeof GEMINI_API_KEY !== 'undefined' ? GEMINI_API_KEY : '');
+}
+
+function updateApiUI() {
+  apiKey = resolveApiKey();
+  const btn = document.getElementById('btn-api-key');
+  if (!btn) return;
+  const hasStored = !!localStorage.getItem(API_KEY_STORAGE)?.trim();
+  btn.classList.toggle('key-set', hasStored);
+  btn.title = hasStored ? 'API Key aktif (dari browser) — klik untuk ubah' : 'Set API Key Gemini';
+}
+
+function bukaModalApiKey() {
+  const overlay = document.getElementById('api-modal-overlay');
+  const input = document.getElementById('api-modal-input');
+  const status = document.getElementById('api-modal-status');
+  if (!overlay || !input) return;
+  const stored = localStorage.getItem(API_KEY_STORAGE) || '';
+  input.value = stored;
+  input.type = 'password';
+  const toggle = document.getElementById('api-modal-toggle');
+  if (toggle) toggle.textContent = '👁';
+  status.textContent = stored ? '✅ Key aktif dari browser' : '';
+  status.className = 'api-modal-status' + (stored ? ' ok' : '');
+  overlay.classList.add('show');
+  setTimeout(() => input.focus(), 100);
+}
+
+function tutupModalApiKey() {
+  document.getElementById('api-modal-overlay')?.classList.remove('show');
+}
+
+function tutupModalApiKeyLuar(e) {
+  if (e.target === document.getElementById('api-modal-overlay')) tutupModalApiKey();
+}
+
+function toggleShowApiKey() {
+  const input = document.getElementById('api-modal-input');
+  const btn = document.getElementById('api-modal-toggle');
+  if (!input) return;
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  if (btn) btn.textContent = isHidden ? '🙈' : '👁';
+}
+
+function simpanApiKey() {
+  const input = document.getElementById('api-modal-input');
+  const status = document.getElementById('api-modal-status');
+  if (!input || !status) return;
+  const val = input.value.trim();
+  if (!val) {
+    status.textContent = '⚠️ Key tidak boleh kosong. Gunakan tombol Hapus untuk menghapus.';
+    status.className = 'api-modal-status err';
+    return;
+  }
+  if (!val.startsWith('AIza')) {
+    status.textContent = '⚠️ Format key tidak valid — API Key Gemini biasanya diawali "AIza".';
+    status.className = 'api-modal-status err';
+    return;
+  }
+  localStorage.setItem(API_KEY_STORAGE, val);
+  updateApiUI();
+  status.textContent = '✅ Key berhasil disimpan!';
+  status.className = 'api-modal-status ok';
+  setTimeout(tutupModalApiKey, 900);
+}
+
+function hapusApiKey() {
+  const status = document.getElementById('api-modal-status');
+  const input = document.getElementById('api-modal-input');
+  localStorage.removeItem(API_KEY_STORAGE);
+  if (input) input.value = '';
+  updateApiUI();
+  if (status) {
+    const hasFallback = typeof GEMINI_API_KEY !== 'undefined' && GEMINI_API_KEY && !GEMINI_API_KEY.includes('PASTE');
+    status.textContent = hasFallback ? '🗑 Key browser dihapus — menggunakan key dari config.js' : '🗑 Key dihapus. Tambahkan key baru untuk mulai memproses.';
+    status.className = 'api-modal-status' + (hasFallback ? ' ok' : ' err');
+  }
+}
+
+/* ════════════════════════════════════
+   SYNC CONFIG → GAS → SHEET
+════════════════════════════════════ */
+async function syncConfig() {
+  if (!GAS_URL) {
+    showToast('GAS_URL belum diisi — isi dulu di app.js sebelum sync', 'error');
+    return;
+  }
+
+  showToast('Mengirim konfigurasi ke server…', 'info');
+
+  const modsPayload = Object.entries(MODS).map(([key, mod]) => ({
+    key,
+    label: mod.label,
+    title: mod.title,
+    desc: mod.desc,
+    slots: mod.slots.map(s => s.key).join(','),
+    options: mod.options ? extractOptionKeys(mod.options()) : '',
+  }));
+
+  const optionsPayload = [
+    ...extractSelectOptions('gender', renderOpsiGender()),
+    ...extractSelectOptions('enhance_level', renderOpsiEnhanceLevel()),
+    ...extractSelectOptions('restore_mode', renderOpsiRestoreMode()),
+    ...extractSelectOptions('colorize_style', renderOpsiColorizeStyle()),
+    ...extractSelectOptions('outfit_type', renderOpsiOutfit()),
+    ...extractSelectOptions('bg_preset', renderOpsiBackgroundCustom()),
+  ];
+
+  const payload = {
+    action: 'sync',
+    config: {
+      GEMINI_API_KEY: resolveApiKey(),
+      APP_VERSION: typeof APP_VERSION !== 'undefined' ? APP_VERSION : '1.0.0',
+    },
+    mods: modsPayload,
+    bg_colors: BG_COLORS,
+    options: optionsPayload,
+  };
+
+  try {
+    const resp = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await resp.json();
+    if (data?.success) {
+      showToast(`✅ Sync berhasil — versi ${data.version || payload.config.APP_VERSION}`, 'success');
+    } else {
+      showToast('⚠️ Sync gagal: ' + (data?.error || 'Tidak ada respons'), 'error');
+    }
+  } catch (err) {
+    showToast('❌ Sync error: ' + (err.message || 'Cek koneksi dan GAS_URL'), 'error');
+  }
+}
+
+function extractOptionKeys(html) {
+  const matches = [...html.matchAll(/id="([\w-]+)"/g)];
+  return matches.map(m => m[1]).join(',');
+}
+
+function extractSelectOptions(group, html) {
+  const matches = [...html.matchAll(/<option value="([^"]*)"[^>]*>([^<]+)<\/option>/g)];
+  return matches.map(m => ({ group, value: m[1], label: m[2].trim() }));
+}
+
+/* ════════════════════════════════════
+   CREW — GET-CONFIG + VERSION CHECK
+════════════════════════════════════ */
+let _currentVersion = null;
+
+async function crewLoadConfig() {
+  try {
+    const resp = await fetch(CREW_GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get-config' }),
+    });
+    const cfg = await resp.json();
+    if (!cfg || cfg.error) return;
+
+    // Hydrate BG_COLORS
+    if (cfg.bg_colors?.length) {
+      BG_COLORS.length = 0;
+      cfg.bg_colors.forEach(c => BG_COLORS.push({ hex: c.hex, name: c.name }));
+    }
+
+    // Hydrate MODS labels/titles/descs dari sheet (structure tetap dari app.js)
+    if (cfg.mods?.length) {
+      cfg.mods.forEach(m => {
+        if (MODS[m.key]) {
+          MODS[m.key].label = m.label || MODS[m.key].label;
+          MODS[m.key].title = m.title || MODS[m.key].title;
+          MODS[m.key].desc  = m.desc  || MODS[m.key].desc;
+        }
+      });
+    }
+
+    // Version check
+    if (cfg.version && _currentVersion && cfg.version !== _currentVersion) {
+      showToast('⚡ Update tersedia — muat ulang halaman untuk versi terbaru', 'info');
+    }
+    _currentVersion = cfg.version || _currentVersion;
+
+  } catch (_) {}
+}
+
+
+init();
+if (IS_CREW_MODE) crewLoadConfig();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cetak Foto — Prestasi Tools</title>
+<link rel="icon" href="icon.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ── LAYOUT ── */
+body { overflow: hidden; }
+.cetak-wrap { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+/* ── HEADER ── */
+.cetak-header {
+  padding: 11px 16px; border-bottom: 2px solid var(--green-mid);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--white); flex-shrink: 0;
+}
+.cetak-brand { display: flex; align-items: center; gap: 10px; }
+.cetak-brand-icon {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; box-shadow: var(--shadow-green); flex-shrink: 0;
+  overflow: hidden;
+}
+.cetak-brand-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 9px; display: block; }
+
+/* ── FOOTER ── */
+.app-footer {
+  background: var(--white); border-top: 1.5px solid var(--border);
+  padding: 7px 24px; display: flex; align-items: center; justify-content: space-between;
+  font-size: 10px; color: var(--text-2); font-family: 'DM Mono', monospace;
+  letter-spacing: 0.4px; flex-shrink: 0; flex-wrap: wrap; gap: 6px;
+}
+.footer-left { display: flex; align-items: center; gap: 10px; }
+.footer-right { display: flex; align-items: center; gap: 10px; color: var(--text-3); }
+.footer-brand { color: var(--green-dark); font-weight: 700; }
+.footer-ver { color: var(--text-3); font-weight: 400; }
+.footer-dev {
+  background: none; border: none; padding: 0; cursor: pointer;
+  color: var(--text-2); font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 0.4px;
+  transition: color .15s;
+}
+.footer-dev:hover { color: var(--green-dark); text-decoration: underline; }
+.footer-sep { color: var(--border-2); }
+.footer-idle { display: flex; align-items: center; gap: 5px; }
+.idle-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: idle-pulse 2s ease-in-out infinite; flex-shrink: 0; }
+@keyframes idle-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+.btn-bug {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 9px; font-family: 'DM Mono', monospace; font-weight: 600;
+  color: rgba(244, 63, 94, 0.7); background: transparent;
+  border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 6px;
+  padding: 2px 7px; cursor: pointer; letter-spacing: 0.5px;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.btn-bug:hover { color: #f43f5e; border-color: rgba(244, 63, 94, 0.6); background: rgba(244, 63, 94, 0.07); }
+.cetak-brand-name { font-size: 14px; font-weight: 800; letter-spacing: -.3px; color: var(--text); }
+.cetak-brand-sub { font-size: 10px; color: var(--text-3); margin-top: 1px; }
+.cetak-brand-badge {
+  background: var(--text); color: var(--green);
+  font-size: 7px; font-weight: 700; font-family: 'DM Mono', monospace;
+  border-radius: 4px; padding: 2px 6px; letter-spacing: 1px;
+}
+.btn-nav-shortcut {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; font-family: 'Sora', sans-serif;
+  color: var(--green-dark); background: var(--green-light);
+  border: 1.5px solid var(--green-mid); border-radius: 8px;
+  padding: 6px 14px; cursor: pointer; text-decoration: none;
+  transition: all .15s; letter-spacing: .2px;
+}
+.btn-nav-shortcut:hover { background: var(--green-mid); color: var(--green-dim); }
+
+/* ── MAIN 3-COLUMN ── */
+.cetak-main { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+
+/* ── LEFT: EDIT PANEL ── */
+.edit-panel {
+  width: 272px; flex-shrink: 0;
+  background: var(--white); border-right: 1.5px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.ep-scroll { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 14px; }
+.ep-scroll::-webkit-scrollbar { width: 6px; }
+.ep-scroll::-webkit-scrollbar-thumb { background: var(--green-mid); border-radius: 4px; }
+
+/* Import Zone */
+.import-zone {
+  border: 2px dashed var(--green-mid); border-radius: 12px;
+  background: var(--green-light); padding: 22px 16px;
+  text-align: center; cursor: pointer; transition: all .2s;
+  flex-shrink: 0;
+}
+.import-zone:hover, .import-zone.dragover {
+  border-color: var(--green); background: #d8f9e8;
+}
+.import-zone-icon { font-size: 28px; margin-bottom: 6px; }
+.import-zone-title { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.import-zone-sub { font-size: 10px; color: var(--text-3); }
+#fileInput { display: none; }
+
+/* Section Labels */
+.sec-label {
+  font-size: 9px; font-weight: 700; color: var(--text-3);
+  letter-spacing: 1.8px; text-transform: uppercase;
+  font-family: 'DM Mono', monospace; margin-bottom: 8px;
+}
+
+/* Edit Controls */
+.edit-section { display: flex; flex-direction: column; gap: 0; }
+.rotate-row { display: flex; gap: 6px; margin-bottom: 10px; }
+.btn-icon {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 5px; font-size: 11px; font-weight: 600; font-family: 'Sora', sans-serif;
+  color: var(--text-2); background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 7px 0; cursor: pointer; transition: all .15s;
+}
+.btn-icon:hover { background: var(--green-light); color: var(--green-dark); border-color: var(--green-mid); }
+.btn-icon.active { background: var(--green-light); color: var(--green-dark); border-color: var(--green); }
+
+.slider-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+.slider-header { display: flex; justify-content: space-between; align-items: center; }
+.slider-label { font-size: 11px; font-weight: 600; color: var(--text-2); }
+.slider-val {
+  font-size: 10px; font-family: 'DM Mono', monospace; color: var(--green-dark);
+  background: var(--green-light); border-radius: 4px; padding: 1px 6px;
+  min-width: 36px; text-align: center;
+}
+input[type=range] {
+  width: 100%; -webkit-appearance: none; height: 5px;
+  background: var(--green-mid); border-radius: 3px; outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 15px; height: 15px;
+  border-radius: 50%; background: var(--green); cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,200,83,.4);
+}
+input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
+
+.btn-reset {
+  font-size: 10px; font-weight: 600; font-family: 'Sora', sans-serif;
+  color: var(--text-3); background: transparent; border: 1.5px solid var(--border);
+  border-radius: 7px; padding: 5px 12px; cursor: pointer; transition: all .15s;
+  align-self: flex-start;
+}
+.btn-reset:hover { color: var(--red); border-color: var(--red); background: #fff5f5; }
+
+/* Size Selector — Dropdown */
+.size-section { display: flex; flex-direction: column; gap: 0; }
+.size-select-wrap { position: relative; margin-top: 2px; }
+.size-select-wrap::after {
+  content: '▾'; position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+  font-size: 12px; color: var(--green-dark); pointer-events: none;
+}
+#sizeSelect {
+  width: 100%; padding: 9px 30px 9px 12px;
+  font-size: 12px; font-weight: 700; font-family: 'DM Mono', monospace;
+  color: var(--text); background: var(--bg);
+  border: 1.5px solid var(--border); border-radius: 9px;
+  outline: none; cursor: pointer; appearance: none; -webkit-appearance: none;
+  transition: border-color .15s, background .15s;
+}
+#sizeSelect:focus { border-color: var(--green); background: var(--green-light); }
+#sizeSelect option { font-weight: 600; color: var(--text); background: #fff; }
+#sizeSelect optgroup { font-weight: 700; color: var(--text-3); font-size: 10px; }
+
+
+.custom-mm { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+.custom-mm input[type=number] {
+  width: 64px; font-size: 11px; font-family: 'DM Mono', monospace;
+  color: var(--text); background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 7px; padding: 5px 8px; outline: none; transition: border-color .15s;
+}
+.custom-mm input[type=number]:focus { border-color: var(--green); background: var(--green-light); }
+.custom-mm-sep { font-size: 11px; color: var(--text-3); font-family: 'DM Mono', monospace; }
+.custom-mm-unit { font-size: 10px; color: var(--text-3); font-family: 'DM Mono', monospace; }
+.btn-custom-apply {
+  font-size: 10px; font-weight: 700; font-family: 'Sora', sans-serif;
+  color: var(--green-dark); background: var(--green-light);
+  border: 1.5px solid var(--green-mid); border-radius: 7px;
+  padding: 5px 10px; cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.btn-custom-apply:hover { background: var(--green-mid); }
+
+/* ── ACTION BAR ── */
+.cetak-action-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px; background: var(--white);
+  border-bottom: 1.5px solid var(--border); flex-shrink: 0;
+}
+.cab-center {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+
+/* Add to Queue Button */
+.btn-add-queue {
+  flex-shrink: 0; padding: 9px 18px; font-size: 12px; font-weight: 800;
+  font-family: 'Sora', sans-serif; letter-spacing: .2px;
+  color: var(--white); background: linear-gradient(135deg, var(--green), var(--green-dark));
+  border: none; border-radius: 10px; cursor: pointer;
+  transition: all .2s; box-shadow: var(--shadow-green); white-space: nowrap;
+}
+.btn-add-queue:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,200,83,.35); }
+.btn-add-queue:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ── CENTER: CANVAS PANEL ── */
+.canvas-panel {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; background: #1a2e22; overflow: hidden;
+  position: relative; min-width: 0;
+}
+.canvas-wrap { position: relative; display: inline-block; line-height: 0; }
+#previewCanvas { display: block; max-width: 100%; }
+.crop-overlay {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+}
+.crop-overlay.active { pointer-events: all; cursor: crosshair; }
+.crop-box {
+  position: absolute; border: 2px solid #fff;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,.5);
+  cursor: move; box-sizing: border-box;
+}
+.crop-box::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(rgba(255,255,255,.25) 1px, transparent 1px) 0 33.33%,
+    linear-gradient(rgba(255,255,255,.25) 1px, transparent 1px) 0 66.66%,
+    linear-gradient(90deg, rgba(255,255,255,.25) 1px, transparent 1px) 33.33% 0,
+    linear-gradient(90deg, rgba(255,255,255,.25) 1px, transparent 1px) 66.66% 0;
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+.crop-handle {
+  position: absolute; width: 12px; height: 12px;
+  background: #fff; border: 2px solid var(--green-dark); border-radius: 2px;
+}
+.crop-handle.nw { top:-6px; left:-6px; cursor:nwse-resize; }
+.crop-handle.ne { top:-6px; right:-6px; cursor:nesw-resize; }
+.crop-handle.sw { bottom:-6px; left:-6px; cursor:nesw-resize; }
+.crop-handle.se { bottom:-6px; right:-6px; cursor:nwse-resize; }
+
+.canvas-empty {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px; color: rgba(255,255,255,.35);
+  text-align: center; padding: 24px;
+}
+.canvas-empty-icon { font-size: 48px; opacity: .4; }
+.canvas-empty-title { font-size: 14px; font-weight: 700; }
+.canvas-empty-sub { font-size: 12px; }
+
+.canvas-hint {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+  font-size: 10px; font-family: 'DM Mono', monospace; color: rgba(255,255,255,.5);
+  background: rgba(0,0,0,.45); border-radius: 6px; padding: 4px 12px;
+  white-space: nowrap; pointer-events: none;
+}
+
+/* ── RIGHT: QUEUE PANEL ── */
+.queue-panel {
+  width: 300px; flex-shrink: 0;
+  background: var(--white); border-left: 1.5px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.queue-head {
+  padding: 12px 14px 10px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.queue-head-title { font-size: 13px; font-weight: 800; color: var(--text); }
+.queue-count-badge {
+  font-size: 9px; font-family: 'DM Mono', monospace; font-weight: 700;
+  background: var(--green-light); color: var(--green-dark);
+  border: 1.5px solid var(--green-mid); border-radius: 10px; padding: 2px 8px;
+}
+.queue-list { flex-shrink: 0; min-height: 64px; max-height: 148px; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.queue-list::-webkit-scrollbar { width: 6px; }
+.queue-list::-webkit-scrollbar-thumb { background: var(--green-mid); border-radius: 4px; }
+
+.queue-empty {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center; padding: 24px; gap: 8px;
+  color: var(--text-3);
+}
+.queue-empty-icon { font-size: 32px; opacity: .4; }
+.queue-empty-text { font-size: 11px; font-weight: 600; }
+.queue-empty-sub { font-size: 10px; color: var(--text-3); }
+
+.queue-item {
+  display: flex; gap: 8px; align-items: center;
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 8px;
+}
+.qi-thumb {
+  width: 44px; height: 44px; flex-shrink: 0;
+  border-radius: 6px; object-fit: cover;
+  border: 1px solid var(--border);
+}
+.qi-info { flex: 1; min-width: 0; }
+.qi-size {
+  font-size: 11px; font-weight: 800; color: var(--text);
+  font-family: 'DM Mono', monospace; margin-bottom: 2px;
+}
+.qi-mm { font-size: 9px; color: var(--text-3); font-family: 'DM Mono', monospace; }
+.qi-controls { display: flex; align-items: center; gap: 4px; }
+.btn-qty {
+  width: 22px; height: 22px; border-radius: 5px;
+  font-size: 13px; font-weight: 700;
+  color: var(--text-2); background: var(--white); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s; flex-shrink: 0;
+}
+.btn-qty:hover { background: var(--green-light); color: var(--green-dark); border-color: var(--green-mid); }
+.qi-qty {
+  font-size: 12px; font-weight: 800; font-family: 'DM Mono', monospace;
+  color: var(--text); min-width: 20px; text-align: center;
+}
+.btn-del {
+  width: 22px; height: 22px; border-radius: 5px;
+  font-size: 12px; color: var(--text-3);
+  background: transparent; border: none; cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-del:hover { color: var(--red); background: #fff5f5; }
+.btn-flip {
+  width: 24px; height: 22px; border-radius: 5px; font-size: 12px;
+  color: var(--text-3); background: var(--white); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s; flex-shrink: 0;
+}
+.btn-flip:hover { background: var(--green-light); color: var(--green-dark); border-color: var(--green-mid); }
+.btn-flip.active { background: var(--green-light); color: var(--green-dark); border-color: var(--green); }
+
+.queue-summary {
+  font-size: 10px; font-family: 'DM Mono', monospace; color: var(--text-3); line-height: 1.5;
+}
+.queue-summary span { color: var(--green-dark); font-weight: 700; }
+.btn-print {
+  flex-shrink: 0; padding: 9px 18px; font-size: 12px; font-weight: 800;
+  font-family: 'Sora', sans-serif; letter-spacing: .2px; white-space: nowrap;
+  color: var(--white); background: linear-gradient(135deg, #1a6b3c, #0f4a28);
+  border: none; border-radius: 10px; cursor: pointer;
+  transition: all .2s; box-shadow: 0 4px 16px rgba(0,0,0,.2);
+}
+.btn-print:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+.btn-print:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.btn-clear-queue {
+  flex-shrink: 0; padding: 5px 10px;
+  font-size: 10px; font-weight: 600; font-family: 'Sora', sans-serif;
+  color: var(--text-3); background: transparent;
+  border: 1px solid var(--border); border-radius: 7px; cursor: pointer;
+  transition: all .15s; white-space: nowrap;
+}
+.btn-clear-queue:hover { color: var(--red); border-color: var(--red); background: #fff5f5; }
+
+/* ── LAYOUT PREVIEW ── */
+.layout-preview {
+  flex: 1; min-height: 0; border-top: 1.5px solid var(--border);
+  display: flex; flex-direction: column;
+}
+.lp-head {
+  padding: 7px 12px 6px;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.lp-title {
+  font-size: 10px; font-weight: 800; color: var(--text-2);
+  font-family: 'DM Mono', monospace; letter-spacing: .5px; text-transform: uppercase;
+}
+.lp-paper-label {
+  font-size: 9px; font-family: 'DM Mono', monospace; font-weight: 700;
+  color: var(--text-3);
+}
+.lp-orient-btn {
+  font-size: 11px; font-weight: 700;
+  color: var(--text-3); background: var(--bg);
+  border: 1.5px solid var(--border); border-radius: 5px;
+  padding: 1px 5px; cursor: pointer; transition: all .12s; line-height: 1.4;
+}
+.lp-orient-btn.active { background: var(--green-light); color: var(--green-dark); border-color: var(--green); }
+.lp-orient-btn:hover:not(.active) { border-color: var(--green-mid); color: var(--green-dark); }
+.lp-scroll {
+  flex: 1; min-height: 80px; overflow-y: auto; overflow-x: hidden;
+  padding: 0 12px 10px; background: #2a2a2a;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.lp-scroll::-webkit-scrollbar { width: 5px; }
+.lp-scroll::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+.lp-empty {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  color: #666; font-size: 10px; font-family: 'DM Mono', monospace;
+  padding: 24px 0; text-align: center; line-height: 1.6;
+}
+#layoutCanvas { display: block; border-radius: 2px; }
+.lp-info {
+  padding: 4px 12px 7px; flex-shrink: 0;
+  font-size: 9px; font-family: 'DM Mono', monospace; color: var(--text-3);
+  background: #2a2a2a; text-align: center;
+}
+.lp-info span { color: #90cba8; font-weight: 700; }
+.btn-lp-expand {
+  font-size: 9px; font-weight: 700; font-family: 'DM Mono', monospace;
+  color: var(--green-dark); background: var(--green-light);
+  border: 1.5px solid var(--green-mid); border-radius: 5px;
+  padding: 2px 8px; cursor: pointer; transition: all .12s; white-space: nowrap;
+}
+.btn-lp-expand:hover { background: var(--green-mid); color: var(--green-dark); }
+
+/* ── LAYOUT PREVIEW MODAL (full) ── */
+.lp-modal-backdrop {
+  position: fixed; inset: 0; z-index: 900;
+  background: rgba(0,0,0,.72); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.lp-modal {
+  background: #1a1a1a; border-radius: 14px;
+  box-shadow: 0 32px 80px rgba(0,0,0,.6);
+  width: 100%; max-width: 640px; max-height: 92vh;
+  display: flex; flex-direction: column; overflow: hidden;
+  border: 1px solid #333;
+}
+.lp-modal-head {
+  padding: 12px 16px; border-bottom: 1px solid #333;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.lp-modal-title {
+  font-size: 13px; font-weight: 800; color: #e0e0e0;
+  font-family: 'Sora', sans-serif;
+}
+.lp-modal-meta {
+  font-size: 9px; font-family: 'DM Mono', monospace; color: #888;
+  background: #2a2a2a; border-radius: 4px; padding: 2px 7px; margin-left: 8px;
+}
+.btn-lp-modal-close {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: #2a2a2a; border: 1px solid #444; color: #aaa;
+  font-size: 14px; cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-lp-modal-close:hover { background: #3a2020; color: #ff6b6b; border-color: #ff6b6b; }
+.lp-modal-body {
+  flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+  background: #242424; padding: 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.lp-modal-body::-webkit-scrollbar { width: 6px; }
+.lp-modal-body::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+#layoutCanvasFull { display: block; border-radius: 2px; }
+.lp-modal-foot {
+  padding: 10px 16px; border-top: 1px solid #333; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.lp-modal-foot-info {
+  font-size: 10px; font-family: 'DM Mono', monospace; color: #888;
+}
+.lp-modal-foot-info span { color: #90cba8; font-weight: 700; }
+.btn-lp-print {
+  padding: 8px 20px; font-size: 12px; font-weight: 800;
+  font-family: 'Sora', sans-serif; color: #fff;
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  border: none; border-radius: 8px; cursor: pointer; transition: all .15s;
+  box-shadow: var(--shadow-green);
+}
+.btn-lp-print:hover { transform: translateY(-1px); }
+
+/* ── PRINT AREA ── */
+#print-area { display: none; }
+@media print {
+  body > .cetak-wrap { display: none !important; }
+  #print-area {
+    display: block !important;
+    margin: 0; padding: 0;
+  }
+  .print-page {
+    width: 210mm; height: 297mm;
+    position: relative; overflow: hidden;
+    page-break-after: always; background: white;
+  }
+  .print-page:last-child { page-break-after: auto; }
+  .print-photo {
+    position: absolute;
+    margin: 0; padding: 0;
+    overflow: hidden;
+    image-rendering: high-quality;
+  }
+  .print-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+  @page { size: 210mm 297mm; margin: 0; }
+}
+
+/* ── BTN OPEN EDIT ── */
+.btn-open-edit {
+  width: 100%; padding: 9px; font-size: 12px; font-weight: 700;
+  font-family: 'Sora', sans-serif; color: var(--green-dark);
+  background: var(--green-light); border: 1.5px solid var(--green-mid);
+  border-radius: 10px; cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-open-edit:hover { background: var(--green-mid); }
+
+/* ── EDIT MODAL ── */
+.edit-modal-backdrop {
+  position: fixed; inset: 0; z-index: 800;
+  background: rgba(0,0,0,.6); backdrop-filter: blur(3px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.edit-modal {
+  background: var(--white); border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.3);
+  width: 100%; max-width: 780px; max-height: 94vh;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.edit-modal-head {
+  padding: 10px 16px 9px; border-bottom: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.edit-modal-title { font-size: 13px; font-weight: 800; color: var(--text); }
+.btn-modal-close {
+  width: 26px; height: 26px; border-radius: 7px; border: none;
+  background: var(--bg); color: var(--text-2); font-size: 14px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.btn-modal-close:hover { background: #fff0f0; color: var(--red); }
+/* Layout 2 kolom: sidebar kiri + preview kanan */
+.edit-modal-layout {
+  display: flex; flex-direction: row; flex: 1; min-height: 0; overflow: hidden;
+}
+.edit-modal-sidebar {
+  width: 196px; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  border-right: 1.5px solid var(--border);
+  background: var(--bg);
+}
+.edit-modal-preview {
+  background: #111c17; flex: 1; min-width: 0; position: relative;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+#editPreviewCanvas { max-width: 100%; max-height: 100%; display: block; object-fit: contain; }
+.edit-modal-body { padding: 12px 12px 8px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.edit-modal-body .rotate-row { display: flex; flex-direction: column; gap: 5px; }
+.edit-modal-body .btn-icon {
+  display: flex; align-items: center; justify-content: center;
+  gap: 5px; font-size: 11px; font-weight: 600; font-family: 'Sora', sans-serif;
+  color: var(--text-2); background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 7px 0; cursor: pointer; transition: all .15s; width: 100%;
+}
+.edit-modal-body .btn-icon:hover { background: var(--green-light); color: var(--green-dark); border-color: var(--green-mid); }
+.edit-modal-body .slider-row { display: flex; flex-direction: column; gap: 3px; }
+.edit-modal-body .slider-header { display: flex; justify-content: space-between; align-items: center; }
+.edit-modal-body .slider-label { font-size: 10px; font-weight: 600; color: var(--text-2); }
+.edit-modal-body .slider-val {
+  font-size: 9px; font-family: 'DM Mono', monospace; color: var(--green-dark);
+  background: var(--green-light); border-radius: 4px; padding: 1px 5px; min-width: 30px; text-align: center;
+}
+.edit-modal-foot {
+  padding: 10px 12px; border-top: 1.5px solid var(--border);
+  display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;
+}
+.btn-modal-reset {
+  width: 100%; padding: 8px; font-size: 11px; font-weight: 700;
+  font-family: 'Sora', sans-serif; color: var(--text-3);
+  background: var(--bg); border: 1.5px solid var(--border); border-radius: 9px;
+  cursor: pointer; transition: all .15s;
+}
+.btn-modal-reset:hover { color: var(--red); border-color: var(--red); background: #fff5f5; }
+.btn-modal-done {
+  width: 100%; padding: 10px; font-size: 12px; font-weight: 800;
+  font-family: 'Sora', sans-serif; color: var(--white);
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  border: none; border-radius: 9px; cursor: pointer; transition: all .2s;
+  box-shadow: var(--shadow-green);
+}
+.btn-modal-done:hover { transform: translateY(-1px); }
+
+/* ── PRINT SETTINGS ── */
+.print-settings {
+  border: 1.5px solid var(--border); border-radius: 10px;
+  overflow: hidden; flex-shrink: 0;
+}
+.ps-header {
+  padding: 9px 14px; display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; font-size: 10px; font-weight: 700; font-family: 'DM Mono', monospace;
+  color: var(--text-3); letter-spacing: .8px; text-transform: uppercase;
+  transition: color .15s; user-select: none;
+}
+.ps-header:hover { color: var(--green-dark); }
+.ps-chevron { font-size: 10px; transition: transform .2s; }
+.ps-chevron.open { transform: rotate(90deg); }
+.ps-body { padding: 6px 14px 10px; display: flex; flex-direction: column; gap: 8px; }
+.ps-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ps-label { font-size: 10px; font-weight: 600; color: var(--text-2); white-space: nowrap; }
+.ps-gap-wrap { display: flex; align-items: center; gap: 4px; }
+.ps-gap-wrap input[type=number] {
+  width: 48px; font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 700;
+  color: var(--text); background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 6px; padding: 3px 6px; outline: none; text-align: center;
+  transition: border-color .15s;
+}
+.ps-gap-wrap input[type=number]:focus { border-color: var(--green); }
+.ps-unit { font-size: 9px; color: var(--text-3); font-family: 'DM Mono', monospace; }
+.ps-radio-group { display: flex; gap: 8px; }
+.ps-radio { display: flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; color: var(--text-2); cursor: pointer; }
+.ps-radio input { accent-color: var(--green); cursor: pointer; }
+.ps-check { display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; color: var(--text-2); cursor: pointer; }
+.ps-check input { accent-color: var(--green); cursor: pointer; }
+
+/* ── NOTIFICATIONS ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9000;
+  background: var(--text); color: var(--white); border-radius: 10px;
+  padding: 10px 18px; font-size: 12px; font-weight: 600; font-family: 'Sora', sans-serif;
+  box-shadow: var(--shadow-lg); opacity: 0; transform: translateY(8px);
+  transition: all .25s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.green { background: var(--green-dark); }
+.toast.red { background: var(--red); }
+</style>
+</head>
+<body>
+<div class="cetak-wrap">
+
+  <!-- HEADER -->
+  <header class="cetak-header">
+    <div class="cetak-brand">
+      <div class="cetak-brand-icon"><img src="icon.png" alt="icon"></div>
+      <div>
+        <div class="cetak-brand-name">
+          Toko Prestasi Tools
+          <span class="cetak-brand-badge">CETAK</span>
+        </div>
+        <div class="cetak-brand-sub">Cetak Foto Prestasi</div>
+      </div>
+    </div>
+    <a href="index.html" class="btn-nav-shortcut" title="Buka Prompt Generator">
+      ✦ Prompt Generator
+    </a>
+  </header>
+
+  <!-- ACTION BAR -->
+  <div class="cetak-action-bar">
+    <button class="btn-add-queue" id="btnAddQueue" disabled title="Tambahkan foto yang sudah di-crop ke antrian cetak">✚ Tambah ke Antrian</button>
+    <div class="cab-center">
+      <span class="queue-summary" id="queueSummary">
+        Total: <span id="totalItems">0</span> item · <span id="totalPages">0</span> halaman
+      </span>
+      <button class="btn-clear-queue" id="btnClearQueue" style="display:none" title="Hapus semua item dari antrian cetak">✕ Kosongkan</button>
+    </div>
+    <button class="btn-print" id="btnPrint" disabled title="Susun semua item antrian ke halaman kertas, lalu buka dialog cetak printer">🖨 Susun &amp; Cetak</button>
+  </div>
+
+  <!-- MAIN -->
+  <main class="cetak-main">
+
+    <!-- LEFT: EDIT PANEL -->
+    <aside class="edit-panel">
+      <div class="ep-scroll">
+
+        <!-- Import Zone -->
+        <div class="import-zone" id="importZone">
+          <div class="import-zone-icon">📁</div>
+          <div class="import-zone-title">Klik atau Drop Foto</div>
+          <div class="import-zone-sub">JPG, PNG, WEBP — maks 20MB</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*">
+
+        <!-- Tombol Edit Foto (muncul setelah import) -->
+        <div id="editSection" style="display:none">
+          <button class="btn-open-edit" id="btnOpenEdit" title="Buka editor foto — putar, cermin, kemiringan, kecerahan, kontras, lalu crop sesuai ukuran">✏ Edit Foto</button>
+        </div>
+
+        <!-- Size Selector -->
+        <div class="size-section" id="sizeSection" style="display:none">
+          <div class="sec-label">Pilih Ukuran Cetak</div>
+
+          <!-- Dropdown -->
+          <div class="size-select-wrap">
+            <select id="sizeSelect" title="Pilih ukuran cetak standar (pasfoto, R-size, kartu) atau Custom untuk ukuran bebas">
+              <option value="">— Pilih Ukuran —</option>
+              <optgroup label="✏ Custom">
+                <option value="custom">Custom — ketik sendiri (mm)</option>
+              </optgroup>
+              <optgroup label="Pasfoto / ID">
+                <option value="2x3">2×3 cm — 20×30mm</option>
+                <option value="3x4">3×4 cm — 30×40mm</option>
+                <option value="4x6">4×6 cm — 40×60mm</option>
+              </optgroup>
+              <optgroup label="Dokumen Khusus">
+                <option value="ktpsim">KTP / SIM — 85.6×54mm</option>
+                <option value="kartunama">Kartu Nama — 90×55mm</option>
+                <option value="stnk">STNK — 230×75mm</option>
+              </optgroup>
+              <optgroup label="Foto R-Size">
+                <option value="2r">2R — 64×89mm</option>
+                <option value="3r">3R — 89×127mm</option>
+                <option value="postcard">Postcard — 100×148mm</option>
+                <option value="4r">4R — 102×152mm</option>
+                <option value="5r">5R — 127×178mm</option>
+                <option value="6r">6R — 152×203mm</option>
+                <option value="8r">8R — 203×254mm</option>
+                <option value="8r+">8R+ — 203×305mm</option>
+                <option value="10r">10R — 254×305mm</option>
+                <option value="10r+">10R+ — 254×381mm</option>
+              </optgroup>
+              <optgroup label="Kertas Standar">
+                <option value="a5">A5 — 148×210mm</option>
+                <option value="a4">A4 — 210×297mm</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <!-- Custom mm inputs (tampil hanya saat pilih Custom) -->
+          <div class="custom-mm" id="customMmRow" style="display:none">
+            <input type="number" id="customW" placeholder="W" min="5" max="400">
+            <span class="custom-mm-sep">×</span>
+            <input type="number" id="customH" placeholder="H" min="5" max="400">
+            <span class="custom-mm-unit">mm</span>
+            <button class="btn-custom-apply" id="btnCustomApply" title="Terapkan ukuran custom yang diketik sebagai ukuran crop">OK</button>
+          </div>
+
+        </div>
+
+        <!-- Print Settings -->
+        <div class="print-settings" id="printSettings">
+          <div class="ps-header" id="psHeader">
+            <span>⚙ Pengaturan Cetak</span>
+            <span class="ps-chevron open" id="psChevron">▾</span>
+          </div>
+          <div class="ps-body" id="psBody">
+            <div class="ps-row">
+              <span class="ps-label" title="Sesuaikan dengan kertas printer yang dipakai">Ukuran Kertas</span>
+              <select id="psPaperSize" title="Pilih ukuran kertas printer. A4 untuk printer rumahan, 10R untuk printer foto" style="font-size:10px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text);background:var(--bg);border:1.5px solid var(--border);border-radius:6px;padding:3px 6px;outline:none;cursor:pointer;">
+                <option value="A4" selected>A4 — 210×297mm</option>
+                <option value="F4">F4 — 215×330mm</option>
+                <option value="10R">10R — 254×305mm (foto)</option>
+                <option value="A3">A3 — 297×420mm</option>
+              </select>
+            </div>
+            <div class="ps-row">
+              <span class="ps-label" title="Jarak kosong antar foto dalam mm. Lebih besar = lebih mudah digunting">Gap antar foto</span>
+              <div class="ps-gap-wrap">
+                <input type="number" id="psGap" value="2" min="0" max="10" step="0.5" title="Jarak antar foto (mm). Disarankan 2–3mm agar ada ruang gunting">
+                <span class="ps-unit">mm</span>
+              </div>
+            </div>
+            <div class="ps-row">
+              <span class="ps-label" title="Cara foto mengisi area cetaknya">Mode isi cell</span>
+              <div class="ps-radio-group">
+                <label class="ps-radio" title="Fill: foto dipotong agar pas memenuhi area (default, tanpa sisa putih)"><input type="radio" name="fillMode" value="fill" checked> Fill</label>
+                <label class="ps-radio" title="Fit: foto diperkecil agar muat seluruhnya, bisa ada sisa putih di pinggir"><input type="radio" name="fillMode" value="fit"> Fit</label>
+                <label class="ps-radio" title="Stretch: foto direntangkan paksa mengisi area, bisa terdistorsi"><input type="radio" name="fillMode" value="stretch"> Stretch</label>
+              </div>
+            </div>
+            <div class="ps-row">
+              <label class="ps-check" title="Auto Rotate: foto otomatis diputar 90° jika lebih efisien mengisi kertas (menghemat halaman)"><input type="checkbox" id="psAutoRotate"> Auto Rotate</label>
+              <label class="ps-check" title="Cell Border: tambah garis bingkai hitam tebal di tepi setiap foto — berguna untuk foto dengan latar putih agar batas terlihat jelas saat digunting"><input type="checkbox" id="psCellBorder"> Cell Border</label>
+              <label class="ps-check" title="Garis Gunting: tampilkan garis putus-putus ✂ di antara foto sebagai panduan memotong dengan gunting"><input type="checkbox" id="psCutLines" checked> Garis Gunting</label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- CENTER: CANVAS -->
+    <section class="canvas-panel" id="canvasPanel">
+      <div class="canvas-empty" id="canvasEmpty">
+        <div class="canvas-empty-icon">🖼️</div>
+        <div class="canvas-empty-title">Belum ada foto</div>
+        <div class="canvas-empty-sub">Import foto dari panel kiri untuk mulai</div>
+      </div>
+      <div class="canvas-wrap" id="canvasWrap" style="display:none">
+        <canvas id="previewCanvas"></canvas>
+        <div class="crop-overlay" id="cropOverlay">
+          <div class="crop-box" id="cropBox" style="display:none">
+            <div class="crop-handle nw" data-corner="nw"></div>
+            <div class="crop-handle ne" data-corner="ne"></div>
+            <div class="crop-handle sw" data-corner="sw"></div>
+            <div class="crop-handle se" data-corner="se"></div>
+          </div>
+        </div>
+      </div>
+      <div class="canvas-hint" id="canvasHint" style="display:none"></div>
+    </section>
+
+    <!-- RIGHT: QUEUE -->
+    <aside class="queue-panel">
+      <div class="queue-head">
+        <div class="queue-head-title">🗂 Antrian Cetak</div>
+        <div class="queue-count-badge" id="queueBadge">0 item</div>
+      </div>
+
+      <div class="queue-list" id="queueList">
+        <div class="queue-empty" id="queueEmpty">
+          <div class="queue-empty-icon">📋</div>
+          <div class="queue-empty-text">Antrian kosong</div>
+          <div class="queue-empty-sub">Crop foto & tambahkan ke sini</div>
+        </div>
+      </div>
+      <!-- Layout Preview -->
+      <div class="layout-preview" id="layoutPreview">
+        <div class="lp-head">
+          <span class="lp-title">📄 Preview Layout</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button class="btn-lp-expand" id="btnLpExpand" style="display:none" title="Buka preview layout dalam tampilan layar penuh">⤢ Perbesar</button>
+            <span class="lp-paper-label" id="lpPaperLabel">A4 · 210×297mm</span>
+          </div>
+        </div>
+        <div class="lp-scroll" id="lpScroll">
+          <div class="lp-empty" id="lpEmpty">Tambah foto ke antrian<br>untuk melihat preview layout</div>
+          <canvas id="layoutCanvas" style="display:none"></canvas>
+        </div>
+        <div class="lp-info" id="lpInfo" style="display:none">
+          <span id="lpPageCount">0</span> halaman · sisa <span id="lpWaste">0</span>%
+        </div>
+      </div>
+    </aside>
+
+  </main>
+</div>
+
+<!-- LAYOUT PREVIEW MODAL -->
+<div class="lp-modal-backdrop" id="lpModalBackdrop" style="display:none">
+  <div class="lp-modal">
+    <div class="lp-modal-head">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="lp-modal-title">🖨 Preview Layout</span>
+        <span class="lp-modal-meta" id="lpModalMeta">0 halaman</span>
+      </div>
+      <button class="btn-lp-modal-close" id="btnLpModalClose" title="Tutup preview layout">✕</button>
+    </div>
+    <div class="lp-modal-body" id="lpModalBody">
+      <canvas id="layoutCanvasFull"></canvas>
+    </div>
+    <div class="lp-modal-foot">
+      <div class="lp-modal-foot-info">
+        <span id="lpModalPages">0</span> halaman ·
+        sisa <span id="lpModalWaste">0</span>%
+      </div>
+      <button class="btn-lp-print" id="btnLpPrint" title="Kirim layout ke dialog cetak printer sekarang">🖨 Cetak Sekarang</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="edit-modal-backdrop" id="editModalBackdrop" style="display:none">
+  <div class="edit-modal">
+    <div class="edit-modal-head">
+      <div class="edit-modal-title">✏ Edit Foto</div>
+      <button class="btn-modal-close" id="btnModalClose" title="Tutup editor dan batalkan perubahan">✕</button>
+    </div>
+    <div class="edit-modal-layout">
+
+      <!-- SIDEBAR KIRI: Kontrol -->
+      <div class="edit-modal-sidebar">
+        <div class="edit-modal-body">
+          <div class="rotate-row">
+            <button class="btn-icon" id="btnRotateL" title="Putar kiri 90°">↺ Putar Kiri</button>
+            <button class="btn-icon" id="btnRotateR" title="Putar kanan 90°">↻ Putar Kanan</button>
+            <button class="btn-icon" id="btnFlipH" title="Cermin horizontal">⇄ Cermin</button>
+          </div>
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Kemiringan</span>
+              <span class="slider-val" id="valAngle">0°</span>
+            </div>
+            <input type="range" id="slAngle" min="-15" max="15" step="0.5" value="0">
+          </div>
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Kecerahan</span>
+              <span class="slider-val" id="valBright">0</span>
+            </div>
+            <input type="range" id="slBright" min="-100" max="100" step="1" value="0">
+          </div>
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Kontras</span>
+              <span class="slider-val" id="valContrast">0</span>
+            </div>
+            <input type="range" id="slContrast" min="-100" max="100" step="1" value="0">
+          </div>
+        </div>
+        <div class="edit-modal-foot">
+          <button class="btn-modal-reset" id="btnReset" title="Kembalikan semua pengaturan (putar, kecerahan, kontras) ke nilai awal">↺ Reset</button>
+          <button class="btn-modal-done" id="btnModalDone" title="Simpan hasil edit dan kembali ke tampilan crop">✓ Selesai Edit</button>
+        </div>
+      </div>
+
+      <!-- PREVIEW KANAN: Canvas + Grid -->
+      <div class="edit-modal-preview">
+        <canvas id="editPreviewCanvas"></canvas>
+      </div>
+
+    </div><!-- /.edit-modal-layout -->
+  </div>
+</div>
+
+<!-- PRINT AREA (hidden, shown only @media print) -->
+<div id="print-area"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="app-cetak.js"></script>
+
+<!-- FOOTER -->
+<footer class="app-footer">
+  <div class="footer-left">
+    <span>🧰 <strong class="footer-brand">Toko Prestasi Tools</strong> <span class="footer-ver">v2.1</span></span>
+    <span class="footer-sep">·</span>
+    <div class="footer-idle">
+      <span class="idle-dot"></span>
+      <span>Aktif</span>
+    </div>
+  </div>
+  <div class="footer-center"></div>
+  <div class="footer-right">
+    <button class="footer-dev" onclick="openNexusForge()">Nexus Forge</button>
+    <span class="footer-sep">·</span>
+    <span id="cetak-footer-clock">—</span>
+  </div>
+</footer>
+<script>
+(function(){
+  function tickClock(){
+    const el = document.getElementById('cetak-footer-clock');
+    if(!el) return;
+    const now = new Date();
+    el.textContent = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }
+  tickClock(); setInterval(tickClock, 1000);
+
+  window.openNexusForge = function() {
+    if (document.getElementById('nexus-modal')) return;
+    const ROLES = [
+      { tier:'COMMAND', items:[
+        { img:'KAELA',  name:'KAELA',  role:'Lead AI Architect · Command Center · Dispatch' },
+      ]},
+      { tier:'WORKFLOW CORE', items:[
+        { img:'CIPHER', name:'CIPHER', role:'Business Analyst · BRD · Acceptance Criteria' },
+        { img:'LYRA',   name:'LYRA',   role:'UX/Design · Wireframe · Design Spec' },
+        { img:'RAVEN',  name:'RAVEN',  role:'Senior Backend Dev · Web Engine · Data Pipeline' },
+        { img:'ZANE',   name:'ZANE',   role:'Frontend Dev · HTML/CSS/JS · Rendering Layer' },
+        { img:'MARCUS', name:'MARCUS', role:'Security Review' },
+      ]},
+      { tier:'QA & SPECIALIST', items:[
+        { img:'DRAKE',  name:'DRAKE',  role:'Debug Specialist · Root Cause Analysis' },
+        { img:'VECTOR', name:'VECTOR', role:'QA Functional Tester' },
+        { img:'PRISM',  name:'PRISM',  role:'Data QA · Verifikasi Kalkulasi Bisnis' },
+      ]},
+      { tier:'SUPPORT', items:[
+        { img:'NOVA',   name:'NOVA',   role:'Documentation · README · User Guide' },
+        { img:'REED',   name:'REED',   role:'Patch Archive · Session State · Bug Registry' },
+      ]},
+      { tier:'EKSTERNAL', items:[
+        { img:'SEIRA',  name:'SEIRA',  role:'Brainstorm · Eksplorasi Konsep · ChatGPT' },
+      ]},
+    ];
+    let rolesHtml = '';
+    ROLES.forEach(group => {
+      rolesHtml += `<div style="font-size:8px;font-weight:700;color:#bbb;letter-spacing:2px;font-family:'DM Mono',monospace;margin:10px 0 6px;text-transform:uppercase;">${group.tier}</div>`;
+      rolesHtml += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">`;
+      group.items.forEach(r => {
+        rolesHtml += `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#f8fdf9;border-radius:10px;border:1.5px solid #e2f0e8;"><img src="crew/NEXUS_FORGE_${r.img}.png" onclick="nfLightbox(this.src,'${r.name} — ${r.role}')" style="width:38px;height:38px;border-radius:8px;object-fit:cover;flex-shrink:0;display:block;cursor:zoom-in;transition:transform .15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><div style="min-width:0;"><div style="font-size:11px;font-weight:800;color:#1a2e1f;letter-spacing:.3px;">${r.name}</div><div style="font-size:9px;color:#6b8f72;margin-top:1px;line-height:1.3;">${r.role}</div></div></div>`;
+      });
+      rolesHtml += `</div>`;
+    });
+    const m = document.createElement('div');
+    m.id = 'nexus-modal';
+    m.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);padding:16px;backdrop-filter:blur(4px)';
+    m.innerHTML = `
+    <div style="background:#fff;border-radius:20px;padding:0;max-width:560px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.3);font-family:'Sora',sans-serif;">
+      <div style="background:linear-gradient(135deg,#00C853,#00963a);padding:20px 22px 18px;position:relative;flex-shrink:0;">
+        <button onclick="document.getElementById('nexus-modal').remove()" style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.2);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <img src="crew/NEXUS_FORGE_OLAN.png" onclick="nfLightbox(this.src,'OLAN — Project Director')" style="width:58px;height:58px;border-radius:14px;object-fit:cover;flex-shrink:0;display:block;border:2px solid rgba(255,255,255,0.3);cursor:zoom-in;">
+          <div>
+            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:2.5px;font-family:'DM Mono',monospace;">PROJECT DIRECTOR</div>
+            <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px;line-height:1.1;">OLAN</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px;">Nexus Forge · Toko Prestasi · Kongbeng, Kutai Timur</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:8px;">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.9);font-family:'DM Mono',monospace;">NEXUS FORGE</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.5);font-family:'DM Mono',monospace;">Smart Contract v12.5 · 12 AI Roles · Powered by Claude</div>
+        </div>
+      </div>
+      <div style="overflow-y:auto;padding:16px 20px 20px;flex:1;">
+        <div style="font-size:9px;font-weight:700;color:#aaa;letter-spacing:2px;font-family:'DM Mono',monospace;margin-bottom:8px;">AI TEAM · 12 ROLES</div>
+        ${rolesHtml}
+        <div style="margin-top:16px;padding-top:12px;border-top:1.5px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:9px;color:#bbb;font-family:'DM Mono',monospace;">Toko Prestasi Tools v2.1 · Nexus Forge</div>
+          <a href="https://wa.me/6281299303888" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#00C853;text-decoration:none;font-family:'DM Mono',monospace;">💬 WhatsApp</a>
+        </div>
+      </div>
+    </div>`;
+    m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+    document.body.appendChild(m);
+  };
+
+  window.nfLightbox = function(src, caption) {
+    if (document.getElementById('nf-lightbox')) return;
+    const lb = document.createElement('div');
+    lb.id = 'nf-lightbox';
+    lb.style.cssText = 'position:fixed;inset:0;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.85);cursor:zoom-out;padding:20px;';
+    lb.innerHTML = `
+      <img src="${src}" style="max-width:min(420px,90vw);max-height:70vh;border-radius:18px;object-fit:contain;box-shadow:0 24px 80px rgba(0,0,0,.6);display:block;animation:lb-in .2s ease;">
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.75);font-family:'Sora',sans-serif;text-align:center;">${caption}</div>
+      <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.35);font-family:'DM Mono',monospace;">klik mana saja untuk tutup</div>
+    `;
+    lb.addEventListener('click', () => lb.remove());
+    document.body.appendChild(lb);
+    if (!document.getElementById('lb-style')) {
+      const s = document.createElement('style');
+      s.id = 'lb-style';
+      s.textContent = '@keyframes lb-in{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}';
+      document.head.appendChild(s);
+    }
+  };
+})();
+</script>
+</body>
+</html>
