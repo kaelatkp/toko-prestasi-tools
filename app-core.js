@@ -16,12 +16,12 @@ let _clData = null;
 
 async function loadChangelog() {
   try {
-    const r = await fetch('./changelog.json?t=' + Date.now());
+    const r = await fetch(GITHUB_RAW + '/changelog.json?t=' + Date.now());
     _clData = await r.json();
   } catch (_) { _clData = null; }
 
-  // Auto-show popup jika belum pernah lihat versi ini
-  if (!localStorage.getItem(CL_SEEN_KEY)) openChangelog();
+  // Auto-show hanya jika data berhasil dimuat DAN belum pernah dilihat
+  if (_clData && !localStorage.getItem(CL_SEEN_KEY)) openChangelog();
 }
 
 function openChangelog() {
@@ -55,13 +55,14 @@ function openChangelog() {
     </div>`;
   document.body.appendChild(modal);
   requestAnimationFrame(() => modal.classList.add('show'));
-  localStorage.setItem(CL_SEEN_KEY, '1');
 }
 
 function closeChangelog() {
   const modal = document.getElementById('cl-modal');
   if (!modal) return;
   modal.classList.remove('show');
+  // Key baru di-set setelah user klik Tutup — bukan saat modal dibuka
+  localStorage.setItem(CL_SEEN_KEY, '1');
   modal.addEventListener('transitionend', () => modal.remove(), { once: true });
 }
 
