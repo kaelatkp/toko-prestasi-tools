@@ -16,7 +16,7 @@ let _clData = null;
 
 async function loadChangelog() {
   try {
-    const r = await fetch(GITHUB_RAW + '/changelog.json?t=' + Date.now());
+    const r = await fetch('./changelog.json?t=' + Date.now());
     _clData = await r.json();
   } catch (_) { _clData = null; }
 
