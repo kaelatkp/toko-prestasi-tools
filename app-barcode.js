@@ -356,7 +356,8 @@ function bcCetak() {
   let st = document.getElementById('_bc_ps');
   if (!st) { st = document.createElement('style'); st.id = '_bc_ps'; document.head.appendChild(st); }
   st.textContent = `@media print{@page{size:${w}mm ${h}mm;margin:0;}.sidebar,.bc-stat-bar,.bc-form-area,#welcome,#welcome-dok,#workspace,.app-footer{display:none!important;}#welcome-barcode{display:flex!important;}.bc-paper-wrap{overflow:visible!important;padding:0!important;background:none!important;}}`;
-  window.print();
+  if (window.electronAPI?.doPrint) window.electronAPI.doPrint();
+  else window.print();
 }
 
 /* ── Reset Layout ── */
