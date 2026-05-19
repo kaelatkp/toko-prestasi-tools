@@ -1,5 +1,5 @@
 {
-  "version": "2.1",
+  "version": "git add .",
   "files": {
     "index.html": "aac53c7bd019a58be7637c6405bbdc01f989026f2fca4e76cb3686d935ba4c57",
     "tokens.css": "ab2af760022139ba4ba65bb2695cddb889087256b709c074bbdc0b08083e54ca",
@@ -9,7 +9,7 @@
     "app-dokumen.js": "6bd143aa9a5f3dd6429669160408bae9314eb95f8b47c42b0ba1117e9bb84eb2",
     "app-barcode.js": "48009d7fa228ad906dc78ae1a83ea61d00c7e84ca422f6c5d2710d8ec2e570a8",
     "app-screensaver.js": "6c9c55fd72c9d8db67c7c1a2236a0a306746e00d207a3005237803d2864a78f7",
-    "app-cetak.js": "174c458152181ec5192ff9cb6c0e8a2c62d2cffbcaad021733072d8c2da0d8e1",
-    "cetak.html": "7a268f3a507407715672f4b318b6e554ce148baa3d0cba089e1306ed41a0168d"
+    "app-cetak.js": "8ebcf003b547dfb156adbe3c74855d244ce45ae46cf158caa64ed9a5fc192e19",
+    "cetak.html": "edf0e97b6d2e07bf54ca1073d0f8f8eb2fea132fbd41f08114da45efbc5b5ac9"
   }
 }

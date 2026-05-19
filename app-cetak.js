@@ -928,7 +928,10 @@ async function packAndPrint() {
   });
 
   // Wait for images to render fully, then print
-  setTimeout(() => window.print(), 300);
+  setTimeout(() => {
+    if (window.electronAPI?.doPrint) window.electronAPI.doPrint();
+    else window.print();
+  }, 300);
 }
 
 /* ─────────────────────────────── LAYOUT PREVIEW ── */
