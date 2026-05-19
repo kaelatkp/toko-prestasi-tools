@@ -295,8 +295,7 @@ function bcRenderPreview() {
 
     let cutLines = '';
     if (totalBarcode > 1) {
-      const dashStyle = 'stroke:#bbb;stroke-width:0.6;stroke-dasharray:4,3;';
-      const scissorSize = 7;
+      const dashStyle = 'stroke:#555;stroke-width:0.5;stroke-dasharray:4,3;';
       let lines = '';
       const itemCount   = pageItems.length;
       const filledRows  = Math.ceil(itemCount / cols);
@@ -310,13 +309,11 @@ function bcRenderPreview() {
         const yEnd = c < lastRowCols ? contentBottom : contentBottom - (cellH + gpPx);
         if (yEnd <= mgPx) continue;
         lines += `<line x1="${cx}" y1="${mgPx}" x2="${cx}" y2="${yEnd}" style="${dashStyle}"/>`;
-        lines += `<text x="${cx}" y="${mgPx - 2}" text-anchor="middle" font-size="${scissorSize}" fill="#bbb" style="user-select:none;">✂</text>`;
       }
       for (let r = 1; r < filledRows; r++) {
         const cy  = mgPx + r * (cellH + gpPx) - gpPx / 2;
         const xEnd = r === filledRows - 1 ? lastRowRight : contentRight;
         lines += `<line x1="${mgPx}" y1="${cy}" x2="${xEnd}" y2="${cy}" style="${dashStyle}"/>`;
-        lines += `<text x="${mgPx - 2}" y="${cy + scissorSize / 2}" text-anchor="end" font-size="${scissorSize}" fill="#bbb" style="user-select:none;">✂</text>`;
       }
       cutLines = `<svg style="position:absolute;inset:0;pointer-events:none;" width="${pxW}" height="${pxH}" xmlns="http://www.w3.org/2000/svg">${lines}</svg>`;
     }

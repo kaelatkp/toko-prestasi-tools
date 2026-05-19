@@ -1,5 +1,5 @@
 {
-  "version": "2.2",
+  "version": "2.3",
   "files": {
     "index.html": "aac53c7bd019a58be7637c6405bbdc01f989026f2fca4e76cb3686d935ba4c57",
     "tokens.css": "ab2af760022139ba4ba65bb2695cddb889087256b709c074bbdc0b08083e54ca",
@@ -7,9 +7,9 @@
     "app-core.js": "2c5b84851ee78fc920ba655d303fae1333c6f4aba0e5ce979052000ed39c1871",
     "app-foto.js": "e389bd0d560de9099ad2f7aa099460be6d26e137843ec6ed7653539ab7711925",
     "app-dokumen.js": "6bd143aa9a5f3dd6429669160408bae9314eb95f8b47c42b0ba1117e9bb84eb2",
-    "app-barcode.js": "6016e788b3b62e6b7f56596d8d0510c4c3462e628f38292002fad837c36b8bfd",
+    "app-barcode.js": "856ecef3d44740deea173158d692dc9fecbf87a92ad4572d8246904eac810f2a",
     "app-screensaver.js": "6c9c55fd72c9d8db67c7c1a2236a0a306746e00d207a3005237803d2864a78f7",
-    "app-cetak.js": "8ebcf003b547dfb156adbe3c74855d244ce45ae46cf158caa64ed9a5fc192e19",
+    "app-cetak.js": "a3f7f52a30e93e2579462030096eb9e92dc49bbfb8e3c636c24e1e0a80c3e979",
     "cetak.html": "edf0e97b6d2e07bf54ca1073d0f8f8eb2fea132fbd41f08114da45efbc5b5ac9"
   }
 }

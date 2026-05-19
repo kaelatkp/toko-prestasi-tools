@@ -883,8 +883,7 @@ async function packAndPrint() {
     // Cut lines SVG — barcode style: dashed lines through gaps between photos
     if (printSettings.cutLines && pageItems.length > 1) {
       const GAP = printSettings.gap;
-      const dashSt = 'stroke:#bbb;stroke-width:0.5;stroke-dasharray:4,3;fill:none;';
-      const scissorSz = 3;
+      const dashSt = 'stroke:#555;stroke-width:0.4;stroke-dasharray:4,3;fill:none;';
 
       // Group by row (same y)
       const rowMap = new Map();
@@ -904,7 +903,6 @@ async function packAndPrint() {
         for (let i = 0; i < items.length - 1; i++) {
           const cx = items[i].x + items[i].w + GAP / 2;
           svgLines += `<line x1="${cx}mm" y1="${y1}mm" x2="${cx}mm" y2="${y2}mm" style="${dashSt}"/>`;
-          svgLines += `<text x="${cx}mm" y="${y1 - 1}mm" text-anchor="middle" font-size="${scissorSz}mm" fill="#bbb" style="user-select:none;">✂</text>`;
         }
       });
 
@@ -915,7 +913,6 @@ async function packAndPrint() {
         const x1 = Math.min(...items.map(i => i.x));
         const x2 = Math.max(...items.map(i => i.x + i.w));
         svgLines += `<line x1="${x1}mm" y1="${cy}mm" x2="${x2}mm" y2="${cy}mm" style="${dashSt}"/>`;
-        svgLines += `<text x="${x1 - 1}mm" y="${cy + scissorSz * 0.4}mm" text-anchor="end" font-size="${scissorSz}mm" fill="#bbb" style="user-select:none;">✂</text>`;
       }
 
       const svgWrap = document.createElement('div');
@@ -1098,7 +1095,7 @@ async function renderLayoutPreview() {
 
       const GAP = printSettings.gap;
       lctx.save();
-      lctx.strokeStyle = '#aaa';
+      lctx.strokeStyle = '#555';
       lctx.lineWidth = 0.8;
       lctx.setLineDash([4, 3]);
 
@@ -1110,10 +1107,6 @@ async function renderLayoutPreview() {
         for (let i = 0; i < items.length - 1; i++) {
           const cx = Math.round((items[i].x + items[i].w + GAP / 2) * scale);
           lctx.beginPath(); lctx.moveTo(cx, y1); lctx.lineTo(cx, y2); lctx.stroke();
-          lctx.setLineDash([]);
-          lctx.fillStyle = '#aaa'; lctx.font = '7px Arial'; lctx.textAlign = 'center';
-          lctx.fillText('✂', cx, y1 - 1);
-          lctx.setLineDash([4, 3]);
         }
       });
 
@@ -1125,10 +1118,6 @@ async function renderLayoutPreview() {
         const x1 = Math.round(Math.min(...items.map(i => i.x)) * scale);
         const x2 = Math.round(Math.max(...items.map(i => i.x + i.w)) * scale);
         lctx.beginPath(); lctx.moveTo(x1, cy); lctx.lineTo(x2, cy); lctx.stroke();
-        lctx.setLineDash([]);
-        lctx.fillStyle = '#aaa'; lctx.font = '7px Arial'; lctx.textAlign = 'right';
-        lctx.fillText('✂', x1 - 1, cy + 3);
-        lctx.setLineDash([4, 3]);
       }
 
       lctx.setLineDash([]);
