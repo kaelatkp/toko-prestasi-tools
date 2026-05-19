@@ -717,12 +717,17 @@ function startSplashLoading() {
 function appMasuk() {
   const el = document.documentElement;
   (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen)?.call(el);
-  // Stop canvas rain
   if (typeof window._cancelSplashRain === 'function') window._cancelSplashRain();
   const splash = document.getElementById('app-splash');
   if (splash) {
     splash.classList.add('hiding');
-    setTimeout(() => { splash.style.display = 'none'; }, 520);
+    setTimeout(() => {
+      splash.style.display = 'none';
+      // Tampilkan changelog SETELAH splash benar-benar hilang
+      setTimeout(loadChangelog, 400);
+    }, 520);
+  } else {
+    setTimeout(loadChangelog, 400);
   }
 }
 
