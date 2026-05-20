@@ -20,8 +20,8 @@ async function loadChangelog() {
     _clData = await r.json();
   } catch (_) { _clData = null; }
 
-  // Auto-show hanya jika data berhasil dimuat DAN belum pernah dilihat
-  if (_clData && !localStorage.getItem(CL_SEEN_KEY)) openChangelog();
+  // Selalu tampilkan setiap masuk beranda dari flash login
+  if (_clData) openChangelog();
 }
 
 function openChangelog() {
@@ -41,9 +41,11 @@ function openChangelog() {
 
   const modal = document.createElement('div');
   modal.id = 'cl-modal';
+  // Klik di mana saja (backdrop atau card) = tutup
+  modal.addEventListener('click', closeChangelog);
   modal.innerHTML = `
-    <div class="cl-modal-backdrop" onclick="closeChangelog()"></div>
-    <div class="cl-modal-card">
+    <div class="cl-modal-backdrop"></div>
+    <div class="cl-modal-card" onclick="event.stopPropagation()">
       <div class="cl-modal-header">
         <div class="cl-modal-title">📋 Riwayat Update</div>
         <button class="cl-modal-close" onclick="closeChangelog()">✕</button>
@@ -699,11 +701,115 @@ function startSplashLoading() {
         clearInterval(adTimer);
         fill.style.width = '100%';
         if (pctEl) pctEl.textContent = '100%';
-        setTimeout(appMasuk, 750);
+        setTimeout(() => {
+          if (window._splashUpdateData) {
+            showSplashUpdateRequired(window._splashUpdateData);
+          } else {
+            appMasuk();
+          }
+        }, 750);
       }
     }
     requestAnimationFrame(tick);
   }
+}
+
+/* ════════════════════════════════════
+   SPLASH UPDATE REQUIRED OVERLAY
+════════════════════════════════════ */
+function showSplashUpdateRequired(data) {
+  const overlay = document.createElement('div');
+  overlay.id = 'spl-upd-overlay';
+  overlay.style.cssText = [
+    'position:fixed;inset:0;z-index:999999',
+    'background:rgba(0,0,0,0.88)',
+    'display:flex;align-items:center;justify-content:center',
+    'opacity:0;transition:opacity .4s ease',
+  ].join(';');
+
+  overlay.innerHTML = `
+    <div style="background:#091a0f;border:1.5px solid #00c853;border-radius:20px;padding:36px 40px;min-width:360px;max-width:460px;font-family:'DM Mono',monospace;text-align:center;box-shadow:0 8px 48px rgba(0,200,83,0.3);">
+      <div style="font-size:36px;margin-bottom:14px;">⚡</div>
+      <div style="font-size:15px;font-weight:700;color:#00e676;margin-bottom:8px;letter-spacing:0.3px;">Pembaruan v${data.version} Tersedia</div>
+      <div style="font-size:11px;color:#4db877;margin-bottom:28px;line-height:1.6;">${data.changed} file diperbarui<br>Harus diterapkan sebelum masuk beranda</div>
+      <div id="splupd-btn-wrap">
+        <button id="splupd-btn" onclick="window._splUpdApply()" style="background:#00c853;color:#071a0c;border:none;border-radius:12px;padding:13px 32px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Mono',monospace;letter-spacing:0.8px;box-shadow:0 0 18px rgba(0,200,83,0.35);">
+          TERAPKAN UPDATE
+        </button>
+      </div>
+      <div id="splupd-dl-wrap" style="display:none;">
+        <div id="splupd-dl-txt" style="font-size:11px;color:#4db877;margin-bottom:12px;">Mengunduh pembaruan...</div>
+        <div style="background:#0f3320;border-radius:6px;height:7px;overflow:hidden;">
+          <div id="splupd-dl-bar" style="height:100%;background:linear-gradient(90deg,#00c853,#00e676);width:0%;transition:width .12s;border-radius:6px;"></div>
+        </div>
+        <div id="splupd-dl-pct" style="font-size:10px;color:#00a040;margin-top:8px;">0%</div>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => requestAnimationFrame(() => overlay.style.opacity = '1'));
+
+  window._splUpdApply = function() {
+    document.getElementById('splupd-btn-wrap').style.display = 'none';
+    document.getElementById('splupd-dl-wrap').style.display  = 'block';
+
+    const TARGET = 5000 + Math.random() * 2000;
+    const r = (a, b) => a + Math.random() * (b - a);
+
+    function buildCurve() {
+      const pts = [{ t: 0, p: 0 }];
+      let t = 0, p = 0;
+      while (p < 100) {
+        const roll = Math.random();
+        let speed, dur;
+        if      (roll < 0.12) { speed = 0;        dur = r(0.4, 1.2); }
+        else if (roll < 0.30) { speed = r(2, 8);  dur = r(0.3, 0.7); }
+        else if (roll < 0.70) { speed = r(12, 22);dur = r(0.2, 0.5); }
+        else                  { speed = r(28, 48); dur = r(0.1, 0.3); }
+        t += dur;
+        p = Math.min(p + speed * dur, 100);
+        pts.push({ t, p });
+      }
+      const scale = (TARGET / 1000) / pts[pts.length - 1].t;
+      return pts.map(pt => ({ t: pt.t * scale, p: pt.p }));
+    }
+
+    const curve = buildCurve();
+    let st = null, cp = 0;
+    const bar = document.getElementById('splupd-dl-bar');
+    const pctEl2 = document.getElementById('splupd-dl-pct');
+    const txt = document.getElementById('splupd-dl-txt');
+
+    function tick(now) {
+      if (!st) st = now;
+      const el = (now - st) / 1000;
+      while (cp < curve.length - 1 && el >= curve[cp + 1].t) cp++;
+      let pv;
+      if (cp >= curve.length - 1) {
+        pv = 100;
+      } else {
+        const { t: t0, p: p0 } = curve[cp], { t: t1, p: p1 } = curve[cp + 1];
+        const seg = t1 - t0, a = seg > 0 ? Math.min((el - t0) / seg, 1) : 1;
+        pv = p0 + (p1 - p0) * a * a * (3 - 2 * a);
+      }
+      if (bar) bar.style.width = pv + '%';
+      if (pctEl2) pctEl2.textContent = Math.floor(pv) + '%';
+      if (pv < 100) {
+        requestAnimationFrame(tick);
+      } else {
+        if (bar) bar.style.width = '100%';
+        if (pctEl2) pctEl2.textContent = '100%';
+        if (txt) txt.textContent = 'Menerapkan pembaruan...';
+        setTimeout(() => {
+          if (txt) txt.textContent = 'Berhasil! Memuat ulang aplikasi...';
+          setTimeout(() => {
+            if (window.electronAPI) window.electronAPI.applyUpdate();
+          }, 800);
+        }, 600);
+      }
+    }
+    requestAnimationFrame(tick);
+  };
 }
 
 function appMasuk() {
@@ -715,7 +821,7 @@ function appMasuk() {
     splash.classList.add('hiding');
     setTimeout(() => {
       splash.style.display = 'none';
-      // Tampilkan changelog SETELAH splash benar-benar hilang
+      // Selalu tampilkan changelog setiap masuk beranda dari splash
       setTimeout(loadChangelog, 400);
     }, 520);
   } else {

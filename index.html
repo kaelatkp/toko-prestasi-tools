@@ -1723,6 +1723,9 @@ function nfLightbox(src, caption) {
   @keyframes ub-in { from{opacity:0;transform:translateX(-50%) translateY(16px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
 </style>
 <script>
+// Flag untuk splash — ditangkap oleh showSplashUpdateRequired() di app-core.js
+window._splashUpdateData = null;
+
 var _ubUpdating = false;
 function ubApply() {
   if (_ubUpdating || !window.electronAPI) return;
@@ -1734,6 +1737,9 @@ function ubApply() {
 }
 if (window.electronAPI) {
   window.electronAPI.onUpdateAvailable(function(d) {
+    // Simpan untuk dicek saat splash selesai loading
+    window._splashUpdateData = d;
+    // Banner tetap update (akan muncul jika splash sudah selesai & masuk beranda)
     document.getElementById('ub-txt').textContent = 'Update v' + d.version + ' — ' + d.changed + ' file berubah';
     document.getElementById('update-banner').style.display = 'block';
   });
