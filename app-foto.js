@@ -1064,8 +1064,8 @@ function renderWorkspace(mod, groupId) {
     </div>
     <div class="result-actions-sticky" id="result-actions-wrap" style="display:none">
       <div class="result-actions">
-        <button class="btn-download btn-gemini-rec" onclick="launchPlatform('gemini')">✨ Gemini <span class="btn-rec-badge">⭐ Foto</span></button>
-        <button class="btn-download" style="background:var(--text);" onclick="launchPlatform('chatgpt')">💬 ChatGPT</button>
+        <button class="btn-download btn-chatgpt-fire" onclick="launchPlatform('chatgpt')">🔥 ChatGPT <span class="btn-rec-badge">⭐ Terbaik</span></button>
+        <button class="btn-download btn-gemini-rec" onclick="launchPlatform('gemini')">✨ Gemini</button>
         <button class="btn-retry btn-copy-prompt" onclick="copyPrompt()">📋 Salin</button>
       </div>
     </div>

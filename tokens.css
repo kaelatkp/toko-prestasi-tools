@@ -674,6 +674,11 @@ body {
   0%, 100% { box-shadow: 0 2px 8px rgba(37,99,69,0.28), var(--shadow-green); }
   50%       { box-shadow: 0 2px 22px rgba(37,99,69,0.65), 0 0 0 3px rgba(37,99,69,0.12); }
 }
+@keyframes chatgpt-fire {
+  0%   { box-shadow: 0 2px 10px rgba(255,80,0,0.55), 0 0 0 0 rgba(255,80,0,0); background-position: 0% 50%; }
+  50%  { box-shadow: 0 4px 28px rgba(255,80,0,0.85), 0 0 0 4px rgba(255,80,0,0.18); background-position: 100% 50%; }
+  100% { box-shadow: 0 2px 10px rgba(255,80,0,0.55), 0 0 0 0 rgba(255,80,0,0); background-position: 0% 50%; }
+}
 @keyframes prompt-bar-shimmer {
   0%   { background-position: -200% center; }
   100% { background-position: 200% center; }
@@ -711,8 +716,18 @@ body {
   color: var(--text-2); margin-top: 5px; letter-spacing: 0.3px;
 }
 
-/* ── GEMINI RECOMMENDED ── */
-.btn-gemini-rec { animation: gemini-glow 2.2s ease-in-out infinite; }
+/* ── PLATFORM RECOMMENDED BUTTONS ── */
+.btn-gemini-rec { /* static — no breathing */ }
+.btn-chatgpt-fire {
+  background: linear-gradient(135deg, #ff6b00 0%, #e53935 60%, #ff1744 100%) !important;
+  background-size: 200% 200% !important;
+  color: white !important;
+  animation: chatgpt-fire 1.8s ease-in-out infinite !important;
+  border: none !important;
+}
+.btn-chatgpt-fire:hover {
+  filter: brightness(1.12);
+}
 .btn-rec-badge {
   display: inline-block; font-size: 7px; font-weight: 700; letter-spacing: 0.8px;
   background: rgba(255,255,255,0.22); color: white;
@@ -1747,6 +1762,7 @@ body.cyberpunk-mode .btn-reset { border-color: rgba(0,229,255,.25) !important; c
 body.cyberpunk-mode #prompt-text { background: #040b11 !important; border-color: #0d3349 !important; color: #c8f0ff !important; }
 body.cyberpunk-mode .note-box { background: rgba(0,229,255,.05) !important; border-color: rgba(0,229,255,.18) !important; }
 body.cyberpunk-mode .btn-gemini-rec { background: linear-gradient(135deg, #00e5ff, #6600ff) !important; box-shadow: 0 0 14px rgba(0,229,255,.4) !important; }
+body.cyberpunk-mode .btn-chatgpt-fire { background: linear-gradient(135deg, #ff6b00, #ff1744) !important; box-shadow: 0 0 18px rgba(255,80,0,.6) !important; }
 body.cyberpunk-mode .ws-step--done { color: #00e5ff; }
 body.cyberpunk-mode .ws-step--active { color: #00e5ff; font-weight: 700; text-shadow: 0 0 6px rgba(0,229,255,.4); }
 body.cyberpunk-mode .ws-step-sep { color: #1a5875; }
