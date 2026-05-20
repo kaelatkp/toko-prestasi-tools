@@ -4,51 +4,18 @@
       "version": "2.7",
       "date": "20 Mei 2026",
       "notes": [
-        "Flash Login: tampilan card diperbesar 25% — lebih lega dan terbaca",
-        "Flash Login: pembaruan otomatis lebih andal — wajib diterapkan sebelum masuk",
-        "Prompt Foto: tombol Generate Prompt menyala brutal terbakar 🔥 saat aktif",
-        "Prompt Foto: opsi 'Sudah Berseragam ✓' — AI hanya ganti background & reposisi"
-      ]
-    },
-    {
-      "version": "2.6",
-      "date": "20 Mei 2026",
-      "notes": [
-        "Prompt Foto: ChatGPT naik jadi platform #1 — tombol terbakar 🔥 dengan glow bernapas",
-        "Barcode Generator: garis gunting keliling setiap label — 1 atau banyak produk",
-        "Cetak Foto: garis gunting keliling setiap foto — berlaku meski hanya 1 foto",
-        "Footer konsisten di semua tools — brand, versi, jam, idle dot",
-        "Sidebar Barcode Generator melebar jadi 1/3 layar"
+        "Flash Login: mekanisme pembaruan diperkuat — update wajib diterapkan sebelum masuk",
+        "Prompt Foto: opsi 'Sudah Berseragam ✓' — AI hanya ganti background & reposisi, seragam tidak diubah"
       ]
     },
     {
       "version": "2.5",
       "date": "20 Mei 2026",
       "notes": [
-        "Beranda ganti tema warna otomatis setiap hari",
-        "Barcode Generator kini buka di jendela terpisah — mudah multitasking",
+        "Barcode Generator kini buka di jendela terpisah",
         "Fix jumlah barcode tercetak tidak sesuai (scale bug)",
-        "Edit Foto: garis tengah draggable (cyan) untuk luruskan posisi wajah",
-        "Edit Foto: slider Saturasi warna",
-        "Fix marquee teks tidak berjalan horizontal",
-        "Popup Riwayat Update muncul otomatis setelah masuk app"
-      ]
-    },
-    {
-      "version": "2.4",
-      "date": "20 Mei 2026",
-      "notes": [
-        "Tambah panel Riwayat Update di beranda (auto-muncul saat ada versi baru)",
-        "Fix label versi konsisten di seluruh aplikasi"
-      ]
-    },
-    {
-      "version": "2.3",
-      "date": "20 Mei 2026",
-      "notes": [
-        "Hapus ikon gunting dari garis potong cetak foto",
-        "Hapus ikon gunting dari garis potong cetak barcode",
-        "Garis potong lebih kontrast (#555)"
+        "Edit Foto: kontrol garis tengah untuk luruskan posisi wajah",
+        "Edit Foto: kontrol saturasi warna"
       ]
     },
     {
