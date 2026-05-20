@@ -16,7 +16,7 @@ function bcX(s) {
 
 /* ── CRUD Produk ── */
 function bcTambahProduk() {
-  bcProducts.push({ id: bcNextId++, nama: '', harga: '', kode: '', jumlah: 1 });
+  bcProducts.push({ id: bcNextId++, nama: '', harga: '', kode: '', jumlah: '' });
   bcRenderForm();
   bcRenderPreview();
 }
@@ -28,11 +28,40 @@ function bcHapusProduk(id) {
   bcRenderPreview();
 }
 
+/* ── Lock states update tanpa re-render form ── */
+function bcUpdateLocks(id) {
+  const p = bcProducts.find(p => p.id === id);
+  if (!p) return;
+  const v        = bcValidateKode(p.kode);
+  const namaOk   = p.nama.trim().length > 0;
+  const kodeOk   = v.state === 'ok';
+  const hargaOk  = p.harga !== '' && parseInt(p.harga) > 0;
+  const jumlahOk = p.jumlah !== '' && parseInt(p.jumlah) >= 1;
+
+  const kodeInput   = document.querySelector(`[data-bckode="${id}"]`);
+  const hargaInput  = document.querySelector(`[data-bcharga="${id}"]`);
+  const jumlahInput = document.querySelector(`[data-bcjumlah="${id}"]`);
+  const addBtn      = document.querySelector(`[data-bcadd="${id}"]`);
+
+  function applyLock(input, locked) {
+    if (!input) return;
+    const field = input.closest ? input.closest('.bc-field') : input.parentElement;
+    if (field) field.classList.toggle('bc-field-locked', locked);
+    input.disabled = locked;
+  }
+
+  applyLock(kodeInput,   !namaOk);
+  applyLock(hargaInput,  !kodeOk);
+  applyLock(jumlahInput, !hargaOk);
+  if (addBtn) addBtn.disabled = !(namaOk && kodeOk && hargaOk && jumlahOk);
+}
+
 function bcUpd(id, field, val) {
   const p = bcProducts.find(p => p.id === id);
   if (!p) return;
   if (field === 'jumlah') {
-    p[field] = Math.min(999, Math.max(1, parseInt(val) || 1));
+    const n = parseInt(val);
+    p[field] = (isNaN(n) || n < 1) ? '' : Math.min(999, n);
   } else if (field === 'kode') {
     const clean = val.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
     p[field] = clean;
@@ -43,11 +72,13 @@ function bcUpd(id, field, val) {
       try { inputEl.setSelectionRange(pos, pos); } catch(e) {}
     }
     bcUpdKodeUI(id, clean);
+    bcUpdateLocks(id);
     bcRenderPreview();
     return;
   } else {
-    p[field] = val;
+    p[field] = (field === 'nama') ? val.toUpperCase() : val;
   }
+  bcUpdateLocks(id);
   bcRenderPreview();
 }
 
@@ -96,41 +127,66 @@ function bcRenderForm() {
     const stateClass  = v.state === 'ok' ? 'kode-ok' : v.state === 'warn' ? 'kode-warn' : v.state === 'err' ? 'kode-err' : '';
     const statusIcon  = v.state === 'ok' ? '✓' : v.state === 'warn' ? '!' : v.state === 'err' ? '✕' : '';
     const statusColor = v.state === 'ok' ? 'var(--green-dark)' : v.state === 'warn' ? '#d97706' : v.state === 'err' ? 'var(--red)' : 'transparent';
+
+    // Progressive unlock state
+    const namaOk   = p.nama.trim().length > 0;
+    const kodeOk   = v.state === 'ok';
+    const hargaOk  = p.harga && parseInt(p.harga) > 0;
+    const jumlahOk = p.jumlah && parseInt(p.jumlah) >= 1;
+
+    const lockKode   = !namaOk;
+    const lockHarga  = !kodeOk;
+    const lockJumlah = !hargaOk;
+    const lockAdd    = !jumlahOk;
+
+    const lk = 'bc-field-locked';
     return `
     <div class="bc-entry-card">
       <div class="bc-entry-head">
         <span class="bc-entry-num">#${String(i + 1).padStart(2, '0')}</span>
         ${bcProducts.length > 1 ? `<button class="bc-btn-del" onclick="bcHapusProduk(${p.id})">✕ Hapus</button>` : ''}
       </div>
+
+      <!-- 1. Nama Barang -->
       <div class="bc-field">
         <label>Nama Barang</label>
-        <input type="text" placeholder="Contoh: Buku Tulis A5" value="${bcX(p.nama)}" oninput="bcUpd(${p.id},'nama',this.value)">
+        <input type="text" placeholder="Contoh: BUKU TULIS A5" value="${bcX(p.nama)}"
+          oninput="bcUpd(${p.id},'nama',this.value.toUpperCase())"
+          style="text-transform:uppercase;">
       </div>
-      <div class="bc-field-row">
-        <div class="bc-field" style="flex:1.4">
-          <label>Harga (Rp)</label>
-          <input type="text" inputmode="numeric" placeholder="0" value="${bcFmtHargaInput(p.harga)}" maxlength="9"
-            data-bcharga="${p.id}" oninput="bcUpdHarga(${p.id},this)"
-            style="text-align:right;font-family:'DM Mono',monospace;">
-        </div>
-        <div class="bc-field bc-field-qty">
-          <label>Jml</label>
-          <input type="number" value="${p.jumlah}" min="1" max="9999" maxlength="4" oninput="bcUpd(${p.id},'jumlah',this.value)"
-            style="text-align:center;font-family:'DM Mono',monospace;font-weight:700;color:var(--green-dark);">
-        </div>
-      </div>
-      <div class="bc-kode-add-row">
-        <div class="bc-field" style="flex:1;min-width:0">
-          <label>Kode Barcode <span style="font-size:8px;color:var(--text-muted);font-weight:500;">(6–8)</span></label>
+
+      <!-- 2. Kode | Harga | Jml | + (urutan isi kiri ke kanan) -->
+      <div class="bc-field-row" style="align-items:flex-end;">
+
+        <div class="bc-field ${lockKode ? lk : ''}" style="flex:0 0 122px;min-width:0">
+          <label>Kode <span style="font-size:8px;color:var(--text-muted);font-weight:500;">(6–8)</span></label>
           <div class="kode-wrap" style="position:relative;">
             <input type="text" placeholder="BK12345" value="${bcX(p.kode)}"
               oninput="bcUpd(${p.id},'kode',this.value)"
               maxlength="8" data-bckode="${p.id}" class="${stateClass}"
-              style="font-family:'DM Mono',monospace;font-weight:700;font-size:15px;letter-spacing:2px;padding-right:28px;text-transform:uppercase;width:100%;box-sizing:border-box;">
-            <span class="kode-status" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:700;color:${statusColor};">${statusIcon}</span>
+              ${lockKode ? 'disabled' : ''}
+              style="font-family:'DM Mono',monospace;font-weight:700;font-size:14px;letter-spacing:1.5px;padding-right:26px;text-transform:uppercase;width:100%;box-sizing:border-box;">
+            <span class="kode-status" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;color:${statusColor};">${statusIcon}</span>
           </div>
         </div>
-        <button class="bc-btn-add-inline" onclick="bcTambahProduk()" title="Tambah produk baru">＋</button>
+
+        <div class="bc-field ${lockHarga ? lk : ''}" style="flex:1;min-width:0">
+          <label>Harga (Rp)</label>
+          <input type="text" inputmode="numeric" placeholder="0" value="${bcFmtHargaInput(p.harga)}" maxlength="9"
+            data-bcharga="${p.id}" oninput="bcUpdHarga(${p.id},this)"
+            ${lockHarga ? 'disabled' : ''}
+            style="text-align:right;font-family:'DM Mono',monospace;">
+        </div>
+
+        <div class="bc-field bc-field-qty ${lockJumlah ? lk : ''}">
+          <label>Jml</label>
+          <input type="number" value="${p.jumlah}" min="1" max="999" oninput="bcUpd(${p.id},'jumlah',this.value)"
+            data-bcjumlah="${p.id}" ${lockJumlah ? 'disabled' : ''}
+            style="text-align:center;font-family:'DM Mono',monospace;font-weight:700;color:var(--green-dark);">
+        </div>
+
+        <button class="bc-btn-add-inline" onclick="bcTambahProduk()" title="Tambah produk baru"
+          data-bcadd="${p.id}" ${lockAdd ? 'disabled' : ''}>＋</button>
       </div>
       ${v.msg
         ? `<div class="kode-hint ${v.state}" data-bccodehint="${p.id}">${v.msg}</div>`
@@ -151,7 +207,7 @@ function bcFmtHargaInput(v) {
   return n ? n.toLocaleString('id-ID') : '';
 }
 function bcUpdHarga(id, inputEl) {
-  const raw = inputEl.value.replace(/[^\d]/g, '');
+  const raw = inputEl.value.replace(/[^\d]/g, '').slice(0, 7);
   const n = parseInt(raw) || 0;
   const p = bcProducts.find(p => p.id === id);
   if (!p) return;
@@ -163,6 +219,7 @@ function bcUpdHarga(id, inputEl) {
   const diff = formatted.length - oldLen;
   const newPos = Math.max(0, curPos + diff);
   try { inputEl.setSelectionRange(newPos, newPos); } catch(e) {}
+  bcUpdateLocks(id);
   bcRenderPreview();
 }
 
@@ -318,16 +375,9 @@ function bcRenderPreview() {
       cutLines = `<svg style="position:absolute;inset:0;pointer-events:none;" width="${pxW}" height="${pxH}" xmlns="http://www.w3.org/2000/svg">${lines}</svg>`;
     }
 
-    const ftL = bcX(namaToko);
-    const ftC = pages > 1 ? `Hal ${pg + 1}/${pages}` : '';
-    const ftR = createdBy ? `Dibuat oleh: ${bcX(createdBy)}` : '';
-
     html += `<div class="bc-paper-page" style="width:${pxW}px;height:${pxH}px;">
       <div style="position:absolute;top:${mgPx}px;left:${mgPx}px;display:grid;grid-template-columns:repeat(${cols},${cellW}px);grid-auto-rows:${cellH}px;gap:${gpPx}px;">${cards}</div>
       ${cutLines}
-      <div style="position:absolute;bottom:4px;left:${mgPx}px;right:${mgPx}px;display:flex;justify-content:space-between;font-size:7.5px;color:#bbb;font-family:Arial;">
-        <span>${ftL}</span><span>${ftC}</span><span>${ftR}</span>
-      </div>
     </div>`;
   }
 
@@ -352,7 +402,7 @@ function bcCetak() {
   // Paper always portrait — label rotation is visual only, no page size change
   let st = document.getElementById('_bc_ps');
   if (!st) { st = document.createElement('style'); st.id = '_bc_ps'; document.head.appendChild(st); }
-  st.textContent = `@media print{@page{size:${w}mm ${h}mm;margin:0;}.sidebar,.bc-stat-bar,.bc-form-area,#welcome,#welcome-dok,#workspace,.app-footer{display:none!important;}#welcome-barcode{display:flex!important;}.bc-paper-wrap{overflow:visible!important;padding:0!important;background:none!important;}}`;
+  st.textContent = `@media print{@page{size:${w}mm ${h}mm;margin:0;}.sidebar,.bc-stat-bar,.bc-form-area,#welcome,#welcome-dok,#workspace,.app-footer,.bc-win-header,.bc-win-sidebar,.bc-win-footer{display:none!important;}#welcome-barcode{display:flex!important;}.bc-win-wrap,.bc-win-body,.bc-win-main{display:block!important;overflow:visible!important;height:auto!important;}.bc-paper-wrap{overflow:visible!important;padding:0!important;background:none!important;}#bc-paper-scaler{transform:scale(1)!important;}}`;
   if (window.electronAPI?.doPrint) window.electronAPI.doPrint();
   else window.print();
 }

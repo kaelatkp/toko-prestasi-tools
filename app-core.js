@@ -437,26 +437,17 @@ function switchMode(mode) {
     btn.classList.toggle('active', btn.dataset.mode === mode);
   });
 
-  // Layout class — barcode mode uses 1/3 sidebar + 2/3 preview
-  document.querySelector('.app')?.classList.toggle('app--barcode', mode === 'barcode');
-
   // Sidebar scroll panels
   const fScroll = document.getElementById('sidebar-foto-scroll');
   const dScroll = document.getElementById('sidebar-dok-scroll');
-  const bScroll = document.getElementById('sidebar-barcode-scroll');
-  const bFooter = document.getElementById('bc-print-footer');
-  if (fScroll) fScroll.style.display = mode === 'foto'     ? '' : 'none';
-  if (dScroll) dScroll.style.display = mode === 'dokumen'  ? '' : 'none';
-  if (bScroll) bScroll.style.display = mode === 'barcode'  ? '' : 'none';
-  if (bFooter) bFooter.style.display = mode === 'barcode'  ? '' : 'none';
+  if (fScroll) fScroll.style.display = mode === 'foto'    ? '' : 'none';
+  if (dScroll) dScroll.style.display = mode === 'dokumen' ? '' : 'none';
 
   // Welcome screens
-  const wFoto    = document.getElementById('welcome');
-  const wDok     = document.getElementById('welcome-dok');
-  const wBarcode = document.getElementById('welcome-barcode');
-  if (wFoto)    wFoto.style.display    = mode === 'foto'    ? '' : 'none';
-  if (wDok)     wDok.style.display     = mode === 'dokumen' ? '' : 'none';
-  if (wBarcode) wBarcode.style.display = mode === 'barcode' ? '' : 'none';
+  const wFoto = document.getElementById('welcome');
+  const wDok  = document.getElementById('welcome-dok');
+  if (wFoto) wFoto.style.display = mode === 'foto'    ? '' : 'none';
+  if (wDok)  wDok.style.display  = mode === 'dokumen' ? '' : 'none';
 
   // Hide workspace (not used in barcode mode)
   document.getElementById('workspace')?.classList.remove('show');

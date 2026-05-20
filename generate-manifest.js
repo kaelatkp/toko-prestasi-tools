@@ -11,7 +11,7 @@ const readline = require('readline');
 const APP_FILES = [
   'index.html', 'tokens.css', 'config.js',
   'app-core.js', 'app-foto.js', 'app-dokumen.js',
-  'app-barcode.js', 'app-screensaver.js', 'app-cetak.js', 'cetak.html'
+  'app-barcode.js', 'app-screensaver.js', 'app-cetak.js', 'cetak.html', 'barcode.html'
 ];
 
 // Baca versi sekarang

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barcode Generator — Prestasi Tools</title>
+<link rel="icon" href="icon.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ── LAYOUT ── */
+body { overflow: hidden; margin: 0; }
+.bc-win-wrap { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+/* ── HEADER ── */
+.bc-win-header {
+  padding: 10px 16px; border-bottom: 2px solid var(--green-mid);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--white); flex-shrink: 0; gap: 12px;
+}
+.bc-win-brand { display: flex; align-items: center; gap: 10px; }
+.bc-win-brand-icon {
+  width: 34px; height: 34px; border-radius: 9px; overflow: hidden;
+  box-shadow: var(--shadow-green); flex-shrink: 0;
+}
+.bc-win-brand-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bc-win-brand-text { display: flex; flex-direction: column; gap: 1px; }
+.bc-win-brand-title { font-size: 13px; font-weight: 800; font-family: 'Sora', sans-serif; color: var(--green-dark); line-height: 1; }
+.bc-win-brand-sub { font-size: 9px; color: var(--text-3); font-family: 'DM Mono', monospace; letter-spacing: 0.3px; }
+.bc-win-header-badge { background: var(--green); color: #fff; font-size: 8px; font-weight: 800; font-family: 'Sora',sans-serif; letter-spacing: 0.8px; padding: 2px 7px; border-radius: 5px; }
+
+/* ── BODY ── */
+.bc-win-body { display: flex; flex: 1; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.bc-win-sidebar {
+  width: 260px; flex-shrink: 0; display: flex; flex-direction: column;
+  border-right: 1.5px solid var(--border); background: var(--bg-2); overflow: hidden;
+}
+.bc-win-sidebar-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
+.bc-win-sidebar-foot {
+  flex-shrink: 0; padding: 10px 14px 14px;
+  border-top: 1.5px solid var(--border); background: var(--bg-2);
+}
+.bc-win-cetak-btn {
+  width: 100%; padding: 11px; background: var(--green); color: #fff;
+  border: none; border-radius: 10px; font-size: 13px; font-weight: 800;
+  font-family: 'Sora', sans-serif; cursor: pointer; transition: background .15s;
+}
+.bc-win-cetak-btn:hover { background: var(--green-dark); }
+
+/* ── MAIN PREVIEW ── */
+.bc-win-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-3); }
+
+/* ── FOOTER ── */
+.bc-win-footer {
+  flex-shrink: 0; padding: 6px 20px;
+  border-top: 1.5px solid var(--border); background: var(--white);
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 10px; color: var(--text-2); font-family: 'DM Mono', monospace; letter-spacing: 0.4px;
+}
+.bc-win-footer-left { display: flex; align-items: center; gap: 10px; }
+.bc-win-footer-right { display: flex; align-items: center; gap: 10px; }
+.bc-win-footer-brand { color: var(--green-dark); font-weight: 700; }
+.bc-win-footer-ver { color: var(--text-3); }
+.bc-win-footer-sep { color: var(--border-2); }
+.idle-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: idle-pulse 2s ease-in-out infinite; }
+@keyframes idle-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+
+/* ── PRINT ── */
+@media print {
+  .bc-win-header, .bc-win-sidebar, .bc-win-footer,
+  .bc-stat-bar, .bc-stat-zoom { display: none !important; }
+  .bc-win-wrap, .bc-win-body, .bc-win-main { display: block !important; overflow: visible !important; height: auto !important; }
+  .bc-paper-wrap { overflow: visible !important; padding: 0 !important; background: none !important; }
+  #bc-paper-scaler { transform: scale(1) !important; }
+}
+</style>
+</head>
+<body>
+<div class="bc-win-wrap">
+
+  <!-- HEADER -->
+  <header class="bc-win-header">
+    <div class="bc-win-brand">
+      <div class="bc-win-brand-icon"><img src="icon.png" alt="TP"></div>
+      <div class="bc-win-brand-text">
+        <div class="bc-win-brand-title">Toko Prestasi Tools</div>
+        <div class="bc-win-brand-sub">Cetak Label &amp; Barcode Toko</div>
+      </div>
+    </div>
+    <span class="bc-win-header-badge">BARCODE</span>
+  </header>
+
+  <!-- BODY -->
+  <div class="bc-win-body">
+
+    <!-- SIDEBAR -->
+    <aside class="bc-win-sidebar">
+      <div class="bc-win-sidebar-scroll">
+
+        <div class="bc-section-header">🏪 Identitas Toko</div>
+        <div class="bc-identity bc-identity-row">
+          <div class="bc-field-wrap" style="flex:1.5">
+            <label>Nama Toko</label>
+            <input type="text" id="bc-nama-toko" value="Toko Prestasi" readonly
+              style="background:var(--bg-2);color:var(--text-3);cursor:default;"
+              title="Nama toko terkunci sesuai aplikasi">
+          </div>
+          <div class="bc-field-wrap" style="flex:1">
+            <label>Dibuat Oleh <span style="font-weight:400;font-size:8px;opacity:.7">(opsional)</span></label>
+            <input type="text" id="bc-created-by" placeholder="Nama kasir" maxlength="10"
+              oninput="this.value=this.value.toUpperCase();bcRenderPreview()"
+              title="Nama kasir/operator — opsional, maks 10 karakter">
+          </div>
+        </div>
+
+        <div class="bc-section-header">📐 Layout Cetak</div>
+        <div class="bc-layout">
+          <div class="bc-layout-top-row">
+            <div class="bc-field-wrap" style="flex:1.4">
+              <label>Ukuran</label>
+              <select id="bc-paper-size" onchange="bcRenderPreview()" title="Pilih ukuran kertas printer">
+                <option value="A4">A4 (210×297 mm)</option>
+                <option value="F4">F4 / Folio (215×330 mm)</option>
+              </select>
+            </div>
+            <div class="bc-field-wrap">
+              <label>Orientasi</label>
+              <div class="bc-orient-btns">
+                <button class="bc-orient-btn" id="bc-btn-portrait" onclick="bcSetOrient('portrait')" title="Portrait — kertas berdiri">▯</button>
+                <button class="bc-orient-btn active" id="bc-btn-landscape" onclick="bcSetOrient('landscape')" title="Landscape — kertas tidur">▭</button>
+              </div>
+            </div>
+            <div class="bc-field-wrap" style="align-self:flex-end">
+              <button class="bc-btn-reset" onclick="bcResetLayoutDefault()" title="Reset ke default (Landscape, 10×10, Gap 2mm, Margin 2mm)">↺ Reset</button>
+            </div>
+          </div>
+          <div class="bc-grid-fields-4">
+            <div class="bc-field-wrap">
+              <label>Kolom</label>
+              <input type="number" id="bc-cols" value="10" min="1" max="20" oninput="bcRenderPreview()" style="text-align:center;">
+            </div>
+            <div class="bc-field-wrap">
+              <label>Baris</label>
+              <input type="number" id="bc-rows" value="10" min="1" max="30" oninput="bcRenderPreview()" style="text-align:center;">
+            </div>
+            <div class="bc-field-wrap">
+              <label>Gap (mm)</label>
+              <input type="number" id="bc-gap" value="2" min="0" max="10" step="0.5" oninput="bcRenderPreview()" style="text-align:center;">
+            </div>
+            <div class="bc-field-wrap">
+              <label>Margin (mm)</label>
+              <input type="number" id="bc-margin" value="2" min="0" max="20" oninput="bcRenderPreview()" style="text-align:center;">
+            </div>
+          </div>
+        </div>
+
+        <div class="bc-section-header">📦 Data Produk</div>
+        <div id="bc-entries-wrap"></div>
+
+      </div><!-- /sidebar-scroll -->
+
+      <div class="bc-win-sidebar-foot">
+        <button class="bc-win-cetak-btn" onclick="bcCetak()" title="Susun semua produk ke halaman kertas lalu buka dialog cetak printer">🖨️ Cetak Barcode</button>
+      </div>
+    </aside>
+
+    <!-- MAIN PREVIEW -->
+    <main class="bc-win-main">
+      <div class="bc-stat-bar">
+        <div class="bc-stats">
+          <span class="bc-stat-pill bc-stat-green" id="bc-total-count">0 barcode</span>
+          <span class="bc-stat-pill" id="bc-total-pages">0 halaman</span>
+        </div>
+        <div class="bc-stat-zoom">
+          <button class="bc-zoom-btn" onclick="bcZoomOut()" title="Zoom out">−</button>
+          <span class="bc-zoom-label" id="bc-zoom-label">75%</span>
+          <button class="bc-zoom-btn" onclick="bcZoomIn()" title="Zoom in">+</button>
+          <button class="bc-zoom-btn" onclick="bcZoomReset()" title="Reset zoom" style="font-size:9px;padding:2px 6px;">⊙</button>
+        </div>
+      </div>
+
+      <div class="bc-paper-wrap" id="bc-paper-wrap">
+        <div class="bc-empty-msg">Isi data produk di panel kiri untuk melihat preview barcode</div>
+      </div>
+      <canvas id="bc-canvas" style="display:none;"></canvas>
+    </main>
+
+  </div><!-- /body -->
+
+  <!-- FOOTER -->
+  <footer class="bc-win-footer">
+    <div class="bc-win-footer-left">
+      <span><strong class="bc-win-footer-brand">Toko Prestasi Tools</strong> <span class="bc-win-footer-ver">v2.5</span></span>
+      <span class="bc-win-footer-sep">·</span>
+      <span>Nexus Forge</span>
+      <span class="bc-win-footer-sep">·</span>
+      <span>Jl. Poros Sp 4, Kongbeng, Kutai-Timur</span>
+    </div>
+    <div class="bc-win-footer-right">
+      <span class="idle-dot"></span>
+      <span>Aktif</span>
+    </div>
+  </footer>
+
+</div><!-- /wrap -->
+
+<script src="app-barcode.js"></script>
+<script>
+  initBarcode();
+</script>
+</body>
+</html>

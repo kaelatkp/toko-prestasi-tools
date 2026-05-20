@@ -295,7 +295,7 @@
       </div>
       <div class="brnd-card-cta">Buka Tool →</div>
     </div>
-    <div class="brnd-tool-card" onclick="openTool('barcode')">
+    <div class="brnd-tool-card" onclick="window.open('barcode.html','_blank')">
       <div class="brnd-card-icon">🏷️</div>
       <div class="brnd-card-title">Barcode Generator</div>
       <div class="brnd-card-count">CETAK LABEL TOKO</div>
@@ -991,74 +991,6 @@
 
     </div><!-- /sidebar-dok-scroll -->
 
-    <!-- SIDEBAR BARCODE (hidden by default) -->
-    <div class="sidebar-scroll" id="sidebar-barcode-scroll" style="display:none">
-
-      <div class="bc-section-header">🏪 Identitas Toko</div>
-      <div class="bc-identity bc-identity-row">
-        <div class="bc-field-wrap" style="flex:1.5">
-          <label>Nama Toko</label>
-          <input type="text" id="bc-nama-toko" value="Toko Prestasi" readonly
-            style="background:var(--bg-2);color:var(--text-3);cursor:default;"
-            title="Nama toko terkunci sesuai aplikasi">
-        </div>
-        <div class="bc-field-wrap" style="flex:1">
-          <label>Dibuat Oleh <span style="font-weight:400;font-size:8px;opacity:.7">(opsional)</span></label>
-          <input type="text" id="bc-created-by" placeholder="Nama kasir" maxlength="10"
-            oninput="this.value=this.value.toUpperCase();bcRenderPreview()"
-            title="Nama kasir/operator — opsional, maks 10 karakter">
-        </div>
-      </div>
-
-      <div class="bc-section-header">📐 Layout Cetak</div>
-      <div class="bc-layout">
-        <div class="bc-layout-top-row">
-          <div class="bc-field-wrap" style="flex:1.4">
-            <label>Ukuran</label>
-            <select id="bc-paper-size" onchange="bcRenderPreview()" title="Pilih ukuran kertas printer">
-              <option value="A4">A4 (210×297 mm)</option>
-              <option value="F4">F4 / Folio (215×330 mm)</option>
-            </select>
-          </div>
-          <div class="bc-field-wrap">
-            <label>Orientasi</label>
-            <div class="bc-orient-btns">
-              <button class="bc-orient-btn" id="bc-btn-portrait" onclick="bcSetOrient('portrait')" title="Portrait — kertas berdiri">▯</button>
-              <button class="bc-orient-btn active" id="bc-btn-landscape" onclick="bcSetOrient('landscape')" title="Landscape — kertas tidur">▭</button>
-            </div>
-          </div>
-          <div class="bc-field-wrap" style="align-self:flex-end">
-            <button class="bc-btn-reset" onclick="bcResetLayoutDefault()" title="Reset ke default (Landscape, 10×10, Gap 2mm, Margin 2mm)">↺ Reset</button>
-          </div>
-        </div>
-        <div class="bc-grid-fields-4">
-          <div class="bc-field-wrap">
-            <label>Kolom</label>
-            <input type="number" id="bc-cols" value="10" min="1" max="20" oninput="bcRenderPreview()" style="text-align:center;">
-          </div>
-          <div class="bc-field-wrap">
-            <label>Baris</label>
-            <input type="number" id="bc-rows" value="10" min="1" max="30" oninput="bcRenderPreview()" style="text-align:center;">
-          </div>
-          <div class="bc-field-wrap">
-            <label>Gap (mm)</label>
-            <input type="number" id="bc-gap" value="2" min="0" max="10" step="0.5" oninput="bcRenderPreview()" style="text-align:center;">
-          </div>
-          <div class="bc-field-wrap">
-            <label>Margin (mm)</label>
-            <input type="number" id="bc-margin" value="2" min="0" max="20" oninput="bcRenderPreview()" style="text-align:center;">
-          </div>
-        </div>
-      </div>
-
-      <div class="bc-section-header">📦 Data Produk</div>
-      <div id="bc-entries-wrap"></div>
-
-    </div><!-- /sidebar-barcode-scroll -->
-
-    <div class="bc-print-footer" id="bc-print-footer" style="display:none">
-      <button class="bc-btn-cetak" onclick="bcCetak()" title="Susun semua produk ke halaman kertas lalu buka dialog cetak printer">🖨️ Cetak Barcode</button>
-    </div>
 
   </aside>
 
@@ -1553,25 +1485,6 @@
       </div>
     </div><!-- /welcome-dok -->
 
-    <!-- BARCODE MAIN (hidden by default) -->
-    <div id="welcome-barcode" style="display:none">
-      <div class="bc-stat-bar">
-        <div class="bc-stats">
-          <span class="bc-stat-pill bc-stat-green" id="bc-total-count">0 barcode</span>
-          <span class="bc-stat-pill" id="bc-total-pages">0 halaman</span>
-        </div>
-        <div class="bc-zoom-controls">
-          <button class="bc-zoom-btn" onclick="bcZoomOut()" title="Zoom Out (Ctrl+Scroll)">−</button>
-          <span class="bc-zoom-label" id="bc-zoom-label">75%</span>
-          <button class="bc-zoom-btn" onclick="bcZoomIn()" title="Zoom In (Ctrl+Scroll)">＋</button>
-          <button class="bc-zoom-btn" onclick="bcZoomReset()" title="Reset Zoom" style="font-size:12px;">⊙</button>
-        </div>
-      </div>
-      <div class="bc-paper-wrap" id="bc-paper-wrap">
-        <div class="bc-empty-msg">Isi data produk di panel kiri untuk melihat preview barcode</div>
-      </div>
-      <canvas id="bc-canvas" style="display:none;"></canvas>
-    </div><!-- /welcome-barcode -->
 
     <!-- WORKSPACE (shared foto + dokumen) -->
     <div class="workspace" id="workspace">
@@ -1614,7 +1527,6 @@
 <script src="app-core.js"></script>
 <script src="app-foto.js"></script>
 <script src="app-dokumen.js"></script>
-<script src="app-barcode.js"></script>
 <script>
 /* ── CLOCK (footer only) ── */
 (function() {
@@ -1645,7 +1557,6 @@
 /* ── INIT ALL MODULES ── */
 initFoto();
 initDokPanel();
-initBarcode();
 initScreensaver();
 initPingWidget();
 startSplashLoading();
