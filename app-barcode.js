@@ -322,7 +322,7 @@ function bcRenderPreview() {
            </div>`
         : `<div style="width:${tw}px;height:${bcH}px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#aaa;">no barcode</div>`;
 
-      const innerCard = `<div style="width:${cardW}px;height:${cardH}px;background:#fff;border:0.8px dashed #555;display:flex;flex-direction:column;overflow:hidden;font-family:Arial,Helvetica,sans-serif;box-sizing:border-box;">
+      const innerCard = `<div style="width:${cardW}px;height:${cardH}px;background:#fff;border:none;display:flex;flex-direction:column;overflow:hidden;font-family:Arial,Helvetica,sans-serif;box-sizing:border-box;">
         <div style="background:#fff;height:${stripH}px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 ${padH}px;gap:3px;border-bottom:1.5px solid #00C853;">
           <span style="font-size:${fsBy + 1}px;font-weight:800;color:#0f1f14;letter-spacing:0.6px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;">${bcX(namaToko)}</span>
           ${createdBy ? `<span style="font-size:${fsBy}px;font-weight:700;color:#2e7d50;letter-spacing:0.3px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;max-width:45%;">${bcX(createdBy)}</span>` : ''}
@@ -351,28 +351,33 @@ function bcRenderPreview() {
     }).join('');
 
     let cutLines = '';
-    if (totalBarcode > 1) {
+    {
       const dashStyle = 'stroke:#555;stroke-width:0.5;stroke-dasharray:4,3;';
       let lines = '';
       const itemCount   = pageItems.length;
       const filledRows  = Math.ceil(itemCount / cols);
       const lastRowCols = itemCount % cols === 0 ? cols : itemCount % cols;
-      const contentBottom = mgPx + filledRows * (cellH + gpPx) - gpPx;
-      const contentRight  = mgPx + cols * (cellW + gpPx) - gpPx;
-      const lastRowRight  = mgPx + lastRowCols * (cellW + gpPx) - gpPx;
+      // Berapa baris yang penuh (bukan baris parsial terakhir)
+      const fullRowsCount   = lastRowCols === cols ? filledRows : filledRows - 1;
+      const fullRowsBottomY = mgPx + fullRowsCount * (cellH + gpPx) - gpPx / 2;
 
-      for (let c = 1; c < cols; c++) {
-        const cx  = mgPx + c * (cellW + gpPx) - gpPx / 2;
-        const yEnd = c < lastRowCols ? contentBottom : contentBottom - (cellH + gpPx);
-        if (yEnd <= mgPx) continue;
-        lines += `<line x1="${cx}" y1="${mgPx}" x2="${cx}" y2="${yEnd}" style="${dashStyle}"/>`;
+      // ── Garis horizontal: filledRows+1 garis, melintasi SELURUH lebar kertas
+      for (let r = 0; r <= filledRows; r++) {
+        const cy = mgPx + r * (cellH + gpPx) - gpPx / 2;
+        lines += `<line x1="0" y1="${cy}" x2="${pxW}" y2="${cy}" style="${dashStyle}"/>`;
       }
-      for (let r = 1; r < filledRows; r++) {
-        const cy  = mgPx + r * (cellH + gpPx) - gpPx / 2;
-        const xEnd = r === filledRows - 1 ? lastRowRight : contentRight;
-        lines += `<line x1="${mgPx}" y1="${cy}" x2="${xEnd}" y2="${cy}" style="${dashStyle}"/>`;
+      // ── Garis vertikal: per kolom terpakai, melintasi SELURUH tinggi kertas
+      for (let c = 0; c <= cols; c++) {
+        const cx = mgPx + c * (cellW + gpPx) - gpPx / 2;
+        if (c <= lastRowCols) {
+          // Kolom ada di baris terakhir → span penuh tinggi kertas
+          lines += `<line x1="${cx}" y1="0" x2="${cx}" y2="${pxH}" style="${dashStyle}"/>`;
+        } else if (fullRowsCount > 0) {
+          // Kolom hanya di baris-baris penuh → span atas kertas sampai batas baris penuh terakhir
+          lines += `<line x1="${cx}" y1="0" x2="${cx}" y2="${fullRowsBottomY}" style="${dashStyle}"/>`;
+        }
       }
-      cutLines = `<svg style="position:absolute;inset:0;pointer-events:none;" width="${pxW}" height="${pxH}" xmlns="http://www.w3.org/2000/svg">${lines}</svg>`;
+      cutLines = `<svg style="position:absolute;inset:0;pointer-events:none;overflow:visible;" width="${pxW}" height="${pxH}" xmlns="http://www.w3.org/2000/svg">${lines}</svg>`;
     }
 
     html += `<div class="bc-paper-page" style="width:${pxW}px;height:${pxH}px;">

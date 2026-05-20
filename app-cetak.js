@@ -949,7 +949,6 @@ async function packAndPrint() {
       photo.className = 'print-photo';
       photo.style.cssText = `left:${x}mm; top:${y}mm; width:${w}mm; height:${h}mm;`;
       if (printSettings.cellBorder) photo.style.outline = '0.4mm solid #333';
-      if (printSettings.cutLines) photo.style.outline = '0.5mm dashed #555';
 
       const img = document.createElement('img');
       img.src = rotated ? (rotCache.get(item.dataURL) || item.dataURL) : item.dataURL;
@@ -959,8 +958,35 @@ async function packAndPrint() {
       page.appendChild(photo);
     });
 
-    // Cut lines: dashed outline per foto (works for 1 or more photos)
-    // Outline sudah ditambahkan ke setiap photo.style di atas
+    // Cut lines: garis melintasi SELURUH kertas di boundary setiap foto
+    // 1 foto → 4 garis (atas/bawah/kiri/kanan), seolah ada foto di sekelilingnya
+    if (printSettings.cutLines) {
+      const GAP = printSettings.gap;
+      const dashSt = 'stroke:#555;stroke-width:0.4;stroke-dasharray:4,3;fill:none;';
+      let svgLines = '';
+      // Unique Y boundaries → horizontal lines full paper width
+      const yBounds = new Set();
+      pageItems.forEach(it => {
+        yBounds.add(+(it.y - GAP / 2).toFixed(4));
+        yBounds.add(+(it.y + it.h + GAP / 2).toFixed(4));
+      });
+      yBounds.forEach(cy => {
+        svgLines += `<line x1="0" y1="${cy}mm" x2="${pw}mm" y2="${cy}mm" style="${dashSt}"/>`;
+      });
+      // Unique X boundaries → vertical lines full paper height
+      const xBounds = new Set();
+      pageItems.forEach(it => {
+        xBounds.add(+(it.x - GAP / 2).toFixed(4));
+        xBounds.add(+(it.x + it.w + GAP / 2).toFixed(4));
+      });
+      xBounds.forEach(cx => {
+        svgLines += `<line x1="${cx}mm" y1="0" x2="${cx}mm" y2="${ph}mm" style="${dashSt}"/>`;
+      });
+      const svgWrap = document.createElement('div');
+      svgWrap.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:visible;';
+      svgWrap.innerHTML = `<svg width="${pw}mm" height="${ph}mm" overflow="visible" xmlns="http://www.w3.org/2000/svg">${svgLines}</svg>`;
+      page.appendChild(svgWrap);
+    }
 
     printArea.appendChild(page);
   });
@@ -1122,18 +1148,33 @@ async function renderLayoutPreview() {
       }
     });
 
-    // Cut lines preview — dashed rect keliling setiap foto (works for 1 or more)
+    // Cut lines preview — garis melintasi SELURUH area kertas
+    // 1 foto → 4 garis full span (atas/bawah kiri/kanan), konsisten dengan saat cetak
     if (printSettings.cutLines) {
+      const GAP = printSettings.gap;
       lctx.save();
       lctx.strokeStyle = '#555';
       lctx.lineWidth = 0.8;
       lctx.setLineDash([4, 3]);
+      // Horizontal lines: full canvas width
+      const yBounds = new Set();
       pageItems.forEach(it => {
-        const px = Math.round(it.x * scale);
-        const py = Math.round(oY + it.y * scale);
-        const pw2 = Math.round(it.w * scale);
-        const ph2 = Math.round(it.h * scale);
-        lctx.strokeRect(px + 0.5, py + 0.5, pw2 - 1, ph2 - 1);
+        yBounds.add(+(it.y - GAP / 2).toFixed(4));
+        yBounds.add(+(it.y + it.h + GAP / 2).toFixed(4));
+      });
+      yBounds.forEach(ymm => {
+        const cy = Math.round(oY + ymm * scale);
+        lctx.beginPath(); lctx.moveTo(0, cy); lctx.lineTo(CVSW, cy); lctx.stroke();
+      });
+      // Vertical lines: full page height
+      const xBounds = new Set();
+      pageItems.forEach(it => {
+        xBounds.add(+(it.x - GAP / 2).toFixed(4));
+        xBounds.add(+(it.x + it.w + GAP / 2).toFixed(4));
+      });
+      xBounds.forEach(xmm => {
+        const cx = Math.round(xmm * scale);
+        lctx.beginPath(); lctx.moveTo(cx, oY); lctx.lineTo(cx, oY + pageH); lctx.stroke();
       });
       lctx.setLineDash([]);
       lctx.restore();
