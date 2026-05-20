@@ -1038,7 +1038,7 @@ function renderWorkspace(mod, groupId) {
     </div>`;
   }
   html += `<div id="upload-note-slot"></div>
-  <div style="display:flex;align-items:center;gap:10px;">
+  <div class="generate-actions-sticky">
     <button class="btn-proses" onclick="generatePrompt()" disabled>✨ Generate Prompt</button>
     <button class="btn-reset" onclick="resetWorkspace()">Reset</button>
     <span class="action-hint" id="action-hint"></span>

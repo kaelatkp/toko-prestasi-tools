@@ -529,6 +529,20 @@ body {
   z-index: 10;
   box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
 }
+.generate-actions-sticky {
+  position: sticky;
+  bottom: 0;
+  background: var(--white);
+  border-top: 1.5px solid var(--border);
+  z-index: 10;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 -4px 14px rgba(0,0,0,0.07);
+  border-radius: 0 0 10px 10px;
+  margin-top: auto;
+}
 .result-actions { padding: 10px 14px; display: flex; gap: 6px; flex-wrap: wrap; }
 
 .btn-download {
