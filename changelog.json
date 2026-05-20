@@ -5,6 +5,8 @@
       "date": "20 Mei 2026",
       "notes": [
         "Beranda ganti tema warna otomatis setiap hari",
+        "Barcode Generator kini buka di jendela terpisah — mudah multitasking",
+        "Fix jumlah barcode tercetak tidak sesuai (scale bug)",
         "Edit Foto: garis tengah draggable (cyan) untuk luruskan posisi wajah",
         "Edit Foto: slider Saturasi warna",
         "Fix marquee teks tidak berjalan horizontal",
