@@ -579,6 +579,28 @@ function bindGridControls() {
   rowsInput.addEventListener('input', onGridChange);
   colsInput.addEventListener('change', onGridChange);
   rowsInput.addEventListener('change', onGridChange);
+
+  // Sync grid fill mode ↔ printSettings.fillMode
+  document.querySelectorAll('input[name="gridFillMode"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      if (radio.checked) {
+        printSettings.fillMode = radio.value;
+        // Sync ke radio utama di Pengaturan Cetak juga
+        const main = document.querySelector(`input[name="fillMode"][value="${radio.value}"]`);
+        if (main) main.checked = true;
+        scheduleLayoutPreview();
+      }
+    });
+  });
+  // Sync sebaliknya: jika user ubah dari Pengaturan Cetak, update grid radio juga
+  document.querySelectorAll('input[name="fillMode"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      if (radio.checked) {
+        const grid = document.querySelector(`input[name="gridFillMode"][value="${radio.value}"]`);
+        if (grid) grid.checked = true;
+      }
+    });
+  });
 }
 
 function selectSize(size) {
