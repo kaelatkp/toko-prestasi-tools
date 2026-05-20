@@ -958,26 +958,33 @@ async function packAndPrint() {
       page.appendChild(photo);
     });
 
-    // Cut lines: garis di boundary konten — tidak masuk area kosong
-    // 1 foto → 4 garis batas cell; banyak foto → garis antar + batas luar grid
+    // Cut lines: per-baris — garis vertikal terbatas pada tinggi baris masing-masing
+    // Aman untuk campuran ukuran berbeda dalam 1 kertas (e.g. 3 besar + 6 kecil)
     if (printSettings.cutLines) {
       const GAP = printSettings.gap;
       const dashSt = 'stroke:#555;stroke-width:0.4;stroke-dasharray:4,3;fill:none;';
       let svgLines = '';
-      // Bounding box seluruh konten halaman ini
-      const allX = pageItems.flatMap(it => [it.x - GAP/2, it.x + it.w + GAP/2]);
-      const allY = pageItems.flatMap(it => [it.y - GAP/2, it.y + it.h + GAP/2]);
-      const xMin = +Math.min(...allX).toFixed(4), xMax = +Math.max(...allX).toFixed(4);
-      const yMin = +Math.min(...allY).toFixed(4), yMax = +Math.max(...allY).toFixed(4);
-      // Horizontal lines: unique Y bounds, span xMin..xMax
-      const yBounds = new Set(allY.map(v => +v.toFixed(4)));
-      yBounds.forEach(cy => {
-        svgLines += `<line x1="${xMin}mm" y1="${cy}mm" x2="${xMax}mm" y2="${cy}mm" style="${dashSt}"/>`;
+      // Kelompokkan foto per baris (Y sama = 1 baris, toleransi 0.1mm)
+      const rowMap = new Map();
+      pageItems.forEach(it => {
+        const key = Math.round(it.y * 10);
+        if (!rowMap.has(key)) rowMap.set(key, []);
+        rowMap.get(key).push(it);
       });
-      // Vertical lines: unique X bounds, span yMin..yMax
-      const xBounds = new Set(allX.map(v => +v.toFixed(4)));
-      xBounds.forEach(cx => {
-        svgLines += `<line x1="${cx}mm" y1="${yMin}mm" x2="${cx}mm" y2="${yMax}mm" style="${dashSt}"/>`;
+      [...rowMap.values()].sort((a, b) => a[0].y - b[0].y).forEach(rowItems => {
+        const yTop = +(Math.min(...rowItems.map(it => it.y))       - GAP/2).toFixed(4);
+        const yBot = +(Math.max(...rowItems.map(it => it.y + it.h)) + GAP/2).toFixed(4);
+        const xMin = +(Math.min(...rowItems.map(it => it.x))       - GAP/2).toFixed(4);
+        const xMax = +(Math.max(...rowItems.map(it => it.x + it.w)) + GAP/2).toFixed(4);
+        // Garis horizontal atas & bawah baris ini
+        svgLines += `<line x1="${xMin}mm" y1="${yTop}mm" x2="${xMax}mm" y2="${yTop}mm" style="${dashSt}"/>`;
+        svgLines += `<line x1="${xMin}mm" y1="${yBot}mm" x2="${xMax}mm" y2="${yBot}mm" style="${dashSt}"/>`;
+        // Garis vertikal per kolom, terbatas tinggi baris ini
+        new Set(rowItems.flatMap(it => [
+          +(it.x - GAP/2).toFixed(4), +(it.x + it.w + GAP/2).toFixed(4)
+        ])).forEach(cx => {
+          svgLines += `<line x1="${cx}mm" y1="${yTop}mm" x2="${cx}mm" y2="${yBot}mm" style="${dashSt}"/>`;
+        });
       });
       const svgWrap = document.createElement('div');
       svgWrap.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:visible;';
@@ -1145,28 +1152,38 @@ async function renderLayoutPreview() {
       }
     });
 
-    // Cut lines preview — dibatasi bounding box konten, tidak masuk area kosong
+    // Cut lines preview — per-baris, garis vertikal terbatas tinggi baris masing-masing
     if (printSettings.cutLines) {
       const GAP = printSettings.gap;
       lctx.save();
       lctx.strokeStyle = '#555';
       lctx.lineWidth = 0.8;
       lctx.setLineDash([4, 3]);
-      const allXmm = pageItems.flatMap(it => [it.x - GAP/2, it.x + it.w + GAP/2]);
-      const allYmm = pageItems.flatMap(it => [it.y - GAP/2, it.y + it.h + GAP/2]);
-      const xMinPx = Math.round(Math.min(...allXmm) * scale);
-      const xMaxPx = Math.round(Math.max(...allXmm) * scale);
-      const yMinPx = Math.round(oY + Math.min(...allYmm) * scale);
-      const yMaxPx = Math.round(oY + Math.max(...allYmm) * scale);
-      // Horizontal lines: span xMin..xMax
-      new Set(allYmm.map(v => +v.toFixed(4))).forEach(ymm => {
-        const cy = Math.round(oY + ymm * scale);
-        lctx.beginPath(); lctx.moveTo(xMinPx, cy); lctx.lineTo(xMaxPx, cy); lctx.stroke();
+      const rowMap = new Map();
+      pageItems.forEach(it => {
+        const key = Math.round(it.y * 10);
+        if (!rowMap.has(key)) rowMap.set(key, []);
+        rowMap.get(key).push(it);
       });
-      // Vertical lines: span yMin..yMax
-      new Set(allXmm.map(v => +v.toFixed(4))).forEach(xmm => {
-        const cx = Math.round(xmm * scale);
-        lctx.beginPath(); lctx.moveTo(cx, yMinPx); lctx.lineTo(cx, yMaxPx); lctx.stroke();
+      [...rowMap.values()].sort((a, b) => a[0].y - b[0].y).forEach(rowItems => {
+        const yTopMm = Math.min(...rowItems.map(it => it.y))       - GAP/2;
+        const yBotMm = Math.max(...rowItems.map(it => it.y + it.h)) + GAP/2;
+        const xMinMm = Math.min(...rowItems.map(it => it.x))       - GAP/2;
+        const xMaxMm = Math.max(...rowItems.map(it => it.x + it.w)) + GAP/2;
+        const yTopPx = Math.round(oY + yTopMm * scale);
+        const yBotPx = Math.round(oY + yBotMm * scale);
+        const xMinPx = Math.round(xMinMm * scale);
+        const xMaxPx = Math.round(xMaxMm * scale);
+        // Horizontal atas & bawah
+        lctx.beginPath(); lctx.moveTo(xMinPx, yTopPx); lctx.lineTo(xMaxPx, yTopPx); lctx.stroke();
+        lctx.beginPath(); lctx.moveTo(xMinPx, yBotPx); lctx.lineTo(xMaxPx, yBotPx); lctx.stroke();
+        // Vertikal per kolom, terbatas tinggi baris
+        new Set(rowItems.flatMap(it => [
+          +(it.x - GAP/2).toFixed(4), +(it.x + it.w + GAP/2).toFixed(4)
+        ])).forEach(xmm => {
+          const cx = Math.round(xmm * scale);
+          lctx.beginPath(); lctx.moveTo(cx, yTopPx); lctx.lineTo(cx, yBotPx); lctx.stroke();
+        });
       });
       lctx.setLineDash([]);
       lctx.restore();
