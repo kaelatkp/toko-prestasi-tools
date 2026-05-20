@@ -49,7 +49,22 @@ const printSettings = {
 
 /* ── GRID MODE STATE ── */
 let cetakMode = 'ukuran'; // 'ukuran' | 'grid'
-const gridSettings = { cols: 2, rows: 5 };
+const gridSettings = { cols: 2, rows: 2, n: 4 };
+
+// Hitung cols × rows terbaik untuk N bagian sesuai rasio kertas
+function autoGridLayout(n) {
+  if (n <= 0) return { cols: 1, rows: 1 };
+  const pw = getPaperW(), ph = getPaperH();
+  const targetRatio = pw / ph; // misal A4 = 210/297 ≈ 0.707
+  let bestCols = 1, bestRows = n, bestDiff = Infinity;
+  for (let c = 1; c <= n; c++) {
+    if (n % c !== 0) continue; // hanya faktor bulat
+    const r = n / c;
+    const diff = Math.abs(c / r - targetRatio);
+    if (diff < bestDiff) { bestDiff = diff; bestCols = c; bestRows = r; }
+  }
+  return { cols: bestCols, rows: bestRows };
+}
 
 /* ── STATE ── */
 const state = {
@@ -155,8 +170,10 @@ function loadFile(file) {
         sizeSection.style.display = '';
       } else {
         // grid mode — auto-init crop box dengan rasio grid
+        const layout = autoGridLayout(gridSettings.n);
+        gridSettings.cols = layout.cols; gridSettings.rows = layout.rows;
         const cell = getGridCellSize();
-        selectSize({ label: `Grid ${gridSettings.cols}×${gridSettings.rows}`, wMM: cell.wMM, hMM: cell.hMM });
+        selectSize({ label: `÷${gridSettings.n}`, wMM: cell.wMM, hMM: cell.hMM });
         updateGridInfo();
       }
       showToast('Foto dimuat ✓', 'green');
@@ -471,20 +488,21 @@ function bindSizeChips() {
 
 /* ─────────────────────────────── GRID MODE ── */
 function getGridCellSize() {
+  const { cols, rows } = gridSettings;
   const GAP    = printSettings.gap;
   const margin = PAPER_MARGIN_MM;
   const pw     = getPaperW();
   const ph     = getPaperH();
-  const cw     = (pw - margin * 2 - (gridSettings.cols - 1) * GAP) / gridSettings.cols;
-  const ch     = (ph - margin * 2 - (gridSettings.rows - 1) * GAP) / gridSettings.rows;
+  const cw     = (pw - margin * 2 - (cols - 1) * GAP) / cols;
+  const ch     = (ph - margin * 2 - (rows - 1) * GAP) / rows;
   return { wMM: Math.round(cw * 10) / 10, hMM: Math.round(ch * 10) / 10 };
 }
 
 function updateGridInfo() {
-  const cell  = getGridCellSize();
-  const total = gridSettings.cols * gridSettings.rows;
-  const el    = $('gridInfoChip');
-  if (el) el.textContent = `${total} per halaman  ·  ${cell.wMM} × ${cell.hMM}mm per sel`;
+  const { cols, rows } = gridSettings;
+  const cell = getGridCellSize();
+  const el   = $('gridInfoChip');
+  if (el) el.innerHTML = `${cols} kolom × ${rows} baris<br>${cell.wMM} × ${cell.hMM}mm per sel`;
 }
 
 function packGrid(items) {
@@ -533,8 +551,10 @@ function setCetakMode(mode) {
     updateGridInfo();
     // Auto-init crop box dengan rasio grid cell jika sudah ada gambar
     if (state.originalImage) {
+      const layout = autoGridLayout(gridSettings.n);
+      gridSettings.cols = layout.cols; gridSettings.rows = layout.rows;
       const cell = getGridCellSize();
-      selectSize({ label: `Grid ${gridSettings.cols}×${gridSettings.rows}`, wMM: cell.wMM, hMM: cell.hMM });
+      selectSize({ label: `÷${gridSettings.n}`, wMM: cell.wMM, hMM: cell.hMM });
     }
   } else {
     if (btnGrid)   btnGrid.classList.remove('active');
@@ -554,30 +574,26 @@ function setCetakMode(mode) {
 }
 
 function bindGridControls() {
-  const colsInput = $('gridCols');
-  const rowsInput = $('gridRows');
-  if (!colsInput || !rowsInput) return;
+  const nInput = $('gridN');
+  if (!nInput) return;
 
   function onGridChange() {
-    const c = Math.max(1, Math.min(50, parseInt(colsInput.value) || 1));
-    const r = Math.max(1, Math.min(50, parseInt(rowsInput.value) || 1));
-    colsInput.value = c;
-    rowsInput.value = r;
-    gridSettings.cols = c;
-    gridSettings.rows = r;
+    const n = Math.max(1, Math.min(500, parseInt(nInput.value) || 1));
+    nInput.value = n;
+    gridSettings.n = n;
+    const layout = autoGridLayout(n);
+    gridSettings.cols = layout.cols;
+    gridSettings.rows = layout.rows;
     updateGridInfo();
-    // Update crop box rasio jika ada gambar
     if (state.originalImage && cetakMode === 'grid') {
       const cell = getGridCellSize();
-      selectSize({ label: `Grid ${c}×${r}`, wMM: cell.wMM, hMM: cell.hMM });
+      selectSize({ label: `÷${n}`, wMM: cell.wMM, hMM: cell.hMM });
     }
     scheduleLayoutPreview();
   }
 
-  colsInput.addEventListener('input', onGridChange);
-  rowsInput.addEventListener('input', onGridChange);
-  colsInput.addEventListener('change', onGridChange);
-  rowsInput.addEventListener('change', onGridChange);
+  nInput.addEventListener('input', onGridChange);
+  nInput.addEventListener('change', onGridChange);
 }
 
 function selectSize(size) {
@@ -835,11 +851,11 @@ function addToQueue() {
     if (!state.cropBox) return;
     const cell  = getGridCellSize();
     const dataURL = extractCrop();
-    const label = `Grid ${gridSettings.cols}×${gridSettings.rows}`;
+    const label = `÷${gridSettings.n} (${gridSettings.cols}×${gridSettings.rows})`;
     const item  = { id: state.nextId++, dataURL, label, wMM: cell.wMM, hMM: cell.hMM, qty: 1, flipped: false, isGrid: true };
     state.queue.push(item);
     renderQueue();
-    showToast(`${label} — ${cell.wMM}×${cell.hMM}mm per sel ✓`, 'green');
+    showToast(`Dibagi ${gridSettings.n} — ${cell.wMM}×${cell.hMM}mm per sel ✓`, 'green');
     return;
   }
   if (!state.selectedSize || !state.cropBox) return;
@@ -1546,10 +1562,12 @@ function bindPrintSettings() {
     const lbl = document.getElementById('lpPaperLabel');
     if (lbl && ps) lbl.textContent = `${this.value} · ${ps.w}×${ps.h}mm`;
     if (cetakMode === 'grid') {
+      const layout = autoGridLayout(gridSettings.n);
+      gridSettings.cols = layout.cols; gridSettings.rows = layout.rows;
       updateGridInfo();
       if (state.originalImage) {
         const cell = getGridCellSize();
-        selectSize({ label: `Grid ${gridSettings.cols}×${gridSettings.rows}`, wMM: cell.wMM, hMM: cell.hMM });
+        selectSize({ label: `÷${gridSettings.n}`, wMM: cell.wMM, hMM: cell.hMM });
       }
     }
     scheduleLayoutPreview();

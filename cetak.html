@@ -206,34 +206,27 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
 
 /* ── GRID KERTAS SECTION ── */
 .grid-section { display: flex; flex-direction: column; gap: 8px; }
-.grid-inputs-row {
-  display: flex; align-items: center; gap: 8px; margin-top: 2px;
+.grid-n-wrap {
+  display: flex; align-items: center; gap: 10px; margin-top: 2px;
 }
-.grid-field {
-  display: flex; flex-direction: column; gap: 3px; flex: 1;
-}
-.grid-field label {
-  font-size: 8px; font-weight: 700; color: var(--text-3);
-  letter-spacing: 1.5px; text-transform: uppercase;
-}
-.grid-field input[type=number] {
-  width: 100%; font-size: 18px; font-weight: 800;
+.grid-n-wrap input[type=number] {
+  width: 90px; font-size: 28px; font-weight: 800;
   font-family: 'DM Mono', monospace; text-align: center;
   color: var(--green-dark); background: var(--green-light);
-  border: 1.5px solid var(--green-mid); border-radius: 8px;
+  border: 1.5px solid var(--green-mid); border-radius: 10px;
   padding: 6px 4px; outline: none; transition: border-color .15s;
 }
-.grid-field input[type=number]:focus { border-color: var(--green); }
-.grid-x {
-  font-size: 18px; font-weight: 700; color: var(--text-3);
-  font-family: 'DM Mono', monospace; flex-shrink: 0; margin-top: 18px;
+.grid-n-wrap input[type=number]:focus { border-color: var(--green); }
+.grid-n-label {
+  font-size: 13px; font-weight: 700; color: var(--text-2);
+  font-family: 'Sora', sans-serif;
 }
 .grid-info-chip {
   font-size: 10px; font-family: 'DM Mono', monospace;
   color: var(--green-dark); background: var(--green-light);
   border: 1px solid var(--green-mid); border-radius: 7px;
   padding: 6px 10px; text-align: center; font-weight: 600;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.3px; line-height: 1.6;
 }
 
 /* ── ACTION BAR ── */
@@ -807,18 +800,11 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
         <!-- Grid Kertas Section -->
         <div class="grid-section" id="gridSection" style="display:none">
           <div class="sec-label">Bagi Kertas Jadi</div>
-          <div class="grid-inputs-row">
-            <div class="grid-field">
-              <label>Kolom</label>
-              <input type="number" id="gridCols" value="2" min="1" max="50">
-            </div>
-            <span class="grid-x">×</span>
-            <div class="grid-field">
-              <label>Baris</label>
-              <input type="number" id="gridRows" value="5" min="1" max="50">
-            </div>
+          <div class="grid-n-wrap">
+            <input type="number" id="gridN" value="4" min="1" max="500" placeholder="4">
+            <span class="grid-n-label">bagian</span>
           </div>
-          <div class="grid-info-chip" id="gridInfoChip">10 per halaman · — × —mm per sel</div>
+          <div class="grid-info-chip" id="gridInfoChip">— × —  ·  — × —mm per sel</div>
         </div>
 
         <!-- Print Settings -->
