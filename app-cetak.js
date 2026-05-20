@@ -912,7 +912,7 @@ function renderQueue() {
       <div class="qi-controls">
         <button class="btn-flip${item.flipped ? ' active' : ''}" data-id="${item.id}" title="${flipTitle}">${flipLabel}</button>
         <button class="btn-qty" data-id="${item.id}" data-act="minus">−</button>
-        <span class="qi-qty" id="qty-${item.id}">${item.qty}</span>
+        <input type="number" class="qi-qty-input" id="qty-${item.id}" value="${item.qty}" min="1" max="9999" title="Ketik jumlah langsung">
         <button class="btn-qty" data-id="${item.id}" data-act="plus">+</button>
         <button class="btn-del" data-id="${item.id}" title="Hapus">✕</button>
       </div>`;
@@ -933,11 +933,34 @@ function renderQueue() {
       const id = +btn.dataset.id;
       const item = state.queue.find(i => i.id === id);
       if (!item) return;
-      if (btn.dataset.act === 'plus') item.qty = Math.min(99, (item.qty || 1) + 1);
+      if (btn.dataset.act === 'plus') item.qty = Math.min(9999, (item.qty || 1) + 1);
       else item.qty = Math.max(1, (item.qty || 1) - 1);
-      $(`qty-${id}`).textContent = item.qty;
+      const inp = $(`qty-${id}`);
+      if (inp) inp.value = item.qty;
       updateQueueSummary();
     });
+  });
+
+  queueList.querySelectorAll('.qi-qty-input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const id = +inp.id.replace('qty-', '');
+      const item = state.queue.find(i => i.id === id);
+      if (!item) return;
+      const v = parseInt(inp.value);
+      if (!isNaN(v) && v >= 1) { item.qty = Math.min(9999, v); updateQueueSummary(); }
+    });
+    inp.addEventListener('change', () => {
+      const id = +inp.id.replace('qty-', '');
+      const item = state.queue.find(i => i.id === id);
+      if (!item) return;
+      let v = parseInt(inp.value) || 1;
+      v = Math.max(1, Math.min(9999, v));
+      inp.value = v;
+      item.qty = v;
+      updateQueueSummary();
+    });
+    // Select all on focus for quick replace
+    inp.addEventListener('focus', () => inp.select());
   });
   queueList.querySelectorAll('.btn-del').forEach(btn => {
     btn.addEventListener('click', () => {

@@ -195,9 +195,9 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
   width: 100%;
 }
 .mode-cetak-btn {
-  flex: 1 1 0; min-width: 0; height: 34px;
+  flex: 1 1 0; min-width: 0; height: 43px;
   display: flex; align-items: center; justify-content: center;
-  padding: 0 6px; font-size: 10px; font-weight: 700;
+  padding: 0 6px; font-size: 13px; font-weight: 700;
   font-family: 'Sora', sans-serif; letter-spacing: 0.2px;
   border: none; background: var(--bg); color: var(--text-2);
   cursor: pointer; transition: all .15s;
@@ -210,57 +210,59 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
 /* ── GRID KERTAS SECTION ── */
 .grid-section { display: flex; flex-direction: column; gap: 8px; }
 .grid-hv-wrap {
-  display: flex; align-items: flex-end; gap: 8px; margin-top: 2px;
+  display: flex; align-items: flex-end; gap: 10px; margin-top: 2px;
 }
 .grid-hv-field {
   display: flex; flex-direction: column; gap: 4px; flex: 1;
 }
 .grid-hv-field label {
-  font-size: 8px; font-weight: 700; color: var(--text-3);
+  font-size: 10px; font-weight: 700; color: var(--text-3);
   letter-spacing: 1.5px; text-transform: uppercase;
 }
 .grid-hv-field input[type=number] {
-  width: 100%; font-size: 22px; font-weight: 800;
+  width: 100%; font-size: 28px; font-weight: 800;
   font-family: 'DM Mono', monospace; text-align: center;
   color: var(--green-dark); background: var(--green-light);
-  border: 1.5px solid var(--green-mid); border-radius: 9px;
-  padding: 7px 4px; outline: none; transition: border-color .15s;
+  border: 1.5px solid var(--green-mid); border-radius: 11px;
+  padding: 9px 5px; outline: none; transition: border-color .15s;
 }
 .grid-hv-field input[type=number]:focus { border-color: var(--green); }
 .grid-hv-sep {
-  font-size: 20px; font-weight: 700; color: var(--text-3);
-  font-family: 'DM Mono', monospace; flex-shrink: 0; padding-bottom: 8px;
+  font-size: 25px; font-weight: 700; color: var(--text-3);
+  font-family: 'DM Mono', monospace; flex-shrink: 0; padding-bottom: 10px;
 }
 .grid-info-chip {
-  font-size: 10px; font-family: 'DM Mono', monospace;
+  font-size: 13px; font-family: 'DM Mono', monospace;
   color: var(--green-dark); background: var(--green-light);
   border: 1px solid var(--green-mid); border-radius: 7px;
-  padding: 6px 10px; text-align: center; font-weight: 600;
+  padding: 8px 13px; text-align: center; font-weight: 600;
   letter-spacing: 0.3px; line-height: 1.6;
 }
 .grid-fill-label {
-  font-size: 9px; font-weight: 700; color: var(--text-3);
+  font-size: 11px; font-weight: 700; color: var(--text-3);
   letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px;
 }
 .grid-fill-opts {
-  display: flex; gap: 5px;
+  display: flex; gap: 6px;
 }
 .grid-fill-opt {
   flex: 1; cursor: pointer;
+  display: flex; flex-direction: column;
 }
 .grid-fill-opt input[type=radio] { display: none; }
 .gfo-box {
   display: flex; flex-direction: column; gap: 2px; align-items: center;
-  padding: 7px 4px; border-radius: 8px;
+  padding: 9px 5px; border-radius: 10px;
   border: 1.5px solid var(--border); background: var(--bg);
   transition: all .15s; text-align: center;
+  flex: 1; justify-content: center;
 }
 .gfo-title {
-  font-size: 11px; font-weight: 800; color: var(--text-2);
+  font-size: 14px; font-weight: 800; color: var(--text-2);
   font-family: 'Sora', sans-serif;
 }
 .gfo-desc {
-  font-size: 8px; color: var(--text-3); font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--text-3); font-family: 'DM Mono', monospace;
   line-height: 1.3;
 }
 .grid-fill-opt input[type=radio]:checked + .gfo-box {
@@ -415,6 +417,16 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
   font-size: 12px; font-weight: 800; font-family: 'DM Mono', monospace;
   color: var(--text); min-width: 20px; text-align: center;
 }
+.qi-qty-input {
+  font-size: 12px; font-weight: 800; font-family: 'DM Mono', monospace;
+  color: var(--text); width: 46px; text-align: center;
+  border: 1.5px solid var(--border); border-radius: 6px;
+  padding: 2px 2px; background: var(--white); outline: none;
+  -moz-appearance: textfield;
+}
+.qi-qty-input::-webkit-outer-spin-button,
+.qi-qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.qi-qty-input:focus { border-color: var(--green); background: var(--green-light); }
 .btn-del {
   width: 22px; height: 22px; border-radius: 5px;
   font-size: 12px; color: var(--text-3);
