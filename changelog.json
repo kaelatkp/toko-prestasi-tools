@@ -5,13 +5,9 @@
       "date": "20 Mei 2026",
       "notes": [
         "Flash Login: mekanisme pembaruan diperkuat — update wajib diterapkan sebelum masuk",
-        "Prompt Foto: opsi 'Sudah Berseragam ✓' — AI hanya ganti background & reposisi, seragam tidak diubah"
-      ]
-    },
-    {
-      "version": "2.5",
-      "date": "20 Mei 2026",
-      "notes": [
+        "Prompt Foto: opsi 'Sudah Berseragam ✓' — AI hanya ganti background & reposisi, seragam tidak diubah",
+        "Cetak Foto: mode Grid Kertas — bagi A4/F4 jadi kolom × baris bebas (misal 2×5 = 10 per kertas)",
+        "Cetak Foto: tambah ukuran cetak & kertas F4 (215×330mm, bukan Legal)",
         "Barcode Generator kini buka di jendela terpisah",
         "Fix jumlah barcode tercetak tidak sesuai (scale bug)",
         "Edit Foto: kontrol garis tengah untuk luruskan posisi wajah",
