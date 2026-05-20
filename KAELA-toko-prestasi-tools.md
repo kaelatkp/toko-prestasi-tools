@@ -208,7 +208,7 @@ Output di `dist/`:
 |-------|------|-----------|
 | Generator Foto | `app-foto.js` | 25 modul: pasfoto, wisuda, couple, produk, event, dll |
 | Generator Dokumen | `app-dokumen.js` | KTP, SIM, Paspor, SKCK, CPNS, KUA, dll |
-| Barcode | `app-barcode.js` | Generate + cetak label barcode produk toko |
+| Barcode | `app-barcode.js` + `barcode.html` | Generate + cetak label barcode — buka di window terpisah via `window.open('barcode.html','_blank')` |
 | Cetak Foto | `app-cetak.js` + `cetak.html` | Queue cetak, layout A4/F4/10R, PDF preview |
 | Screensaver | `app-screensaver.js` | Display promosi toko |
 | Nexus Forge | `app-core.js` | Modal info tim AI + foto crew |
@@ -347,7 +347,7 @@ Modal edit di dalam `cetak.html` — dibuka dari Cetak Foto workspace.
 | v2.2 | 19 Mei 2026 | Fix foto Nexus Forge, fix klik kanan popup, fix print PDF (cetak foto + barcode), fix footer tercetak |
 | v2.3 | 20 Mei 2026 | Hapus ikon gunting ✂ dari garis potong cetak foto & barcode, garis potong lebih kontrast (#555) |
 | v2.4 | 20 Mei 2026 | Fix semua label versi tertinggal (v2.1→v2.3), tambah panel Riwayat Update di beranda, tambah changelog.json |
-| **v2.5** | **20 Mei 2026** | **Daily theme 7 hari, fix marquee wrapping, fix Ctrl+Shift+T dev panel, edit foto: garis tengah draggable + slider Saturasi, changelog popup muncul setelah splash** |
+| **v2.5** | **20 Mei 2026** | **Daily theme, barcode jadi window terpisah (barcode.html), fix print count bug, edit foto: garis tengah + saturasi, changelog popup after splash, fix marquee, fix Ctrl+Shift+T** |
 
 ---
 
@@ -370,6 +370,7 @@ Modal edit di dalam `cetak.html` — dibuka dari Cetak Foto workspace.
 | 13 | `Ctrl+Shift+T` dev panel tidak muncul | `e.key === 'T'` tidak match karena Chromium kirim lowercase `'t'`; fix ke `.toUpperCase()`; z-index 9998 dinaikkan ke 999999 | v2.5 |
 | 14 | Changelog popup tidak muncul setelah splash | `loadChangelog()` dipanggil saat page init → modal muncul di balik splash → key localStorage langsung ter-set. Fix: pindah ke dalam `appMasuk()` (400ms setelah splash hilang); key baru di-set saat user klik Tutup, bukan saat modal dibuka | v2.5 |
 | 15 | Changelog popup tidak muncul karena key sudah ter-set di run sebelumnya | Key `tp_cl_seen_vX` di-set terlalu dini (saat `openChangelog()` bukan saat `closeChangelog()`). Root cause: modal muncul di balik splash → user tidak lihat tapi key sudah set. Fix: key di-set di `closeChangelog()` + skip popup kalau data gagal dimuat | v2.5 |
+| 16 | Barcode tercetak kurang dari jumlah yang diminta | `#bc-paper-scaler` punya `transform:scale(0.75)` saat zoom 75% — tidak di-reset saat print → PDF ikut scaled, halaman terpotong. Fix: tambah `#bc-paper-scaler{transform:scale(1)!important;}` ke print CSS di `bcCetak()` | v2.5 |
 
 ---
 
