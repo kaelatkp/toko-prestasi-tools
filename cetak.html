@@ -206,20 +206,27 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
 
 /* ── GRID KERTAS SECTION ── */
 .grid-section { display: flex; flex-direction: column; gap: 8px; }
-.grid-n-wrap {
-  display: flex; align-items: center; gap: 10px; margin-top: 2px;
+.grid-hv-wrap {
+  display: flex; align-items: flex-end; gap: 8px; margin-top: 2px;
 }
-.grid-n-wrap input[type=number] {
-  width: 90px; font-size: 28px; font-weight: 800;
+.grid-hv-field {
+  display: flex; flex-direction: column; gap: 4px; flex: 1;
+}
+.grid-hv-field label {
+  font-size: 8px; font-weight: 700; color: var(--text-3);
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+.grid-hv-field input[type=number] {
+  width: 100%; font-size: 22px; font-weight: 800;
   font-family: 'DM Mono', monospace; text-align: center;
   color: var(--green-dark); background: var(--green-light);
-  border: 1.5px solid var(--green-mid); border-radius: 10px;
-  padding: 6px 4px; outline: none; transition: border-color .15s;
+  border: 1.5px solid var(--green-mid); border-radius: 9px;
+  padding: 7px 4px; outline: none; transition: border-color .15s;
 }
-.grid-n-wrap input[type=number]:focus { border-color: var(--green); }
-.grid-n-label {
-  font-size: 13px; font-weight: 700; color: var(--text-2);
-  font-family: 'Sora', sans-serif;
+.grid-hv-field input[type=number]:focus { border-color: var(--green); }
+.grid-hv-sep {
+  font-size: 20px; font-weight: 700; color: var(--text-3);
+  font-family: 'DM Mono', monospace; flex-shrink: 0; padding-bottom: 8px;
 }
 .grid-info-chip {
   font-size: 10px; font-family: 'DM Mono', monospace;
@@ -799,12 +806,19 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
 
         <!-- Grid Kertas Section -->
         <div class="grid-section" id="gridSection" style="display:none">
-          <div class="sec-label">Bagi Kertas Jadi</div>
-          <div class="grid-n-wrap">
-            <input type="number" id="gridN" value="4" min="1" max="500" placeholder="4">
-            <span class="grid-n-label">bagian</span>
+          <div class="sec-label">Bagi Kertas</div>
+          <div class="grid-hv-wrap">
+            <div class="grid-hv-field">
+              <label>Horizontal</label>
+              <input type="number" id="gridCols" value="2" min="1" max="50">
+            </div>
+            <div class="grid-hv-sep">×</div>
+            <div class="grid-hv-field">
+              <label>Vertikal</label>
+              <input type="number" id="gridRows" value="2" min="1" max="50">
+            </div>
           </div>
-          <div class="grid-info-chip" id="gridInfoChip">— × —  ·  — × —mm per sel</div>
+          <div class="grid-info-chip" id="gridInfoChip">— × —mm per foto</div>
         </div>
 
         <!-- Print Settings -->

@@ -49,22 +49,7 @@ const printSettings = {
 
 /* ── GRID MODE STATE ── */
 let cetakMode = 'ukuran'; // 'ukuran' | 'grid'
-const gridSettings = { cols: 2, rows: 2, n: 4 };
-
-// Hitung cols × rows terbaik untuk N bagian sesuai rasio kertas
-function autoGridLayout(n) {
-  if (n <= 0) return { cols: 1, rows: 1 };
-  const pw = getPaperW(), ph = getPaperH();
-  const targetRatio = pw / ph; // misal A4 = 210/297 ≈ 0.707
-  let bestCols = 1, bestRows = n, bestDiff = Infinity;
-  for (let c = 1; c <= n; c++) {
-    if (n % c !== 0) continue; // hanya faktor bulat
-    const r = n / c;
-    const diff = Math.abs(c / r - targetRatio);
-    if (diff < bestDiff) { bestDiff = diff; bestCols = c; bestRows = r; }
-  }
-  return { cols: bestCols, rows: bestRows };
-}
+const gridSettings = { cols: 2, rows: 2 };
 
 /* ── STATE ── */
 const state = {
@@ -170,10 +155,8 @@ function loadFile(file) {
         sizeSection.style.display = '';
       } else {
         // grid mode — auto-init crop box dengan rasio grid
-        const layout = autoGridLayout(gridSettings.n);
-        gridSettings.cols = layout.cols; gridSettings.rows = layout.rows;
         const cell = getGridCellSize();
-        selectSize({ label: `÷${gridSettings.n}`, wMM: cell.wMM, hMM: cell.hMM });
+        selectSize({ label: `1/${gridSettings.cols * gridSettings.rows} kertas`, wMM: cell.wMM, hMM: cell.hMM });
         updateGridInfo();
       }
       showToast('Foto dimuat ✓', 'green');
@@ -500,9 +483,10 @@ function getGridCellSize() {
 
 function updateGridInfo() {
   const { cols, rows } = gridSettings;
-  const cell = getGridCellSize();
-  const el   = $('gridInfoChip');
-  if (el) el.innerHTML = `${cols} kolom × ${rows} baris<br>${cell.wMM} × ${cell.hMM}mm per sel`;
+  const cell  = getGridCellSize();
+  const total = cols * rows;
+  const el    = $('gridInfoChip');
+  if (el) el.innerHTML = `1/${total} kertas per foto  ·  ${cell.wMM} × ${cell.hMM}mm`;
 }
 
 function packGrid(items) {
@@ -551,10 +535,8 @@ function setCetakMode(mode) {
     updateGridInfo();
     // Auto-init crop box dengan rasio grid cell jika sudah ada gambar
     if (state.originalImage) {
-      const layout = autoGridLayout(gridSettings.n);
-      gridSettings.cols = layout.cols; gridSettings.rows = layout.rows;
       const cell = getGridCellSize();
-      selectSize({ label: `÷${gridSettings.n}`, wMM: cell.wMM, hMM: cell.hMM });
+      selectSize({ label: `1/${gridSettings.cols * gridSettings.rows} kertas`, wMM: cell.wMM, hMM: cell.hMM });
     }
   } else {
     if (btnGrid)   btnGrid.classList.remove('active');
@@ -574,26 +556,29 @@ function setCetakMode(mode) {
 }
 
 function bindGridControls() {
-  const nInput = $('gridN');
-  if (!nInput) return;
+  const colsInput = $('gridCols');
+  const rowsInput = $('gridRows');
+  if (!colsInput || !rowsInput) return;
 
   function onGridChange() {
-    const n = Math.max(1, Math.min(500, parseInt(nInput.value) || 1));
-    nInput.value = n;
-    gridSettings.n = n;
-    const layout = autoGridLayout(n);
-    gridSettings.cols = layout.cols;
-    gridSettings.rows = layout.rows;
+    const c = Math.max(1, Math.min(50, parseInt(colsInput.value) || 1));
+    const r = Math.max(1, Math.min(50, parseInt(rowsInput.value) || 1));
+    colsInput.value = c;
+    rowsInput.value = r;
+    gridSettings.cols = c;
+    gridSettings.rows = r;
     updateGridInfo();
     if (state.originalImage && cetakMode === 'grid') {
       const cell = getGridCellSize();
-      selectSize({ label: `÷${n}`, wMM: cell.wMM, hMM: cell.hMM });
+      selectSize({ label: `1/${c * r} kertas`, wMM: cell.wMM, hMM: cell.hMM });
     }
     scheduleLayoutPreview();
   }
 
-  nInput.addEventListener('input', onGridChange);
-  nInput.addEventListener('change', onGridChange);
+  colsInput.addEventListener('input', onGridChange);
+  rowsInput.addEventListener('input', onGridChange);
+  colsInput.addEventListener('change', onGridChange);
+  rowsInput.addEventListener('change', onGridChange);
 }
 
 function selectSize(size) {
@@ -851,11 +836,12 @@ function addToQueue() {
     if (!state.cropBox) return;
     const cell  = getGridCellSize();
     const dataURL = extractCrop();
-    const label = `÷${gridSettings.n} (${gridSettings.cols}×${gridSettings.rows})`;
+    const { cols, rows } = gridSettings;
+    const label = `1/${cols * rows} kertas (${cols}×${rows})`;
     const item  = { id: state.nextId++, dataURL, label, wMM: cell.wMM, hMM: cell.hMM, qty: 1, flipped: false, isGrid: true };
     state.queue.push(item);
     renderQueue();
-    showToast(`Dibagi ${gridSettings.n} — ${cell.wMM}×${cell.hMM}mm per sel ✓`, 'green');
+    showToast(`Grid ${cols}×${rows} — ${cell.wMM}×${cell.hMM}mm per foto ✓`, 'green');
     return;
   }
   if (!state.selectedSize || !state.cropBox) return;
@@ -1562,12 +1548,10 @@ function bindPrintSettings() {
     const lbl = document.getElementById('lpPaperLabel');
     if (lbl && ps) lbl.textContent = `${this.value} · ${ps.w}×${ps.h}mm`;
     if (cetakMode === 'grid') {
-      const layout = autoGridLayout(gridSettings.n);
-      gridSettings.cols = layout.cols; gridSettings.rows = layout.rows;
       updateGridInfo();
       if (state.originalImage) {
         const cell = getGridCellSize();
-        selectSize({ label: `÷${gridSettings.n}`, wMM: cell.wMM, hMM: cell.hMM });
+        selectSize({ label: `1/${gridSettings.cols * gridSettings.rows} kertas`, wMM: cell.wMM, hMM: cell.hMM });
       }
     }
     scheduleLayoutPreview();
