@@ -1050,60 +1050,60 @@ body {
   position: absolute; inset: 0; z-index: 10;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  padding: 40px; gap: 30px;
+  padding: 50px; gap: 38px;
   opacity: 0; transition: opacity 0.45s ease;
 }
 #spl-main.visible { opacity: 1; }
 
 /* Center glass card */
 .spl-card {
-  width: 100%; max-width: 575px;
+  width: 100%; max-width: 719px;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(0,200,83,0.2);
-  border-radius: 30px;
-  padding: 40px 45px;
-  backdrop-filter: blur(24px);
+  border-radius: 38px;
+  padding: 50px 56px;
+  backdrop-filter: blur(30px);
   box-shadow:
-    0 0 80px rgba(0,200,83,0.07),
-    0 24px 64px rgba(0,0,0,0.5),
+    0 0 100px rgba(0,200,83,0.07),
+    0 30px 80px rgba(0,0,0,0.5),
     inset 0 1px 0 rgba(255,255,255,0.07);
-  display: flex; flex-direction: column; gap: 28px;
+  display: flex; flex-direction: column; gap: 35px;
   position: relative; overflow: hidden;
 }
 .spl-card::before {
   content: ''; position: absolute; pointer-events: none;
-  width: 325px; height: 325px; border-radius: 50%;
+  width: 406px; height: 406px; border-radius: 50%;
   background: radial-gradient(circle, rgba(0,200,83,0.1) 0%, transparent 70%);
-  top: -100px; right: -75px;
+  top: -125px; right: -94px;
 }
 .spl-card::after {
   content: ''; position: absolute; pointer-events: none;
-  width: 200px; height: 200px; border-radius: 50%;
+  width: 250px; height: 250px; border-radius: 50%;
   background: radial-gradient(circle, rgba(0,200,83,0.06) 0%, transparent 70%);
-  bottom: -63px; left: -38px;
+  bottom: -79px; left: -48px;
 }
 
 /* Branding row */
-.spl-brand-row { display: flex; align-items: center; gap: 23px; }
+.spl-brand-row { display: flex; align-items: center; gap: 29px; }
 .spl-brand-icon {
-  width: 78px; height: 78px; border-radius: 23px; overflow: hidden; flex-shrink: 0;
+  width: 98px; height: 98px; border-radius: 29px; overflow: hidden; flex-shrink: 0;
   box-shadow: 0 10px 35px rgba(0,200,83,0.3), 0 0 0 1px rgba(0,200,83,0.22);
 }
-.spl-brand-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 23px; display: block; }
+.spl-brand-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 29px; display: block; }
 .spl-brand-name {
-  font-size: 33px; font-weight: 800;
+  font-size: 41px; font-weight: 800;
   color: #e8f5ed; letter-spacing: -0.5px; line-height: 1.1;
 }
 .spl-brand-name span { color: #00C853; }
 .spl-brand-tagline {
-  font-size: 13px; color: rgba(0,200,83,0.45);
-  letter-spacing: 0.4px; font-family: 'DM Mono', monospace; margin-top: 4px;
+  font-size: 16px; color: rgba(0,200,83,0.45);
+  letter-spacing: 0.4px; font-family: 'DM Mono', monospace; margin-top: 5px;
 }
 
 /* Progress bar */
-.spl-pbar-row { display: flex; align-items: center; gap: 18px; }
+.spl-pbar-row { display: flex; align-items: center; gap: 23px; }
 .spl-pbar-track {
-  flex: 1; height: 5px;
+  flex: 1; height: 6px;
   background: rgba(255,255,255,0.07);
   border-radius: 8px; overflow: hidden;
 }
@@ -1120,61 +1120,61 @@ body {
   100% { background-position: 0% center; }
 }
 .spl-pct {
-  font-size: 15px; font-weight: 700; color: #00C853;
-  font-family: 'DM Mono', monospace; width: 48px; text-align: right; flex-shrink: 0;
+  font-size: 19px; font-weight: 700; color: #00C853;
+  font-family: 'DM Mono', monospace; width: 60px; text-align: right; flex-shrink: 0;
 }
 
 /* Status line */
 .spl-tip {
-  font-family: 'DM Mono', monospace; font-size: 13px;
+  font-family: 'DM Mono', monospace; font-size: 16px;
   color: rgba(0,200,83,0.45); letter-spacing: 0.3px;
-  min-height: 15px; transition: opacity 0.3s ease;
+  min-height: 19px; transition: opacity 0.3s ease;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
 /* Bottom info */
 .spl-bottom {
   display: flex; flex-direction: column; align-items: center;
-  gap: 18px; z-index: 1; width: 100%; max-width: 575px;
+  gap: 23px; z-index: 1; width: 100%; max-width: 719px;
 }
 .spl-info-grid {
   display: flex; width: 100%;
   background: rgba(255,255,255,0.025);
   border: 1px solid rgba(0,200,83,0.1);
-  border-radius: 18px; overflow: hidden;
+  border-radius: 23px; overflow: hidden;
 }
 .spl-info-col {
-  display: flex; flex-direction: column; gap: 3px;
-  padding: 14px 20px; text-align: center; flex: 1;
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 18px 25px; text-align: center; flex: 1;
 }
 .spl-info-col:not(:last-child) { border-right: 1px solid rgba(0,200,83,0.08); }
 .spl-info-label {
-  font-size: 9px; color: rgba(0,200,83,0.35);
-  font-family: 'DM Mono', monospace; letter-spacing: 1.5px; text-transform: uppercase;
+  font-size: 11px; color: rgba(0,200,83,0.35);
+  font-family: 'DM Mono', monospace; letter-spacing: 1.9px; text-transform: uppercase;
 }
 .spl-info-val {
-  font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.55;
+  font-size: 15px; color: rgba(255,255,255,0.45); line-height: 1.55;
 }
 .spl-info-val a { color: rgba(0,200,83,0.65); text-decoration: none; font-weight: 600; }
 .spl-info-val a:hover { color: #00C853; }
 .spl-wa-chip {
   display: inline-flex; align-items: center; gap: 4px;
-  padding: 2px 8px; background: rgba(0,200,83,0.08);
-  border: 1px solid rgba(0,200,83,0.18); border-radius: 20px;
-  color: rgba(0,200,83,0.65); font-size: 11px; font-weight: 600;
+  padding: 3px 10px; background: rgba(0,200,83,0.08);
+  border: 1px solid rgba(0,200,83,0.18); border-radius: 25px;
+  color: rgba(0,200,83,0.65); font-size: 14px; font-weight: 600;
   font-family: 'DM Mono', monospace; text-decoration: none;
-  transition: all 0.15s; margin-left: 4px;
+  transition: all 0.15s; margin-left: 5px;
 }
 .spl-wa-chip:hover { background: rgba(0,200,83,0.15); color: #00C853; }
 
 /* Masuk button */
 .spl-btn-masuk {
-  padding: 16px 75px;
+  padding: 20px 94px;
   background: linear-gradient(135deg, #00963a 0%, #00C853 100%);
-  color: #fff; border: none; border-radius: 50px;
-  font-size: 19px; font-weight: 700;
+  color: #fff; border: none; border-radius: 63px;
+  font-size: 24px; font-weight: 700;
   cursor: pointer; font-family: 'Sora', sans-serif; letter-spacing: 0.3px;
-  box-shadow: 0 6px 28px rgba(0,200,83,0.4);
+  box-shadow: 0 8px 35px rgba(0,200,83,0.4);
   transition: transform 0.15s, box-shadow 0.15s; display: none;
 }
 .spl-btn-masuk.ready { display: inline-flex; align-items: center; gap: 8px; animation: spl-appear 0.4s ease forwards; }
@@ -1216,14 +1216,14 @@ body {
 /* ════ SPLASH TIP — Rotating hacker ads ════ */
 .spl-tip {
   font-family: 'DM Mono', monospace;
-  font-size: 12px;
+  font-size: 15px;
   color: rgba(0, 200, 83, 0.48);
   letter-spacing: 0.6px;
   text-align: center;
   z-index: 1;
   min-height: 1.4em;
-  padding: 0 20px;
-  max-width: 720px;
+  padding: 0 25px;
+  max-width: 900px;
   width: 100%;
   opacity: 0;
   transition: opacity 0.34s ease;
