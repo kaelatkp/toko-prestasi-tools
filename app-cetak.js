@@ -26,13 +26,12 @@ const ALL_SIZES = {
   // ── Kertas Standar ──
   'a5':       { label: 'A5',         wMM: 148,   hMM: 210 },
   'a4':       { label: 'A4',         wMM: 210,   hMM: 297 },
+  'f4':       { label: 'F4',         wMM: 215,   hMM: 330 },
 };
 
 const PAPER_SIZES = {
   'A4':  { w: 210, h: 297, label: 'A4 — 210×297mm' },
   'F4':  { w: 215, h: 330, label: 'F4 — 215×330mm' },
-  '10R': { w: 254, h: 305, label: '10R — 254×305mm (foto)' },
-  'A3':  { w: 297, h: 420, label: 'A3 — 297×420mm' },
 };
 const PAPER_MARGIN_MM = 3;
 function getPaperW() { return PAPER_SIZES[printSettings.paperSize]?.w || 210; }
