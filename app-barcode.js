@@ -322,7 +322,7 @@ function bcRenderPreview() {
            </div>`
         : `<div style="width:${tw}px;height:${bcH}px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#aaa;">no barcode</div>`;
 
-      const innerCard = `<div style="width:${cardW}px;height:${cardH}px;background:#fff;border:0.8px solid #d0d0d0;display:flex;flex-direction:column;overflow:hidden;font-family:Arial,Helvetica,sans-serif;box-sizing:border-box;">
+      const innerCard = `<div style="width:${cardW}px;height:${cardH}px;background:#fff;border:0.8px dashed #555;display:flex;flex-direction:column;overflow:hidden;font-family:Arial,Helvetica,sans-serif;box-sizing:border-box;">
         <div style="background:#fff;height:${stripH}px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 ${padH}px;gap:3px;border-bottom:1.5px solid #00C853;">
           <span style="font-size:${fsBy + 1}px;font-weight:800;color:#0f1f14;letter-spacing:0.6px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;">${bcX(namaToko)}</span>
           ${createdBy ? `<span style="font-size:${fsBy}px;font-weight:700;color:#2e7d50;letter-spacing:0.3px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;max-width:45%;">${bcX(createdBy)}</span>` : ''}

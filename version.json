@@ -1,16 +1,16 @@
 {
-  "version": "2.5",
+  "version": "2.6",
   "files": {
-    "index.html": "017e0737c24009366d01b583a802c7a8c8757e201759caeeaa2af0f9eb6bcb14",
+    "index.html": "8400efc9312056111dd84325134a6484bfbed968b02853269032c7721cb1782a",
     "tokens.css": "9c71d7ef8eb3dff5bd05a2cad5b18425cd73acf03c7cf4a1bd80827d76e64008",
     "config.js": "8709f3637aea0ebf52434acea01f1c3b9005b8e6b2588b342c327e7b9ab8ba6e",
-    "app-core.js": "7cac9afd0fcefea55137db9409544aced2af54874ff44a1e8eb9697fef36a467",
+    "app-core.js": "a3bb4b87ce4d341f74fcaade483a661a85d839ded06fcb98efee09d017c5fbf6",
     "app-foto.js": "e389bd0d560de9099ad2f7aa099460be6d26e137843ec6ed7653539ab7711925",
     "app-dokumen.js": "6bd143aa9a5f3dd6429669160408bae9314eb95f8b47c42b0ba1117e9bb84eb2",
-    "app-barcode.js": "3f45b5c83f3ecc1698951d0da7734d39934457003baa33eaf5446792174d9f99",
+    "app-barcode.js": "638744abae3b1f4de541b0a88c71930f234808741e444abcec522fb4ce650ca5",
     "app-screensaver.js": "466fa97248344257940eb9d26eb4bbe0b148fba89fb65d9b1393daebdd9be79b",
-    "app-cetak.js": "e2e040d6eeff0e7d42e2f46698595ef57ec738b6596e0347bcd7358fed753f9c",
-    "cetak.html": "87246f4bbf01586cc73bd371c993d22797b672f64baa31b735dd7efc08149fed",
-    "barcode.html": "13c8bde05d792a820fd438e7b794854e77bf45dd5e35f08ece96f433cab6b0c0"
+    "app-cetak.js": "4649f9fbae408c538b7372e7ac25ea5351c9d08a60b9fa638d728c0f9d2747a0",
+    "cetak.html": "e546f7b38d5dd93c5554477976176aa773a6e0477685bd77cd7a1601fc3c3080",
+    "barcode.html": "e879453934cfe19881ca1a16efc9dc62731351d64b5ee7a8b6d96ed38535c56d"
   }
 }

@@ -949,6 +949,7 @@ async function packAndPrint() {
       photo.className = 'print-photo';
       photo.style.cssText = `left:${x}mm; top:${y}mm; width:${w}mm; height:${h}mm;`;
       if (printSettings.cellBorder) photo.style.outline = '0.4mm solid #333';
+      if (printSettings.cutLines) photo.style.outline = '0.5mm dashed #555';
 
       const img = document.createElement('img');
       img.src = rotated ? (rotCache.get(item.dataURL) || item.dataURL) : item.dataURL;
@@ -958,46 +959,8 @@ async function packAndPrint() {
       page.appendChild(photo);
     });
 
-    // Cut lines SVG — barcode style: dashed lines through gaps between photos
-    if (printSettings.cutLines && pageItems.length > 1) {
-      const GAP = printSettings.gap;
-      const dashSt = 'stroke:#555;stroke-width:0.4;stroke-dasharray:4,3;fill:none;';
-
-      // Group by row (same y)
-      const rowMap = new Map();
-      pageItems.forEach(it => {
-        if (!rowMap.has(it.y)) rowMap.set(it.y, []);
-        rowMap.get(it.y).push(it);
-      });
-      const rows = [...rowMap.entries()]
-        .sort((a, b) => a[0] - b[0])
-        .map(([ry, items]) => ({ ry, items: items.sort((a, b) => a.x - b.x) }));
-
-      let svgLines = '';
-
-      rows.forEach(({ ry, items }) => {
-        const rowH = Math.max(...items.map(i => i.h));
-        const y1 = ry, y2 = ry + rowH;
-        for (let i = 0; i < items.length - 1; i++) {
-          const cx = items[i].x + items[i].w + GAP / 2;
-          svgLines += `<line x1="${cx}mm" y1="${y1}mm" x2="${cx}mm" y2="${y2}mm" style="${dashSt}"/>`;
-        }
-      });
-
-      for (let r = 0; r < rows.length - 1; r++) {
-        const { ry, items } = rows[r];
-        const rowH = Math.max(...items.map(i => i.h));
-        const cy = ry + rowH + GAP / 2;
-        const x1 = Math.min(...items.map(i => i.x));
-        const x2 = Math.max(...items.map(i => i.x + i.w));
-        svgLines += `<line x1="${x1}mm" y1="${cy}mm" x2="${x2}mm" y2="${cy}mm" style="${dashSt}"/>`;
-      }
-
-      const svgWrap = document.createElement('div');
-      svgWrap.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:visible;';
-      svgWrap.innerHTML = `<svg width="${getPaperW()}mm" height="${getPaperH()}mm" overflow="visible" xmlns="http://www.w3.org/2000/svg">${svgLines}</svg>`;
-      page.appendChild(svgWrap);
-    }
+    // Cut lines: dashed outline per foto (works for 1 or more photos)
+    // Outline sudah ditambahkan ke setiap photo.style di atas
 
     printArea.appendChild(page);
   });
@@ -1159,45 +1122,19 @@ async function renderLayoutPreview() {
       }
     });
 
-    // Cut lines — barcode style: dashed lines THROUGH gaps between photos
-    if (printSettings.cutLines && pageItems.length > 1) {
-      // Group items by row (same y = same shelf)
-      const rowMap = new Map();
-      pageItems.forEach(it => {
-        if (!rowMap.has(it.y)) rowMap.set(it.y, []);
-        rowMap.get(it.y).push(it);
-      });
-      const rows = [...rowMap.entries()]
-        .sort((a, b) => a[0] - b[0])
-        .map(([ry, items]) => ({ ry, items: items.sort((a, b) => a.x - b.x) }));
-
-      const GAP = printSettings.gap;
+    // Cut lines preview — dashed rect keliling setiap foto (works for 1 or more)
+    if (printSettings.cutLines) {
       lctx.save();
       lctx.strokeStyle = '#555';
       lctx.lineWidth = 0.8;
       lctx.setLineDash([4, 3]);
-
-      rows.forEach(({ ry, items }) => {
-        const rowH = Math.max(...items.map(i => i.h));
-        const y1 = Math.round(oY + ry * scale);
-        const y2 = Math.round(oY + (ry + rowH) * scale);
-        // Vertical lines between horizontally adjacent items
-        for (let i = 0; i < items.length - 1; i++) {
-          const cx = Math.round((items[i].x + items[i].w + GAP / 2) * scale);
-          lctx.beginPath(); lctx.moveTo(cx, y1); lctx.lineTo(cx, y2); lctx.stroke();
-        }
+      pageItems.forEach(it => {
+        const px = Math.round(it.x * scale);
+        const py = Math.round(oY + it.y * scale);
+        const pw2 = Math.round(it.w * scale);
+        const ph2 = Math.round(it.h * scale);
+        lctx.strokeRect(px + 0.5, py + 0.5, pw2 - 1, ph2 - 1);
       });
-
-      // Horizontal lines between rows
-      for (let r = 0; r < rows.length - 1; r++) {
-        const { ry, items } = rows[r];
-        const rowH = Math.max(...items.map(i => i.h));
-        const cy = Math.round(oY + (ry + rowH + GAP / 2) * scale);
-        const x1 = Math.round(Math.min(...items.map(i => i.x)) * scale);
-        const x2 = Math.round(Math.max(...items.map(i => i.x + i.w)) * scale);
-        lctx.beginPath(); lctx.moveTo(x1, cy); lctx.lineTo(x2, cy); lctx.stroke();
-      }
-
       lctx.setLineDash([]);
       lctx.restore();
     }

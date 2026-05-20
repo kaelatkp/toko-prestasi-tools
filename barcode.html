@@ -34,7 +34,7 @@ body { overflow: hidden; margin: 0; }
 
 /* ── SIDEBAR ── */
 .bc-win-sidebar {
-  width: 260px; flex-shrink: 0; display: flex; flex-direction: column;
+  width: 33.333%; flex-shrink: 0; display: flex; flex-direction: column;
   border-right: 1.5px solid var(--border); background: var(--bg-2); overflow: hidden;
 }
 .bc-win-sidebar-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
@@ -66,6 +66,22 @@ body { overflow: hidden; margin: 0; }
 .bc-win-footer-sep { color: var(--border-2); }
 .idle-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: idle-pulse 2s ease-in-out infinite; }
 @keyframes idle-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+
+/* ── SIDEBAR OVERRIDES (narrow 260px sidebar) ── */
+/* 4-col grid terlalu sempit → pakai 2-col 2×2 agar label tidak wrap */
+.bc-win-sidebar .bc-grid-fields-4 {
+  grid-template-columns: 1fr 1fr !important;
+}
+/* Layout top-row: beri Ukuran lebih ruang, kecilkan orientasi & reset */
+.bc-win-sidebar .bc-layout-top-row {
+  flex-wrap: nowrap; gap: 6px;
+}
+.bc-win-sidebar .bc-layout-top-row .bc-field-wrap:first-child { flex: 1.6; min-width: 0; }
+.bc-win-sidebar .bc-layout-top-row .bc-field-wrap:first-child select { width: 100%; }
+.bc-win-sidebar .bc-orient-btn { padding: 4px 7px; }
+.bc-win-sidebar .bc-btn-reset { white-space: nowrap; font-size: 9.5px; }
+/* Section header spacing */
+.bc-win-sidebar .bc-section-header { font-size: 9.5px; }
 
 /* ── PRINT ── */
 @media print {
@@ -192,23 +208,32 @@ body { overflow: hidden; margin: 0; }
   <!-- FOOTER -->
   <footer class="bc-win-footer">
     <div class="bc-win-footer-left">
-      <span><strong class="bc-win-footer-brand">Toko Prestasi Tools</strong> <span class="bc-win-footer-ver">v2.5</span></span>
+      <span>🧰 <strong class="bc-win-footer-brand">Toko Prestasi Tools</strong> <span class="bc-win-footer-ver">v2.6</span></span>
       <span class="bc-win-footer-sep">·</span>
-      <span>Nexus Forge</span>
-      <span class="bc-win-footer-sep">·</span>
-      <span>Jl. Poros Sp 4, Kongbeng, Kutai-Timur</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span class="idle-dot"></span><span>Aktif</span></span>
     </div>
     <div class="bc-win-footer-right">
-      <span class="idle-dot"></span>
-      <span>Aktif</span>
+      <span>Nexus Forge</span>
+      <span class="bc-win-footer-sep">·</span>
+      <span id="bc-footer-clock">—</span>
     </div>
   </footer>
 
 </div><!-- /wrap -->
 
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="app-barcode.js"></script>
 <script>
   initBarcode();
+  (function(){
+    function tickClock(){
+      const el = document.getElementById('bc-footer-clock');
+      if(!el) return;
+      const now = new Date();
+      el.textContent = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    }
+    tickClock(); setInterval(tickClock, 1000);
+  })();
 </script>
 </body>
 </html>
