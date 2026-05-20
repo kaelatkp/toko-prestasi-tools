@@ -389,17 +389,41 @@ body {
 .ws-body::-webkit-scrollbar-thumb:hover { background: var(--green); }
 .ws-body { scrollbar-width: auto; scrollbar-color: var(--green-mid) transparent; }
 
+@keyframes proses-fire {
+  0%   {
+    box-shadow: 0 0 10px #ff5500, 0 0 24px rgba(255,55,0,.75), 0 0 48px rgba(255,20,0,.4);
+    background-position: 0% 50%;
+    transform: scale(1);
+  }
+  50%  {
+    box-shadow: 0 0 22px #ff1a00, 0 0 48px rgba(255,25,0,.95), 0 0 88px rgba(255,80,0,.6), 0 0 6px rgba(255,230,0,.65);
+    background-position: 100% 50%;
+    transform: scale(1.025);
+  }
+  100% {
+    box-shadow: 0 0 10px #ff5500, 0 0 24px rgba(255,55,0,.75), 0 0 48px rgba(255,20,0,.4);
+    background-position: 0% 50%;
+    transform: scale(1);
+  }
+}
 .btn-proses {
   display: flex; align-items: center; gap: 8px;
   background: var(--green); color: var(--white);
   border: none; border-radius: 10px; padding: 11px 22px;
   font-size: 13px; font-weight: 700; cursor: pointer;
-  font-family: 'Sora', sans-serif; transition: all .15s;
+  font-family: 'Sora', sans-serif;
+  transition: background .15s, opacity .15s;
   box-shadow: var(--shadow-green);
 }
-.btn-proses:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
-.btn-proses:active:not(:disabled) { transform: translateY(0); }
-.btn-proses:disabled { background: #c0ccc4; box-shadow: none; cursor: not-allowed; opacity: 0.7; }
+.btn-proses:not(:disabled) {
+  background: linear-gradient(135deg, #ff6a00 0%, #ee0979 45%, #ff6a00 100%) !important;
+  background-size: 200% 200% !important;
+  animation: proses-fire 1.1s ease-in-out infinite !important;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.35);
+}
+.btn-proses:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-2px) scale(1.03) !important; }
+.btn-proses:active:not(:disabled) { transform: translateY(0) scale(0.98) !important; }
+.btn-proses:disabled { background: #c0ccc4 !important; box-shadow: none !important; cursor: not-allowed; opacity: 0.6; animation: none !important; }
 .btn-reset {
   background: none; border: 1.5px solid var(--border);
   border-radius: 10px; padding: 10px 16px;
@@ -1026,60 +1050,60 @@ body {
   position: absolute; inset: 0; z-index: 10;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  padding: 32px; gap: 24px;
+  padding: 40px; gap: 30px;
   opacity: 0; transition: opacity 0.45s ease;
 }
 #spl-main.visible { opacity: 1; }
 
 /* Center glass card */
 .spl-card {
-  width: 100%; max-width: 460px;
+  width: 100%; max-width: 575px;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(0,200,83,0.2);
-  border-radius: 24px;
-  padding: 32px 36px;
+  border-radius: 30px;
+  padding: 40px 45px;
   backdrop-filter: blur(24px);
   box-shadow:
     0 0 80px rgba(0,200,83,0.07),
     0 24px 64px rgba(0,0,0,0.5),
     inset 0 1px 0 rgba(255,255,255,0.07);
-  display: flex; flex-direction: column; gap: 22px;
+  display: flex; flex-direction: column; gap: 28px;
   position: relative; overflow: hidden;
 }
 .spl-card::before {
   content: ''; position: absolute; pointer-events: none;
-  width: 260px; height: 260px; border-radius: 50%;
+  width: 325px; height: 325px; border-radius: 50%;
   background: radial-gradient(circle, rgba(0,200,83,0.1) 0%, transparent 70%);
-  top: -80px; right: -60px;
+  top: -100px; right: -75px;
 }
 .spl-card::after {
   content: ''; position: absolute; pointer-events: none;
-  width: 160px; height: 160px; border-radius: 50%;
+  width: 200px; height: 200px; border-radius: 50%;
   background: radial-gradient(circle, rgba(0,200,83,0.06) 0%, transparent 70%);
-  bottom: -50px; left: -30px;
+  bottom: -63px; left: -38px;
 }
 
 /* Branding row */
-.spl-brand-row { display: flex; align-items: center; gap: 18px; }
+.spl-brand-row { display: flex; align-items: center; gap: 23px; }
 .spl-brand-icon {
-  width: 62px; height: 62px; border-radius: 18px; overflow: hidden; flex-shrink: 0;
-  box-shadow: 0 8px 28px rgba(0,200,83,0.3), 0 0 0 1px rgba(0,200,83,0.22);
+  width: 78px; height: 78px; border-radius: 23px; overflow: hidden; flex-shrink: 0;
+  box-shadow: 0 10px 35px rgba(0,200,83,0.3), 0 0 0 1px rgba(0,200,83,0.22);
 }
-.spl-brand-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block; }
+.spl-brand-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 23px; display: block; }
 .spl-brand-name {
-  font-size: 26px; font-weight: 800;
+  font-size: 33px; font-weight: 800;
   color: #e8f5ed; letter-spacing: -0.5px; line-height: 1.1;
 }
 .spl-brand-name span { color: #00C853; }
 .spl-brand-tagline {
-  font-size: 10px; color: rgba(0,200,83,0.45);
+  font-size: 13px; color: rgba(0,200,83,0.45);
   letter-spacing: 0.4px; font-family: 'DM Mono', monospace; margin-top: 4px;
 }
 
 /* Progress bar */
-.spl-pbar-row { display: flex; align-items: center; gap: 14px; }
+.spl-pbar-row { display: flex; align-items: center; gap: 18px; }
 .spl-pbar-track {
-  flex: 1; height: 4px;
+  flex: 1; height: 5px;
   background: rgba(255,255,255,0.07);
   border-radius: 8px; overflow: hidden;
 }
@@ -1096,13 +1120,13 @@ body {
   100% { background-position: 0% center; }
 }
 .spl-pct {
-  font-size: 12px; font-weight: 700; color: #00C853;
-  font-family: 'DM Mono', monospace; width: 38px; text-align: right; flex-shrink: 0;
+  font-size: 15px; font-weight: 700; color: #00C853;
+  font-family: 'DM Mono', monospace; width: 48px; text-align: right; flex-shrink: 0;
 }
 
 /* Status line */
 .spl-tip {
-  font-family: 'DM Mono', monospace; font-size: 10px;
+  font-family: 'DM Mono', monospace; font-size: 13px;
   color: rgba(0,200,83,0.45); letter-spacing: 0.3px;
   min-height: 15px; transition: opacity 0.3s ease;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -1111,25 +1135,25 @@ body {
 /* Bottom info */
 .spl-bottom {
   display: flex; flex-direction: column; align-items: center;
-  gap: 14px; z-index: 1; width: 100%; max-width: 460px;
+  gap: 18px; z-index: 1; width: 100%; max-width: 575px;
 }
 .spl-info-grid {
   display: flex; width: 100%;
   background: rgba(255,255,255,0.025);
   border: 1px solid rgba(0,200,83,0.1);
-  border-radius: 14px; overflow: hidden;
+  border-radius: 18px; overflow: hidden;
 }
 .spl-info-col {
   display: flex; flex-direction: column; gap: 3px;
-  padding: 11px 16px; text-align: center; flex: 1;
+  padding: 14px 20px; text-align: center; flex: 1;
 }
 .spl-info-col:not(:last-child) { border-right: 1px solid rgba(0,200,83,0.08); }
 .spl-info-label {
-  font-size: 7px; color: rgba(0,200,83,0.35);
+  font-size: 9px; color: rgba(0,200,83,0.35);
   font-family: 'DM Mono', monospace; letter-spacing: 1.5px; text-transform: uppercase;
 }
 .spl-info-val {
-  font-size: 9.5px; color: rgba(255,255,255,0.45); line-height: 1.55;
+  font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.55;
 }
 .spl-info-val a { color: rgba(0,200,83,0.65); text-decoration: none; font-weight: 600; }
 .spl-info-val a:hover { color: #00C853; }
@@ -1137,7 +1161,7 @@ body {
   display: inline-flex; align-items: center; gap: 4px;
   padding: 2px 8px; background: rgba(0,200,83,0.08);
   border: 1px solid rgba(0,200,83,0.18); border-radius: 20px;
-  color: rgba(0,200,83,0.65); font-size: 9px; font-weight: 600;
+  color: rgba(0,200,83,0.65); font-size: 11px; font-weight: 600;
   font-family: 'DM Mono', monospace; text-decoration: none;
   transition: all 0.15s; margin-left: 4px;
 }
@@ -1145,10 +1169,10 @@ body {
 
 /* Masuk button */
 .spl-btn-masuk {
-  padding: 13px 60px;
+  padding: 16px 75px;
   background: linear-gradient(135deg, #00963a 0%, #00C853 100%);
   color: #fff; border: none; border-radius: 50px;
-  font-size: 15px; font-weight: 700;
+  font-size: 19px; font-weight: 700;
   cursor: pointer; font-family: 'Sora', sans-serif; letter-spacing: 0.3px;
   box-shadow: 0 6px 28px rgba(0,200,83,0.4);
   transition: transform 0.15s, box-shadow 0.15s; display: none;
@@ -1192,14 +1216,14 @@ body {
 /* ════ SPLASH TIP — Rotating hacker ads ════ */
 .spl-tip {
   font-family: 'DM Mono', monospace;
-  font-size: 9.5px;
+  font-size: 12px;
   color: rgba(0, 200, 83, 0.48);
   letter-spacing: 0.6px;
   text-align: center;
   z-index: 1;
   min-height: 1.4em;
   padding: 0 20px;
-  max-width: 600px;
+  max-width: 720px;
   width: 100%;
   opacity: 0;
   transition: opacity 0.34s ease;
@@ -1283,6 +1307,42 @@ body {
 }
 @keyframes pw-numglow-light {
   0%,100%{opacity:1} 50%{opacity:0.7}
+}
+
+/* ════ NET DANGER OVERLAY — vignette koneksi lemah/putus ════ */
+#net-danger {
+  position: fixed; inset: 0; z-index: 9995;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 0 transparent;
+}
+#net-danger.danger-low {
+  animation: net-bleed-low 2.8s ease-in-out infinite;
+}
+#net-danger.danger-offline {
+  animation: net-bleed-offline 1.1s ease-in-out infinite;
+}
+@keyframes net-bleed-low {
+  0%, 100% { box-shadow: inset 0 0 60px 10px rgba(210,30,30,0.22); }
+  50%       { box-shadow: inset 0 0 100px 24px rgba(220,30,30,0.50); }
+}
+@keyframes net-bleed-offline {
+  0%, 100% { box-shadow: inset 0 0 90px 28px rgba(255,20,20,0.58); }
+  50%       { box-shadow: inset 0 0 150px 55px rgba(255,20,20,0.90); }
+}
+#net-danger-msg {
+  position: absolute; bottom: 24px; right: 24px;
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700;
+  color: rgba(255,110,110,0.92);
+  background: rgba(10,0,0,0.60);
+  padding: 4px 14px; border-radius: 20px;
+  border: 1px solid rgba(255,60,60,0.28);
+  letter-spacing: 0.9px; text-transform: uppercase;
+  opacity: 0; transition: opacity 0.7s ease;
+  white-space: nowrap;
+}
+#net-danger.danger-low #net-danger-msg,
+#net-danger.danger-offline #net-danger-msg {
+  opacity: 1;
 }
 
 /* ════ TICKER UPCOMING QUICK-START ════ */
@@ -1763,14 +1823,15 @@ body.cyberpunk-mode .chip { background: rgba(0,229,255,.07); border-color: rgba(
 body.cyberpunk-mode .chip:hover { background: rgba(0,229,255,.14); border-color: #00e5ff; color: #00e5ff; }
 body.cyberpunk-mode .chip.active { background: rgba(0,229,255,.2); border-color: #00e5ff; color: #00e5ff; box-shadow: 0 0 10px rgba(0,229,255,.3); }
 body.cyberpunk-mode .preset-chips-label { color: #3a8fa8; }
-body.cyberpunk-mode .btn-proses {
+body.cyberpunk-mode .btn-proses:not(:disabled) {
   background: linear-gradient(135deg, #00e5ff 0%, #6600ff 100%) !important;
   box-shadow: 0 0 22px rgba(0,229,255,.52), 0 0 44px rgba(102,0,255,.22) !important;
   text-shadow: 0 0 8px rgba(255,255,255,.4);
+  animation: none !important;
 }
 body.cyberpunk-mode .btn-proses:not(:disabled):hover {
   box-shadow: 0 0 34px rgba(0,229,255,.72), 0 0 60px rgba(102,0,255,.35) !important;
-  transform: translateY(-2px);
+  transform: translateY(-2px) !important;
 }
 body.cyberpunk-mode .btn-reset { border-color: rgba(0,229,255,.25) !important; color: #3a8fa8 !important; }
 body.cyberpunk-mode #prompt-text { background: #040b11 !important; border-color: #0d3349 !important; color: #c8f0ff !important; }

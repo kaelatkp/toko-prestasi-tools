@@ -1,11 +1,11 @@
 {
-  "version": "2.6",
+  "version": "2.7",
   "files": {
-    "index.html": "8400efc9312056111dd84325134a6484bfbed968b02853269032c7721cb1782a",
-    "tokens.css": "9c71d7ef8eb3dff5bd05a2cad5b18425cd73acf03c7cf4a1bd80827d76e64008",
+    "index.html": "9376841330a75c95d810d9ca93b21afc670ab992967cf51a349f2cc9f42e10a4",
+    "tokens.css": "aede9f61d1ef6edb01a8d9f0db928a52ee57162d76bb5bb1171212d724f9660d",
     "config.js": "8709f3637aea0ebf52434acea01f1c3b9005b8e6b2588b342c327e7b9ab8ba6e",
-    "app-core.js": "a3bb4b87ce4d341f74fcaade483a661a85d839ded06fcb98efee09d017c5fbf6",
-    "app-foto.js": "e389bd0d560de9099ad2f7aa099460be6d26e137843ec6ed7653539ab7711925",
+    "app-core.js": "b631d8fa499488f56f15cb8b73c19ecdb9fea2b42738dbf2586b559455f18a65",
+    "app-foto.js": "e51ba6bac2b9bb91ec6cb52559ae805e5865bfe75bb95c167c965f1d4611e80c",
     "app-dokumen.js": "6bd143aa9a5f3dd6429669160408bae9314eb95f8b47c42b0ba1117e9bb84eb2",
     "app-barcode.js": "301b7ced00271177de70a9766c56fd16949278c137f493a841bda72899e13b6a",
     "app-screensaver.js": "466fa97248344257940eb9d26eb4bbe0b148fba89fb65d9b1393daebdd9be79b",

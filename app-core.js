@@ -11,7 +11,7 @@ let generatedPrompt = '';
 const GITHUB_RAW = 'https://raw.githubusercontent.com/kaelatkp/toko-prestasi-tools/main';
 
 /* ── CHANGELOG ── */
-const CL_SEEN_KEY = 'tp_cl_seen_v2.6a';
+const CL_SEEN_KEY = 'tp_cl_seen_v2.7';
 let _clData = null;
 
 async function loadChangelog() {
@@ -582,7 +582,7 @@ function startSplashLoading() {
             if (mainEl) {
               requestAnimationFrame(() => requestAnimationFrame(() => mainEl.classList.add('visible')));
             }
-            startMainPhase();
+            startCheckPhase();
           }, 560);
         }, 280);
         return;
@@ -599,14 +599,105 @@ function startSplashLoading() {
     }
     setTimeout(showBiosLine, 180);
   } else {
-    // No preboot element — langsung main
     if (mainEl) mainEl.classList.add('visible');
-    startMainPhase();
+    startCheckPhase();
   }
 
-  /* ══ FASE 3: Main loading (velocity engine + ads + terminal) ══ */
-  function startMainPhase() {
-    const TARGET_MS = r(8500, 11200);
+  /* ── Terminal helper (shared) ── */
+  function addLine(prefix, txt) {
+    if (!termBody) return;
+    const el = document.createElement('div');
+    el.className = 'spl-term-line';
+    const ok = prefix.trim() === 'DONE' || prefix.trim() === 'OK';
+    const pc = ok ? '#00e676' : 'rgba(0,200,83,0.38)';
+    const tc = ok ? '#00e676' : 'rgba(0,200,83,0.82)';
+    el.innerHTML = `<span class="spl-term-prefix" style="color:${pc}">[${prefix}]</span> <span style="color:${tc}">${txt}</span>`;
+    termBody.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('visible')));
+    const all = termBody.querySelectorAll('.spl-term-line');
+    if (all.length > 6) Array.from(all).slice(0, all.length - 6).forEach(l => { l.style.opacity = '0.2'; });
+    if (all.length > 9) all[0].remove();
+    termBody.scrollTop = termBody.scrollHeight;
+  }
+
+  /* ══ FASE 3: Cek Update (5 detik wajib) ══ */
+  function startCheckPhase() {
+    fill.style.width = '0%';
+    if (pctEl) pctEl.textContent = '0%';
+    if (tipEl) { tipEl.textContent = '🔄 Memeriksa pembaruan...'; tipEl.style.opacity = '1'; }
+
+    const CHECK_MSGS = [
+      ['NET ', 'Menghubungkan ke server GitHub...'],
+      ['CHK ', 'Memeriksa version.json dari repository...'],
+      ['HASH', 'Menghitung hash file lokal...'],
+      ['SYNC', 'Membandingkan dengan versi terbaru...'],
+      ['OK  ', 'Pemeriksaan selesai'],
+    ];
+    CHECK_MSGS.forEach(([p, t], i) =>
+      setTimeout(() => addLine(p, t), 300 + (5000 / CHECK_MSGS.length) * i));
+
+    function buildCheckCurve() {
+      const pts = [{ t: 0, p: 0 }];
+      let t = 0, p = 0;
+      while (p < 100) {
+        const roll = Math.random();
+        let speed, dur;
+        if      (roll < 0.15) { speed = 0;        dur = r(0.3, 0.8); }
+        else if (roll < 0.50) { speed = r(8, 16); dur = r(0.3, 0.6); }
+        else                  { speed = r(18, 28); dur = r(0.2, 0.4); }
+        t += dur; p = Math.min(p + speed * dur, 100);
+        pts.push({ t, p });
+      }
+      const scale = 5 / pts[pts.length - 1].t;
+      return pts.map(pt => ({ t: pt.t * scale, p: pt.p }));
+    }
+    const checkCurve = buildCheckCurve();
+    let cst = null, ccp = 0;
+    function checkTick(now) {
+      if (!cst) cst = now;
+      const elapsed = (now - cst) / 1000;
+      while (ccp < checkCurve.length - 1 && elapsed >= checkCurve[ccp + 1].t) ccp++;
+      let pct;
+      if (ccp >= checkCurve.length - 1) {
+        pct = 100;
+      } else {
+        const { t: t0, p: p0 } = checkCurve[ccp], { t: t1, p: p1 } = checkCurve[ccp + 1];
+        const seg = t1 - t0, a = seg > 0 ? Math.min((elapsed - t0) / seg, 1) : 1;
+        pct = p0 + (p1 - p0) * a * a * (3 - 2 * a);
+      }
+      fill.style.width = pct + '%';
+      if (pctEl) pctEl.textContent = Math.floor(pct) + '%';
+      if (pct < 100) {
+        requestAnimationFrame(checkTick);
+      } else {
+        fill.style.width = '100%';
+        if (pctEl) pctEl.textContent = '100%';
+        setTimeout(() => {
+          if (window._splashUpdateData) {
+            if (tipEl) {
+              tipEl.style.opacity = '0';
+              setTimeout(() => { tipEl.textContent = '⚡ Update tersedia — terapkan untuk melanjutkan'; tipEl.style.opacity = '1'; }, 300);
+            }
+            setTimeout(() => showSplashUpdateRequired(window._splashUpdateData), 700);
+          } else {
+            addLine('OK  ', 'Versi sudah terbaru — melanjutkan loading sistem...');
+            if (tipEl) {
+              tipEl.style.opacity = '0';
+              setTimeout(() => { tipEl.textContent = '✅ Versi sudah terbaru'; tipEl.style.opacity = '1'; }, 300);
+            }
+            fill.style.width = '0%';
+            if (pctEl) pctEl.textContent = '0%';
+            setTimeout(startMainLoadPhase, 1400);
+          }
+        }, 400);
+      }
+    }
+    requestAnimationFrame(checkTick);
+  }
+
+  /* ══ FASE 4: Main loading (10 detik → beranda) ══ */
+  function startMainLoadPhase() {
+    const TARGET_MS = 10000;
 
     // Status messages — tampil di spl-tip (status line di card)
     const ADS = [
@@ -617,7 +708,7 @@ function startSplashLoading() {
       'Menghubungkan ke Claude AI · Gemini · ChatGPT — tanpa API key...',
       'Zero API mode aktif — tidak ada biaya tersembunyi, tidak ada batas kuota...',
       'Mengaktifkan auto-fill tanggal & kota — hemat waktu setiap generate...',
-      'Prompt engine v2.3 siap — output terstruktur dan konsisten...',
+      'Prompt engine v2.6 siap — output terstruktur dan konsisten...',
       'CROP_RULE aktif — canvas margin +15% untuk hasil crop optimal...',
       'Toko Prestasi · Jl. Poros Sp 4, Kongbeng, Kutai-Timur · 07:00–21:00',
       'Dibangun oleh Nexus Forge Team — kritik & saran: 0812-99-303-888',
@@ -633,32 +724,17 @@ function startSplashLoading() {
 
     // Terminal messages
     const MSGS = [
-      ['BOOT', 'Menginisialisasi Toko Prestasi Tools v2.3...'],
+      ['BOOT', 'Menginisialisasi Toko Prestasi Tools v2.6...'],
       ['LOAD', 'Memuat komponen antarmuka utama...'],
       ['MOD ', 'Mendaftarkan 25 modul foto ke sistem...'],
       ['MOD ', 'Mendaftarkan 28 jenis dokumen ATK...'],
       ['RULE', 'Mengaktifkan WAJAH_RULE — proteksi identitas ON'],
-      ['ENG ', 'Menginisialisasi prompt engine v2.3...'],
+      ['ENG ', 'Menginisialisasi prompt engine v2.6...'],
       ['SYNC', 'Menyinkronkan preset chips & template dokumen...'],
       ['CODE', 'Memuat barcode engine CODE128A v3.11...'],
       ['NET ', 'Menghubungkan: Claude AI · Gemini · ChatGPT...'],
       ['DONE', 'Semua sistem beroperasi — masuk otomatis...'],
     ];
-    function addLine(prefix, txt) {
-      if (!termBody) return;
-      const el = document.createElement('div');
-      el.className = 'spl-term-line';
-      const ok = prefix.trim() === 'DONE';
-      const pc = ok ? '#00e676' : 'rgba(0,200,83,0.38)';
-      const tc = ok ? '#00e676' : 'rgba(0,200,83,0.82)';
-      el.innerHTML = `<span class="spl-term-prefix" style="color:${pc}">[${prefix}]</span> <span style="color:${tc}">${txt}</span>`;
-      termBody.appendChild(el);
-      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('visible')));
-      const all = termBody.querySelectorAll('.spl-term-line');
-      if (all.length > 6) Array.from(all).slice(0, all.length - 6).forEach(l => { l.style.opacity = '0.2'; });
-      if (all.length > 9) all[0].remove();
-      termBody.scrollTop = termBody.scrollHeight;
-    }
     MSGS.forEach(([p, t], i) => setTimeout(() => addLine(p, t), 300 + (TARGET_MS / MSGS.length) * i));
 
     // Velocity curve (random walk → normalisasi ke TARGET_MS)
@@ -701,13 +777,7 @@ function startSplashLoading() {
         clearInterval(adTimer);
         fill.style.width = '100%';
         if (pctEl) pctEl.textContent = '100%';
-        setTimeout(() => {
-          if (window._splashUpdateData) {
-            showSplashUpdateRequired(window._splashUpdateData);
-          } else {
-            appMasuk();
-          }
-        }, 750);
+        setTimeout(appMasuk, 750);
       }
     }
     requestAnimationFrame(tick);
@@ -1064,6 +1134,21 @@ function initPingWidget() {
     if (dotEl) dotEl.style.animation = dotAnim;
     if (numEl) numEl.style.animation = numAnim;
     barEls.forEach((b, i) => { if (b) b.classList.toggle('active', i < bars); });
+    updateNetDanger(ms);
+  }
+
+  function updateNetDanger(ms) {
+    const overlay = document.getElementById('net-danger');
+    const msgEl   = document.getElementById('net-danger-msg');
+    if (!overlay) return;
+    overlay.classList.remove('danger-low', 'danger-offline');
+    if (ms === null) {
+      overlay.classList.add('danger-offline');
+      if (msgEl) msgEl.textContent = '✕ Koneksi Terputus';
+    } else if (ms >= 300) {
+      overlay.classList.add('danger-low');
+      if (msgEl) msgEl.textContent = ms >= 500 ? '⚠ Koneksi Sangat Lemah' : '⚠ Koneksi Lemah';
+    }
   }
 
   async function doPing() {

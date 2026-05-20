@@ -1,6 +1,19 @@
 {
   "updates": [
     {
+      "version": "2.7",
+      "date": "20 Mei 2026",
+      "notes": [
+        "Flash Login: tampilan card diperbesar 25% — lebih lega dan terbaca",
+        "Flash Login: fase cek pembaruan 5 detik (animasi bar + pesan terminal)",
+        "Flash Login: jika ada update — wajib tekan TERAPKAN, tidak bisa ke beranda",
+        "Flash Login: animasi download minimal 5 detik, lalu auto-login ke beranda",
+        "Flash Login: jika sudah terbaru — info ✅ lalu loading 10 detik normal",
+        "Prompt Foto: tombol Generate Prompt menyala brutal terbakar 🔥 saat aktif",
+        "Prompt Foto: opsi 'Sudah Berseragam ✓' — AI hanya ganti background & reposisi"
+      ]
+    },
+    {
       "version": "2.6",
       "date": "20 Mei 2026",
       "notes": [

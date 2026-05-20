@@ -296,6 +296,13 @@ const BAJU_DOKUMEN = {
   seragam_smp:       { label: 'Seragam SMP — Putih Biru',    seragam: true, search: 'seragam SMP putih biru Indonesia',  prompt_m: 'Apply the school uniform EXACTLY as shown in the reference photo (Photo 2) — replicate uniform design, colors, and attributes precisely. DO NOT guess or invent the uniform.', prompt_f: 'Apply the school uniform EXACTLY as shown in the reference photo (Photo 2) — replicate uniform design, colors, and attributes precisely. DO NOT guess or invent the uniform.' },
   seragam_sma:       { label: 'Seragam SMA / SMK — Putih Abu', seragam: true, search: 'seragam SMA SMK putih abu Indonesia', prompt_m: 'Apply the school uniform EXACTLY as shown in the reference photo (Photo 2) — replicate uniform design, colors, and attributes precisely. DO NOT guess or invent the uniform.', prompt_f: 'Apply the school uniform EXACTLY as shown in the reference photo (Photo 2) — replicate uniform design, colors, and attributes precisely. DO NOT guess or invent the uniform.' },
   seragam_pramuka:   { label: 'Seragam Pramuka',              seragam: true, search: 'seragam pramuka lengkap Indonesia', prompt_m: 'Apply the scout uniform EXACTLY as shown in the reference photo (Photo 2) — replicate uniform design, colors, and attributes precisely. DO NOT guess or invent the uniform.',  prompt_f: 'Apply the scout uniform EXACTLY as shown in the reference photo (Photo 2) — replicate uniform design, colors, and attributes precisely. DO NOT guess or invent the uniform.' },
+  // ── Sudah berseragam (seragam_ok: true) — hanya ganti background + posisi ──
+  seragam_tk_ok:      { label: 'TK — Sudah Berseragam ✓',       seragam_ok: true, prompt_m: 'The subject is ALREADY wearing the correct TK school uniform. DO NOT change, replace, or modify the uniform in any way — preserve it exactly as worn. Only smooth any visible wrinkles or straighten the collar if needed.', prompt_f: 'The subject is ALREADY wearing the correct TK school uniform. DO NOT change, replace, or modify the uniform in any way — preserve it exactly as worn. Only smooth any visible wrinkles if needed.' },
+  seragam_sd_ok:      { label: 'SD — Sudah Berseragam ✓',       seragam_ok: true, prompt_m: 'The subject is ALREADY wearing the correct SD school uniform (white shirt, red shorts/pants). DO NOT change, replace, or modify the uniform in any way — preserve it exactly as worn. Only smooth visible wrinkles or straighten the collar if needed.', prompt_f: 'The subject is ALREADY wearing the correct SD school uniform (white blouse, red skirt). DO NOT change, replace, or modify the uniform in any way — preserve it exactly as worn. Only smooth visible wrinkles if needed.' },
+  seragam_smp_ok:     { label: 'SMP — Sudah Berseragam ✓',      seragam_ok: true, prompt_m: 'The subject is ALREADY wearing the correct SMP school uniform (white shirt, dark blue pants). DO NOT change, replace, or modify the uniform in any way — preserve it exactly as worn. Only smooth visible wrinkles or straighten the collar if needed.', prompt_f: 'The subject is ALREADY wearing the correct SMP school uniform (white blouse, dark blue skirt). DO NOT change, replace, or modify the uniform in any way — preserve it exactly as worn. Only smooth visible wrinkles if needed.' },
+  seragam_sma_ok:     { label: 'SMA / SMK — Sudah Berseragam ✓', seragam_ok: true, prompt_m: 'The subject is ALREADY wearing the correct SMA/SMK school uniform (white shirt, gray pants). DO NOT change, replace, or modify the uniform in any way — preserve it exactly as worn. Only smooth visible wrinkles or straighten the collar if needed.', prompt_f: 'The subject is ALREADY wearing the correct SMA/SMK school uniform (white blouse, gray skirt). DO NOT change, replace, or modify the uniform in any way — preserve it exactly as worn. Only smooth visible wrinkles if needed.' },
+  seragam_pramuka_ok: { label: 'Pramuka — Sudah Berseragam ✓',  seragam_ok: true, prompt_m: 'The subject is ALREADY wearing the correct Pramuka scout uniform. DO NOT change, replace, or modify the uniform in any way — preserve it exactly as worn, including all badges, neckerchief, and scout attributes.', prompt_f: 'The subject is ALREADY wearing the correct Pramuka scout uniform. DO NOT change, replace, or modify the uniform in any way — preserve it exactly as worn, including all badges, neckerchief, and scout attributes.' },
+  seragam_lain_ok:    { label: 'Seragam Lain — Sudah Benar ✓',  seragam_ok: true, prompt_m: 'The subject is ALREADY wearing the correct school uniform. DO NOT change, replace, or modify the uniform in any way — preserve it exactly as worn. Only smooth visible wrinkles or straighten the collar if needed.', prompt_f: 'The subject is ALREADY wearing the correct school uniform. DO NOT change, replace, or modify the uniform in any way — preserve it exactly as worn. Only smooth visible wrinkles if needed.' },
   almamater_putih:   { label: 'Kemeja Putih + Jas Almamater',  prompt_m: 'white dress shirt with university almamater jacket neatly worn over it, collar visible',                                                                                         prompt_f: 'white blouse with university almamater jacket neatly worn over it, collar visible' },
   blus_almamater:    { label: 'Blus + Jas Almamater',          prompt_m: 'formal collared shirt with university almamater jacket neatly worn over it',                                                                                                         prompt_f: 'formal blouse with university almamater jacket neatly worn over it' },
   jas_dasi_pt:       { label: 'Jas Formal + Dasi',             prompt_m: 'formal suit jacket with a white dress shirt and tie underneath, properly worn and buttoned',                                                                                          prompt_f: 'formal blazer with a neat blouse underneath, properly worn' },
@@ -1595,6 +1602,11 @@ function onBajuDokumenChange(sel) {
     // Simpan ref button tapi hidden — baru tampil setelah gender dipilih
     extra.innerHTML = `<div id="ref-btn-slot-dynamic" style="display:none"><div class="ref-search-row"><span class="ref-search-hint">Belum punya foto referensi seragam?</span><button class="btn-ref-search" onclick="cariReferensiDokumen()">🔍 Cari Referensi</button></div></div>`;
     setUploadNote(`<div class="note-box"><span class="note-icon">📌</span><span>Upload <strong>2 foto</strong> ke platform AI: <strong>(1)</strong> foto orang, <strong>(2)</strong> foto referensi seragam. AI akan menerapkan seragam dari referensi ke orang di foto 1.</span></div>`);
+  } else if (entry?.seragam_ok) {
+    // Sudah berseragam — tidak perlu referensi, cukup 1 foto
+    extra.innerHTML = `<div class="opt-hint" style="color:var(--green);font-weight:600;margin-top:2px;">✅ Seragam sudah benar — AI hanya akan merapikan posisi &amp; mengganti background. Tidak perlu foto referensi.</div>`;
+    setUploadNote(`<div class="note-box"><span class="note-icon">✅</span><span>Upload <strong>1 foto</strong> saja — seragam sudah benar, AI hanya ganti background dan rapikan posisi.</span></div>`);
+    clearRefBtnSlot();
   } else {
     extra.innerHTML = '';
     clearUploadNote();
@@ -1792,14 +1804,22 @@ function renderPasFotoSubOptions() {
   let noteTrail = '';
 
   if (tujuan === 'raport_sek') {
-    const seragamItems = BAJU_DOKUMEN_CATS.seragam.items
+    const seragamGantiItems = BAJU_DOKUMEN_CATS.seragam.items
+      .map(key => `<option value="${key}">${BAJU_DOKUMEN[key]?.label || key}</option>`).join('');
+    const seragamOkKeys = ['seragam_tk_ok','seragam_sd_ok','seragam_smp_ok','seragam_sma_ok','seragam_pramuka_ok','seragam_lain_ok'];
+    const seragamOkItems = seragamOkKeys
       .map(key => `<option value="${key}">${BAJU_DOKUMEN[key]?.label || key}</option>`).join('');
     html += `<div class="opt-group">
       <div class="opt-label">Baju / Pakaian</div>
-      <div class="opt-hint" style="margin-bottom:6px;">Foto sekolah pakai seragam yang berlaku — pilih sesuai jenjang.</div>
+      <div class="opt-hint" style="margin-bottom:6px;">Pilih sesuai kondisi foto — ganti seragam butuh 2 foto, sudah berseragam cukup 1 foto.</div>
       <select class="opt-select" id="baju-dokumen" onchange="onBajuDokumenChange(this)">
         <option value="">— Pilih seragam —</option>
-        ${seragamItems}
+        <optgroup label="📎 Ganti / Terapkan Seragam (upload 2 foto)">
+          ${seragamGantiItems}
+        </optgroup>
+        <optgroup label="✅ Sudah Berseragam — hanya ganti background (1 foto)">
+          ${seragamOkItems}
+        </optgroup>
       </select>
     </div>
     <div id="baju-dokumen-extra"></div>`;
@@ -2900,8 +2920,9 @@ const POSE_LAMARAN = 'Body: fully upright — shoulders squared and level, zero 
 function buildPromptPasFoto() {
   const colorName = getColorName(selectedColor);
   const tujuan    = document.getElementById('tujuan-dokumen')?.value || 'umum';
-  const bajuKey   = document.getElementById('baju-dokumen')?.value || 'existing';
-  const isSeragam = BAJU_DOKUMEN[bajuKey]?.seragam === true;
+  const bajuKey    = document.getElementById('baju-dokumen')?.value || 'existing';
+  const isSeragam  = BAJU_DOKUMEN[bajuKey]?.seragam === true;
+  const isSeragamOk = BAJU_DOKUMEN[bajuKey]?.seragam_ok === true;
   const bajuPrompt = getBajuDokumen();
   const extra     = getExtra();
   const g         = getGender();
@@ -2995,7 +3016,11 @@ ${WAJAH_RULE}`;
   }
 
   const ctx = contexts[tujuan] || contexts.umum;
-  const photoNote = isSeragam ? `You are given 2 photos — Photo 1: the person, Photo 2: reference school uniform. Apply the uniform from Photo 2 onto the person in Photo 1.\n\n` : '';
+  const photoNote = isSeragam
+    ? `You are given 2 photos — Photo 1: the person, Photo 2: reference school uniform. Apply the uniform from Photo 2 onto the person in Photo 1.\n\n`
+    : isSeragamOk
+    ? `The subject is ALREADY wearing the correct school uniform in the photo. The uniform is correct and does NOT need to be changed — only reposition, fix background, and tidy as needed.\n\n`
+    : '';
 
   const clothingContrast = tujuan === 'paspor'  ? ' IMPORTANT: clothing MUST NOT be white — it must clearly contrast with the white background.'
     : tujuan === 'sim'    ? ' Avoid blue clothing that would blend with the blue background.'
