@@ -1,6 +1,7 @@
 {
   "version": "2.7",
   "files": {
+    "changelog.json": "25479c61f6ebed82bb5ac49dcd509c6d99211fa37cbd03dbd9d32e4fa80f80f9",
     "index.html": "9376841330a75c95d810d9ca93b21afc670ab992967cf51a349f2cc9f42e10a4",
     "tokens.css": "aede9f61d1ef6edb01a8d9f0db928a52ee57162d76bb5bb1171212d724f9660d",
     "config.js": "8709f3637aea0ebf52434acea01f1c3b9005b8e6b2588b342c327e7b9ab8ba6e",
