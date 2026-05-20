@@ -354,27 +354,34 @@ function bcRenderPreview() {
     {
       const dashStyle = 'stroke:#555;stroke-width:0.5;stroke-dasharray:4,3;';
       let lines = '';
-      const itemCount   = pageItems.length;
-      const filledRows  = Math.ceil(itemCount / cols);
-      const lastRowCols = itemCount % cols === 0 ? cols : itemCount % cols;
-      // Berapa baris yang penuh (bukan baris parsial terakhir)
-      const fullRowsCount   = lastRowCols === cols ? filledRows : filledRows - 1;
-      const fullRowsBottomY = mgPx + fullRowsCount * (cellH + gpPx) - gpPx / 2;
+      const itemCount     = pageItems.length;
+      const filledRows    = Math.ceil(itemCount / cols);
+      const lastRowCols   = itemCount % cols === 0 ? cols : itemCount % cols;
+      const fullRowsCount = lastRowCols === cols ? filledRows : filledRows - 1;
 
-      // ── Garis horizontal: filledRows+1 garis, melintasi SELURUH lebar kertas
+      // Bounding box konten (termasuk setengah gap di luar sebagai margin potong)
+      const xLeft          = mgPx - gpPx / 2;
+      const xRight         = mgPx + cols * (cellW + gpPx) - gpPx / 2;
+      const xLastRowRight  = mgPx + lastRowCols * (cellW + gpPx) - gpPx / 2;
+      const yTop           = mgPx - gpPx / 2;
+      const yBottom        = mgPx + filledRows * (cellH + gpPx) - gpPx / 2;
+      const yFullRowsBot   = mgPx + fullRowsCount * (cellH + gpPx) - gpPx / 2;
+
+      // ── Garis horizontal: batas atas & bawah setiap baris, dibatasi lebar konten
       for (let r = 0; r <= filledRows; r++) {
-        const cy = mgPx + r * (cellH + gpPx) - gpPx / 2;
-        lines += `<line x1="0" y1="${cy}" x2="${pxW}" y2="${cy}" style="${dashStyle}"/>`;
+        const cy   = mgPx + r * (cellH + gpPx) - gpPx / 2;
+        const xEnd = (r === filledRows && lastRowCols < cols) ? xLastRowRight : xRight;
+        lines += `<line x1="${xLeft}" y1="${cy}" x2="${xEnd}" y2="${cy}" style="${dashStyle}"/>`;
       }
-      // ── Garis vertikal: per kolom terpakai, melintasi SELURUH tinggi kertas
+      // ── Garis vertikal: batas kiri & kanan setiap kolom, dibatasi tinggi konten
       for (let c = 0; c <= cols; c++) {
         const cx = mgPx + c * (cellW + gpPx) - gpPx / 2;
         if (c <= lastRowCols) {
-          // Kolom ada di baris terakhir → span penuh tinggi kertas
-          lines += `<line x1="${cx}" y1="0" x2="${cx}" y2="${pxH}" style="${dashStyle}"/>`;
+          // Kolom ada di baris terakhir → span seluruh tinggi baris terisi
+          lines += `<line x1="${cx}" y1="${yTop}" x2="${cx}" y2="${yBottom}" style="${dashStyle}"/>`;
         } else if (fullRowsCount > 0) {
-          // Kolom hanya di baris-baris penuh → span atas kertas sampai batas baris penuh terakhir
-          lines += `<line x1="${cx}" y1="0" x2="${cx}" y2="${fullRowsBottomY}" style="${dashStyle}"/>`;
+          // Kolom hanya ada di baris penuh → span sampai batas baris parsial
+          lines += `<line x1="${cx}" y1="${yTop}" x2="${cx}" y2="${yFullRowsBot}" style="${dashStyle}"/>`;
         }
       }
       cutLines = `<svg style="position:absolute;inset:0;pointer-events:none;overflow:visible;" width="${pxW}" height="${pxH}" xmlns="http://www.w3.org/2000/svg">${lines}</svg>`;
