@@ -949,7 +949,7 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
 <script src="app-cetak.js"></script>
 
 <!-- FOOTER -->
-<footer class="app-footer">
+<footer class="app-footer no-print">
   <div class="footer-left">
     <span>🧰 <strong class="footer-brand">Toko Prestasi Tools</strong> <span class="footer-ver">v2.6</span></span>
     <span class="footer-sep">·</span>
@@ -961,6 +961,8 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
   <div class="footer-center"></div>
   <div class="footer-right">
     <button class="footer-dev" onclick="openNexusForge()">Nexus Forge</button>
+    <span class="footer-sep">·</span>
+    <button class="btn-bug" onclick="laporkanBug()" title="Laporkan bug ke developer via WhatsApp">🐛 Bug?</button>
     <span class="footer-sep">·</span>
     <span id="cetak-footer-clock">—</span>
   </div>
@@ -974,6 +976,11 @@ input[type=range]::-webkit-slider-thumb:hover { background: var(--green-dark); }
     el.textContent = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   }
   tickClock(); setInterval(tickClock, 1000);
+
+  window.laporkanBug = function() {
+    const msg = '🐛 Bug Report — Toko Prestasi Tools\n\nModul: Cetak Foto\nVersi: v2.6\n\nDeskripsi bug:\n';
+    window.open('https://wa.me/6281299303888?text=' + encodeURIComponent(msg), '_blank');
+  };
 
   window.openNexusForge = function() {
     if (document.getElementById('nexus-modal')) return;

@@ -53,18 +53,24 @@ body { overflow: hidden; margin: 0; }
 .bc-win-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-3); }
 
 /* ── FOOTER ── */
-.bc-win-footer {
+.app-footer {
   flex-shrink: 0; padding: 6px 20px;
   border-top: 1.5px solid var(--border); background: var(--white);
   display: flex; align-items: center; justify-content: space-between;
   font-size: 10px; color: var(--text-2); font-family: 'DM Mono', monospace; letter-spacing: 0.4px;
 }
-.bc-win-footer-left { display: flex; align-items: center; gap: 10px; }
-.bc-win-footer-right { display: flex; align-items: center; gap: 10px; }
-.bc-win-footer-brand { color: var(--green-dark); font-weight: 700; }
-.bc-win-footer-ver { color: var(--text-3); }
-.bc-win-footer-sep { color: var(--border-2); }
-.idle-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: idle-pulse 2s ease-in-out infinite; }
+.footer-left  { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.footer-center{ display: flex; align-items: center; justify-content: center; flex: 1; }
+.footer-right { display: flex; align-items: center; gap: 8px; color: var(--text-3); flex-shrink: 0; }
+.footer-brand { color: var(--green-dark); font-weight: 700; }
+.footer-ver   { color: var(--text-3); font-weight: 400; }
+.footer-sep   { color: var(--border-2); }
+.footer-idle  { display: flex; align-items: center; gap: 5px; }
+.footer-dev   { background: none; border: none; padding: 0; cursor: pointer; color: var(--text-2); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.4px; transition: color .15s; }
+.footer-dev:hover { color: var(--green-dark); text-decoration: underline; }
+.btn-bug      { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-family: 'DM Mono', monospace; font-weight: 600; color: rgba(244,63,94,0.7); background: transparent; border: 1px solid rgba(244,63,94,0.25); border-radius: 6px; padding: 2px 7px; cursor: pointer; letter-spacing: 0.5px; transition: color .2s, border-color .2s, background .2s; }
+.btn-bug:hover{ color: #f43f5e; border-color: rgba(244,63,94,0.6); background: rgba(244,63,94,0.07); }
+.idle-dot     { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: idle-pulse 2s ease-in-out infinite; }
 @keyframes idle-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
 
 /* ── SIDEBAR OVERRIDES (narrow 260px sidebar) ── */
@@ -85,7 +91,7 @@ body { overflow: hidden; margin: 0; }
 
 /* ── PRINT ── */
 @media print {
-  .bc-win-header, .bc-win-sidebar, .bc-win-footer,
+  .bc-win-header, .bc-win-sidebar, .app-footer,
   .bc-stat-bar, .bc-stat-zoom { display: none !important; }
   .bc-win-wrap, .bc-win-body, .bc-win-main { display: block !important; overflow: visible !important; height: auto !important; }
   .bc-paper-wrap { overflow: visible !important; padding: 0 !important; background: none !important; }
@@ -206,15 +212,21 @@ body { overflow: hidden; margin: 0; }
   </div><!-- /body -->
 
   <!-- FOOTER -->
-  <footer class="bc-win-footer">
-    <div class="bc-win-footer-left">
-      <span>🧰 <strong class="bc-win-footer-brand">Toko Prestasi Tools</strong> <span class="bc-win-footer-ver">v2.6</span></span>
-      <span class="bc-win-footer-sep">·</span>
-      <span style="display:flex;align-items:center;gap:5px;"><span class="idle-dot"></span><span>Aktif</span></span>
+  <footer class="app-footer">
+    <div class="footer-left">
+      <span>🧰 <strong class="footer-brand">Toko Prestasi Tools</strong> <span class="footer-ver">v2.6</span></span>
+      <span class="footer-sep">·</span>
+      <div class="footer-idle">
+        <span class="idle-dot"></span>
+        <span>Aktif</span>
+      </div>
     </div>
-    <div class="bc-win-footer-right">
-      <span>Nexus Forge</span>
-      <span class="bc-win-footer-sep">·</span>
+    <div class="footer-center"></div>
+    <div class="footer-right">
+      <button class="footer-dev" onclick="openNexusForge()">Nexus Forge</button>
+      <span class="footer-sep">·</span>
+      <button class="btn-bug" onclick="laporkanBug()" title="Laporkan bug ke developer via WhatsApp">🐛 Bug?</button>
+      <span class="footer-sep">·</span>
       <span id="bc-footer-clock">—</span>
     </div>
   </footer>
@@ -226,13 +238,68 @@ body { overflow: hidden; margin: 0; }
 <script>
   initBarcode();
   (function(){
+    // Clock
     function tickClock(){
       const el = document.getElementById('bc-footer-clock');
       if(!el) return;
-      const now = new Date();
-      el.textContent = now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      el.textContent = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     }
     tickClock(); setInterval(tickClock, 1000);
+
+    // Bug report
+    window.laporkanBug = function() {
+      const msg = '🐛 Bug Report — Toko Prestasi Tools\n\nModul: Barcode Generator\nVersi: v2.6\n\nDeskripsi bug:\n';
+      window.open('https://wa.me/6281299303888?text=' + encodeURIComponent(msg), '_blank');
+    };
+
+    // Nexus Forge modal (identik dengan cetak.html)
+    window.nfLightbox = function(src, caption) {
+      if (document.getElementById('nf-lightbox')) return;
+      const lb = document.createElement('div');
+      lb.id = 'nf-lightbox';
+      lb.style.cssText = 'position:fixed;inset:0;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.85);cursor:zoom-out;padding:20px;';
+      lb.innerHTML = `<img src="${src}" style="max-width:min(420px,90vw);max-height:70vh;border-radius:18px;object-fit:contain;box-shadow:0 24px 80px rgba(0,0,0,.6);display:block;"><div style="margin-top:14px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.75);font-family:'Sora',sans-serif;text-align:center;">${caption}</div><div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.35);font-family:'DM Mono',monospace;">klik mana saja untuk tutup</div>`;
+      lb.addEventListener('click', () => lb.remove());
+      document.body.appendChild(lb);
+    };
+
+    window.openNexusForge = function() {
+      if (document.getElementById('nexus-modal')) return;
+      const ROLES = [
+        { tier:'COMMAND', items:[{ img:'KAELA', name:'KAELA', role:'Lead AI Architect · Command Center · Dispatch' }]},
+        { tier:'WORKFLOW CORE', items:[
+          { img:'CIPHER', name:'CIPHER', role:'Business Analyst · BRD · Acceptance Criteria' },
+          { img:'LYRA',   name:'LYRA',   role:'UX/Design · Wireframe · Design Spec' },
+          { img:'RAVEN',  name:'RAVEN',  role:'Senior Backend Dev · Web Engine · Data Pipeline' },
+          { img:'ZANE',   name:'ZANE',   role:'Frontend Dev · HTML/CSS/JS · Rendering Layer' },
+          { img:'MARCUS', name:'MARCUS', role:'Security Review' },
+        ]},
+        { tier:'QA & SPECIALIST', items:[
+          { img:'DRAKE',  name:'DRAKE',  role:'Debug Specialist · Root Cause Analysis' },
+          { img:'VECTOR', name:'VECTOR', role:'QA Functional Tester' },
+          { img:'PRISM',  name:'PRISM',  role:'Data QA · Verifikasi Kalkulasi Bisnis' },
+        ]},
+        { tier:'SUPPORT', items:[
+          { img:'NOVA', name:'NOVA', role:'Documentation · README · User Guide' },
+          { img:'REED', name:'REED', role:'Patch Archive · Session State · Bug Registry' },
+        ]},
+        { tier:'EKSTERNAL', items:[{ img:'SEIRA', name:'SEIRA', role:'Brainstorm · Eksplorasi Konsep · ChatGPT' }]},
+      ];
+      let rolesHtml = '';
+      ROLES.forEach(g => {
+        rolesHtml += `<div style="font-size:8px;font-weight:700;color:#bbb;letter-spacing:2px;font-family:'DM Mono',monospace;margin:10px 0 6px;text-transform:uppercase;">${g.tier}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">`;
+        g.items.forEach(r => {
+          rolesHtml += `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#f8fdf9;border-radius:10px;border:1.5px solid #e2f0e8;"><img src="crew/NEXUS_FORGE_${r.img}.png" onclick="nfLightbox(this.src,'${r.name} — ${r.role}')" style="width:38px;height:38px;border-radius:8px;object-fit:cover;flex-shrink:0;cursor:zoom-in;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><div><div style="font-size:11px;font-weight:800;color:#1a2e1f;">${r.name}</div><div style="font-size:9px;color:#6b8f72;margin-top:1px;line-height:1.3;">${r.role}</div></div></div>`;
+        });
+        rolesHtml += `</div>`;
+      });
+      const m = document.createElement('div');
+      m.id = 'nexus-modal';
+      m.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);padding:16px;backdrop-filter:blur(4px)';
+      m.innerHTML = `<div style="background:#fff;border-radius:20px;padding:0;max-width:560px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.3);font-family:'Sora',sans-serif;"><div style="background:linear-gradient(135deg,#00C853,#00963a);padding:20px 22px 18px;position:relative;flex-shrink:0;"><button onclick="document.getElementById('nexus-modal').remove()" style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.2);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button><div style="display:flex;align-items:center;gap:14px;"><img src="crew/NEXUS_FORGE_OLAN.png" onclick="nfLightbox(this.src,'OLAN — Project Director')" style="width:58px;height:58px;border-radius:14px;object-fit:cover;flex-shrink:0;border:2px solid rgba(255,255,255,0.3);cursor:zoom-in;"><div><div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:2.5px;font-family:'DM Mono',monospace;">PROJECT DIRECTOR</div><div style="font-size:20px;font-weight:800;color:#fff;">OLAN</div><div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px;">Nexus Forge · Toko Prestasi · Kongbeng, Kutai Timur</div></div></div><div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:8px;"><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.9);font-family:'DM Mono',monospace;">NEXUS FORGE</div><div style="font-size:9px;color:rgba(255,255,255,0.5);font-family:'DM Mono',monospace;">Smart Contract v12.5 · 12 AI Roles · Powered by Claude</div></div></div><div style="overflow-y:auto;padding:16px 20px 20px;flex:1;"><div style="font-size:9px;font-weight:700;color:#aaa;letter-spacing:2px;font-family:'DM Mono',monospace;margin-bottom:8px;">AI TEAM · 12 ROLES</div>${rolesHtml}<div style="margin-top:16px;padding-top:12px;border-top:1.5px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between;"><div style="font-size:9px;color:#bbb;font-family:'DM Mono',monospace;">Toko Prestasi Tools v2.6 · Nexus Forge</div><a href="https://wa.me/6281299303888" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#00C853;text-decoration:none;font-family:'DM Mono',monospace;">💬 WhatsApp</a></div></div></div>`;
+      m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+      document.body.appendChild(m);
+    };
   })();
 </script>
 </body>
