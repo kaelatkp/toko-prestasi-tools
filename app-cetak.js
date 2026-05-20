@@ -47,6 +47,10 @@ const printSettings = {
   paperSize: 'A4',
 };
 
+/* ── GRID MODE STATE ── */
+let cetakMode = 'ukuran'; // 'ukuran' | 'grid'
+const gridSettings = { cols: 2, rows: 5 };
+
 /* ── STATE ── */
 const state = {
   originalImage: null,
@@ -104,6 +108,7 @@ let toastTimer;
   bindQueueActions();
   bindPrintSettings();
   bindLayoutModal();
+  bindGridControls();
 })();
 
 /* ── BUILD SIZE DROPDOWN — options sudah di HTML, tidak perlu inject ── */
@@ -144,7 +149,16 @@ function loadFile(file) {
       showCanvas();
       drawCanvas();
       editSection.style.display = '';
-      sizeSection.style.display = '';
+      const modeToggle = $('modeCetakToggle');
+      if (modeToggle) modeToggle.style.display = '';
+      if (cetakMode === 'ukuran') {
+        sizeSection.style.display = '';
+      } else {
+        // grid mode — auto-init crop box dengan rasio grid
+        const cell = getGridCellSize();
+        selectSize({ label: `Grid ${gridSettings.cols}×${gridSettings.rows}`, wMM: cell.wMM, hMM: cell.hMM });
+        updateGridInfo();
+      }
       showToast('Foto dimuat ✓', 'green');
     };
     img.onerror = () => showToast('Gagal memuat foto — format tidak didukung atau file rusak', 'red');
@@ -455,6 +469,117 @@ function bindSizeChips() {
 }
 
 
+/* ─────────────────────────────── GRID MODE ── */
+function getGridCellSize() {
+  const GAP    = printSettings.gap;
+  const margin = PAPER_MARGIN_MM;
+  const pw     = getPaperW();
+  const ph     = getPaperH();
+  const cw     = (pw - margin * 2 - (gridSettings.cols - 1) * GAP) / gridSettings.cols;
+  const ch     = (ph - margin * 2 - (gridSettings.rows - 1) * GAP) / gridSettings.rows;
+  return { wMM: Math.round(cw * 10) / 10, hMM: Math.round(ch * 10) / 10 };
+}
+
+function updateGridInfo() {
+  const cell  = getGridCellSize();
+  const total = gridSettings.cols * gridSettings.rows;
+  const el    = $('gridInfoChip');
+  if (el) el.textContent = `${total} per halaman  ·  ${cell.wMM} × ${cell.hMM}mm per sel`;
+}
+
+function packGrid(items) {
+  const { cols, rows } = gridSettings;
+  const GAP    = printSettings.gap;
+  const margin = PAPER_MARGIN_MM;
+  const cellW  = (getPaperW() - margin * 2 - (cols - 1) * GAP) / cols;
+  const cellH  = (getPaperH() - margin * 2 - (rows - 1) * GAP) / rows;
+  const perPage = cols * rows;
+
+  const pages = [];
+  let pageItems = [];
+
+  for (const item of items) {
+    const idx  = pageItems.length;
+    const col  = idx % cols;
+    const row  = Math.floor(idx / cols);
+    pageItems.push({
+      item,
+      x: margin + col * (cellW + GAP),
+      y: margin + row * (cellH + GAP),
+      w: cellW, h: cellH,
+      rotated: false,
+    });
+    if (pageItems.length >= perPage) {
+      pages.push(pageItems);
+      pageItems = [];
+    }
+  }
+  if (pageItems.length > 0) pages.push(pageItems);
+  return pages;
+}
+
+function setCetakMode(mode) {
+  cetakMode = mode;
+  const btnUkuran = $('modeBtnUkuran');
+  const btnGrid   = $('modeBtnGrid');
+  const sizeSec   = $('sizeSection');
+  const gridSec   = $('gridSection');
+
+  if (mode === 'grid') {
+    if (btnUkuran) btnUkuran.classList.remove('active');
+    if (btnGrid)   btnGrid.classList.add('active');
+    if (sizeSec)   sizeSec.style.display = 'none';
+    if (gridSec)   gridSec.style.display = '';
+    updateGridInfo();
+    // Auto-init crop box dengan rasio grid cell jika sudah ada gambar
+    if (state.originalImage) {
+      const cell = getGridCellSize();
+      selectSize({ label: `Grid ${gridSettings.cols}×${gridSettings.rows}`, wMM: cell.wMM, hMM: cell.hMM });
+    }
+  } else {
+    if (btnGrid)   btnGrid.classList.remove('active');
+    if (btnUkuran) btnUkuran.classList.add('active');
+    if (gridSec)   gridSec.style.display = 'none';
+    if (sizeSec)   sizeSec.style.display = state.originalImage ? '' : 'none';
+    // Reset crop jika ada gambar
+    if (state.originalImage) {
+      state.selectedSize = null;
+      $('sizeSelect').value = '';
+      cropBox.style.display = 'none';
+      cropOverlay.classList.remove('active');
+      btnAddQueue.disabled = true;
+    }
+  }
+  scheduleLayoutPreview();
+}
+
+function bindGridControls() {
+  const colsInput = $('gridCols');
+  const rowsInput = $('gridRows');
+  if (!colsInput || !rowsInput) return;
+
+  function onGridChange() {
+    const c = Math.max(1, Math.min(50, parseInt(colsInput.value) || 1));
+    const r = Math.max(1, Math.min(50, parseInt(rowsInput.value) || 1));
+    colsInput.value = c;
+    rowsInput.value = r;
+    gridSettings.cols = c;
+    gridSettings.rows = r;
+    updateGridInfo();
+    // Update crop box rasio jika ada gambar
+    if (state.originalImage && cetakMode === 'grid') {
+      const cell = getGridCellSize();
+      selectSize({ label: `Grid ${c}×${r}`, wMM: cell.wMM, hMM: cell.hMM });
+    }
+    scheduleLayoutPreview();
+  }
+
+  colsInput.addEventListener('input', onGridChange);
+  rowsInput.addEventListener('input', onGridChange);
+  colsInput.addEventListener('change', onGridChange);
+  rowsInput.addEventListener('change', onGridChange);
+}
+
 function selectSize(size) {
   if (!state.originalImage) { showToast('Import foto dulu', 'red'); return; }
   state.selectedSize = size;
@@ -706,6 +831,17 @@ function bindQueueActions() {
 }
 
 function addToQueue() {
+  if (cetakMode === 'grid') {
+    if (!state.cropBox) return;
+    const cell  = getGridCellSize();
+    const dataURL = extractCrop();
+    const label = `Grid ${gridSettings.cols}×${gridSettings.rows}`;
+    const item  = { id: state.nextId++, dataURL, label, wMM: cell.wMM, hMM: cell.hMM, qty: 1, flipped: false, isGrid: true };
+    state.queue.push(item);
+    renderQueue();
+    showToast(`${label} — ${cell.wMM}×${cell.hMM}mm per sel ✓`, 'green');
+    return;
+  }
   if (!state.selectedSize || !state.cropBox) return;
   const dataURL = extractCrop();
   const { label, wMM, hMM } = getEffectiveSize();
@@ -913,7 +1049,7 @@ async function packAndPrint() {
   if (state.queue.length === 0) return;
 
   const items = expandQueue();
-  const pages = packItems(items);
+  const pages = cetakMode === 'grid' ? packGrid(items) : packItems(items);
 
   if (pages.length === 0) { showToast('Tidak ada item yang bisa dicetak', 'red'); return; }
 
@@ -1036,7 +1172,7 @@ async function renderLayoutPreview() {
 
   const lctx = canvas.getContext('2d');
   const items = expandQueue();
-  const pages = packItems(items);
+  const pages = cetakMode === 'grid' ? packGrid(items) : packItems(items);
 
   // Kosong
   if (pages.length === 0) {
@@ -1409,6 +1545,13 @@ function bindPrintSettings() {
     const ps = PAPER_SIZES[this.value];
     const lbl = document.getElementById('lpPaperLabel');
     if (lbl && ps) lbl.textContent = `${this.value} · ${ps.w}×${ps.h}mm`;
+    if (cetakMode === 'grid') {
+      updateGridInfo();
+      if (state.originalImage) {
+        const cell = getGridCellSize();
+        selectSize({ label: `Grid ${gridSettings.cols}×${gridSettings.rows}`, wMM: cell.wMM, hMM: cell.hMM });
+      }
+    }
     scheduleLayoutPreview();
   });
 
