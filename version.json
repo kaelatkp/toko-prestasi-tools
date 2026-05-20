@@ -2,8 +2,8 @@
   "version": "2.7",
   "files": {
     "changelog.json": "4c09ba68de81a8dc400f46f99e001553bc788fa02f6e70b1a7e345ead24e5fd3",
-    "index.html": "9376841330a75c95d810d9ca93b21afc670ab992967cf51a349f2cc9f42e10a4",
-    "tokens.css": "aede9f61d1ef6edb01a8d9f0db928a52ee57162d76bb5bb1171212d724f9660d",
+    "index.html": "3acfc2d0c5f54286db3ea66f991f9a7e0393b3cffb859d4716c3c9a794ccca5c",
+    "tokens.css": "978623852d594bfde7c9da730893024bebe72d5866a8857cc60bdf525b9ace0b",
     "config.js": "8709f3637aea0ebf52434acea01f1c3b9005b8e6b2588b342c327e7b9ab8ba6e",
     "app-core.js": "b631d8fa499488f56f15cb8b73c19ecdb9fea2b42738dbf2586b559455f18a65",
     "app-foto.js": "e51ba6bac2b9bb91ec6cb52559ae805e5865bfe75bb95c167c965f1d4611e80c",

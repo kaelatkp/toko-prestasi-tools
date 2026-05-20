@@ -1504,6 +1504,7 @@ body {
 /* ════ BERANDA — LIGHT / BIBIT STYLE ════ */
 #beranda {
   position: fixed; inset: 0; z-index: 9000;
+  padding-top: 30px; /* tinggi custom titlebar */
   background: #f0f9f3;
   display: flex; flex-direction: column;
   overflow: hidden;
