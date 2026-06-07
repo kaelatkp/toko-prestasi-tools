@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --green: #00C853;
   --green-dark: #009c3e;
   --green-dim: #007a30;
@@ -13,7 +13,12 @@
   --bg: #f2faf5;
   --bg-2: #e8f5ed;
   --white: #ffffff;
-  --red: #e53935;
+  --red: #c81414;
+  --red-light: #fae8e8;
+  --red-border: #efb9b9;
+  --blue: #1414c8;
+  --blue-light: #e8e8fa;
+  --blue-border: #b9b9ef;
   --shadow: 0 2px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05);
   --shadow-green: 0 4px 20px rgba(0,200,83,0.22);
@@ -161,11 +166,11 @@ body {
   padding: 2px 5px; border-radius: 4px;
 }
 .mod-badge.new { background: var(--green-light); color: var(--green-dark); border: 1px solid var(--green-mid); }
-.mod-badge.hot { background: #fff0f0; color: #c62828; border: 1px solid #ffcdd2; }
+.mod-badge.hot { background: #fae8e8; color: #c81414; border: 1px solid #efb9b9; }
 
 .sidebar-hot-label {
   font-size: 9px; font-weight: 700; letter-spacing: 1px;
-  text-transform: uppercase; color: #c62828;
+  text-transform: uppercase; color: #c81414;
   font-family: 'DM Mono', monospace;
   padding: 8px 12px 4px;
 }
@@ -291,21 +296,21 @@ body {
   font-family: 'DM Mono', monospace; letter-spacing: 0.5px;
   padding: 2px 7px; border-radius: 4px; width: fit-content;
 }
-.wlc-card-tag.doc        { background: #e8f0fe; color: #1a56db; }
+.wlc-card-tag.doc        { background: #e8e8fa; color: #1414c8; }
 .wlc-card-tag.kualitas   { background: var(--green-light); color: var(--green-dark); }
 .wlc-card-tag.kreatif    { background: #fdf4ff; color: #9333ea; }
 .wlc-card-tag.penampilan { background: #fff7ed; color: #c2410c; }
 .wlc-card-tag.digital    { background: #f0fdf4; color: #15803d; }
-.wlc-card-tag.hot        { background: #fff0f0; color: #c62828; }
+.wlc-card-tag.hot        { background: #fae8e8; color: #c81414; }
 
-.wlc-group-hot { color: #c62828 !important; }
+.wlc-group-hot { color: #c81414 !important; }
 
 .wlc-grid-featured { margin-bottom: 4px; }
 .wlc-card-hot {
-  border: 1.5px solid #ffcdd2;
-  background: linear-gradient(135deg, #fff5f5 0%, #fff0f0 100%);
+  border: 1.5px solid #efb9b9;
+  background: linear-gradient(135deg, #fae8e8 0%, #fae8e8 100%);
 }
-.wlc-card-hot:hover { background: #ffebee; border-color: #ef9a9a; }
+.wlc-card-hot:hover { background: #f7dcdc; border-color: #e08080; }
 
 .wlc-grid-group-label {
   font-size: 10px; font-weight: 700; letter-spacing: 1px;
@@ -515,13 +520,13 @@ body {
 /* tombol cari Google yang muncul di result-actions setelah generate seragam */
 .btn-result-search {
   display: inline-flex; align-items: center; gap: 5px;
-  background: #e8f0fe; color: #1a56db;
-  border: 1.5px solid #c7d9fb; border-radius: 8px;
+  background: #e8e8fa; color: #1414c8;
+  border: 1.5px solid #dcdcf7; border-radius: 8px;
   padding: 6px 14px; font-size: 12px; font-weight: 600;
   cursor: pointer; font-family: 'Sora', sans-serif;
   transition: all .15s; white-space: nowrap;
 }
-.btn-result-search:hover { background: #d0e2fd; border-color: #3b6fd4; }
+.btn-result-search:hover { background: #d0d0f7; border-color: #1414c8; }
 
 /* ── COLOR CHIPS ── */
 .color-row { display: flex; gap: 7px; flex-wrap: wrap; }
@@ -759,7 +764,7 @@ body {
 /* ── PLATFORM RECOMMENDED BUTTONS ── */
 .btn-gemini-rec { /* static — no breathing */ }
 .btn-chatgpt-fire {
-  background: linear-gradient(135deg, #ff6b00 0%, #e53935 60%, #ff1744 100%) !important;
+  background: linear-gradient(135deg, #ff6b00 0%, #c81414 60%, #ff1744 100%) !important;
   background-size: 200% 200% !important;
   color: white !important;
   animation: chatgpt-fire 1.8s ease-in-out infinite !important;
@@ -823,11 +828,11 @@ body {
   background: var(--green);
   transition: background .25s ease;
 }
-.ws-header--dokumen::before    { background: #1a56db; }
+.ws-header--dokumen::before    { background: #1414c8; }
 .ws-header--penampilan::before { background: #c2410c; }
 .ws-header--kualitas::before   { background: var(--green); }
 .ws-header--digital::before    { background: #15803d; }
-.ws-header--seleksi::before    { background: #0369a1; }
+.ws-header--seleksi::before    { background: #1414c8; }
 .ws-header--orang::before      { background: #7c3aed; }
 .ws-header--produk::before     { background: #b45309; }
 
@@ -1013,23 +1018,23 @@ body {
 
 /* ════ TIPS FOTO ════ */
 .foto-tips-box {
-  border: 1.5px solid #bfdbfe;
+  border: 1.5px solid #b9b9ef;
   border-radius: 10px;
-  background: #eff6ff;
+  background: #e8e8fa;
   margin-bottom: 10px;
 }
 .foto-tips-header {
   width: 100%; display: flex; align-items: center; justify-content: space-between;
   padding: 8px 12px; border-radius: 10px;
   background: transparent; border: none; cursor: pointer;
-  font-size: 11px; font-weight: 700; color: #1d4ed8;
+  font-size: 11px; font-weight: 700; color: #1414c8;
   font-family: 'Sora', sans-serif; letter-spacing: .03em;
   text-align: left;
 }
-.foto-tips-header:hover { background: #dbeafe; border-radius: 10px; }
-.foto-tips-chevron { font-size: 11px; color: #3b82f6; line-height: 1; }
+.foto-tips-header:hover { background: #dcdcf7; border-radius: 10px; }
+.foto-tips-chevron { font-size: 11px; color: #1414c8; line-height: 1; }
 .foto-tips-list li {
-  font-size: 11px; color: #1e3a5f; line-height: 1.65;
+  font-size: 11px; color: #1414c8; line-height: 1.65;
   font-family: 'Sora', sans-serif;
   padding: 1px 0;
 }
@@ -1427,7 +1432,7 @@ body {
 .bc-field-qty input[type=number] { -moz-appearance: textfield; }
 .kode-ok   { border-color: #4caf50 !important; background: #f0fdf4 !important; }
 .kode-warn { border-color: #f59e0b !important; background: #fffbeb !important; }
-.kode-err  { border-color: var(--red) !important; background: #fff5f5 !important; }
+.kode-err  { border-color: var(--red) !important; background: #fae8e8 !important; }
 .kode-hint { font-size: 9.5px; margin-top: 1px; }
 .kode-hint.ok   { color: var(--green-dark); }
 .kode-hint.warn { color: #d97706; }
@@ -1659,7 +1664,7 @@ body {
   align-items: center; justify-content: center;
   transition: all 0.15s;
 }
-.cl-modal-close:hover { background: #ffe4e4; color: #e53935; }
+.cl-modal-close:hover { background: #fae8e8; color: #c81414; }
 .cl-modal-body {
   overflow-y: auto; padding: 16px 20px; flex: 1;
 }
