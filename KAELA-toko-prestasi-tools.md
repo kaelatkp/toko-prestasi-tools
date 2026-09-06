@@ -15,7 +15,7 @@ Aplikasi desktop Windows untuk Toko Prestasi — generator prompt foto AI, dokum
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  GitHub Repo (kaelatkp/toko-prestasi-tools)         │
+│  GitHub Repo (MrOlzGaming/toko-prestasi-tools)         │
 │  → app files + version.json (manifest hash)         │
 └────────────────────┬────────────────────────────────┘
                      │ git push (Olan)
@@ -90,13 +90,13 @@ D:\KAELA PROJECT\ELECTRON-BUILD\
 
 ## GITHUB
 
-- **Repo:** https://github.com/kaelatkp/toko-prestasi-tools
+- **Repo:** https://github.com/MrOlzGaming/toko-prestasi-tools
 - **Branch:** main
-- **Raw URL:** `https://raw.githubusercontent.com/kaelatkp/toko-prestasi-tools/main`
-- **Releases:** https://github.com/kaelatkp/toko-prestasi-tools/releases/tag/v2.1.0
+- **Raw URL:** `https://raw.githubusercontent.com/MrOlzGaming/toko-prestasi-tools/main`
+- **Releases:** https://github.com/MrOlzGaming/toko-prestasi-tools/releases/tag/v2.1.0
 - **Download link client:**
   ```
-  https://github.com/kaelatkp/toko-prestasi-tools/releases/download/v2.1.0/Toko.Prestasi.Tools-v2.1.0-portable.exe
+  https://github.com/MrOlzGaming/toko-prestasi-tools/releases/download/v2.1.0/Toko.Prestasi.Tools-v2.1.0-portable.exe
   ```
 
 ---
@@ -420,7 +420,7 @@ Setelah edit source file, perlu:
 | Platform | Windows 11 x64 |
 | Electron | v31.7.7 |
 | electron-builder | v24.13.3 |
-| GitHub Account | kaelatkp |
+| GitHub Account | MrOlzGaming (dipindah dari kaelatkp, 6 Sep 2026 -- lihat memori reference-kaela-canonical-account) |
 | AppData path | `C:\Users\[user]\AppData\Roaming\TokoPrestasiTools\` |
 | Electron Build | `D:\KAELA PROJECT\ELECTRON-BUILD\` |
 | App Source | `D:\KAELA PROJECT\#APLIKASIKU\TOKO PRESTASI TOOLS\` |

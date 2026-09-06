@@ -8,7 +8,7 @@ let currentMode    = 'foto';   // 'foto' | 'dokumen' | 'barcode'
 let generatedPrompt = '';
 
 /* ── CHANGELOG ── */
-const GITHUB_RAW = 'https://raw.githubusercontent.com/kaelatkp/toko-prestasi-tools/main';
+const GITHUB_RAW = 'https://raw.githubusercontent.com/MrOlzGaming/toko-prestasi-tools/main';
 
 /* ── CHANGELOG ── */
 const CL_SEEN_KEY = 'tp_cl_seen_v2.7';
